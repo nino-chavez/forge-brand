@@ -5,6 +5,7 @@
  * Design agency toolkit. One brand kit drives every output.
  */
 
+import 'dotenv/config';
 import { program } from 'commander';
 import { registerExportCommand } from './commands/export.js';
 import { registerReviewCommand } from './commands/review.js';
