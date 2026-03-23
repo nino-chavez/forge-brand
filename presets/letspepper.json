@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "schemaVersion": 1,
+    "id": "lets-pepper",
+    "created": "2024-03-01T00:00:00.000Z",
+    "updated": "2026-03-23T00:00:00.000Z",
+    "author": "Nino Chavez",
+    "version": "1.0.0"
+  },
+  "identity": {
+    "name": "Let's Pepper",
+    "tagline": "Grass Triples Volleyball",
+    "mission": "Competitive grassroots grass volleyball tournament series with a pepper-themed brand identity",
+    "audience": ["adult volleyball players", "competitive recreational athletes", "grass volleyball enthusiasts"],
+    "personality": ["playful", "competitive", "community-driven", "spicy", "grassroots"],
+    "positioning": "Chicago's grass triples volleyball series — heat levels for every player",
+    "domain": "sports tournaments",
+    "links": {
+      "website": "https://letspepper.com",
+      "instagram": "https://instagram.com/letspepper",
+      "tournaments": "https://rallyhq.app"
+    }
+  },
+  "colors": {
+    "primary": {
+      "hex": "#f5b91a",
+      "name": "Pepper Yellow",
+      "usage": "Primary accent, CTA buttons, mascot highlight color"
+    },
+    "secondary": {
+      "hex": "#5a9a4e",
+      "name": "Pepper Green",
+      "usage": "Secondary accent, grass/nature association, stem color"
+    },
+    "accent": {
+      "hex": "#d94c35",
+      "name": "Hot Red",
+      "usage": "Spicy elements, heat indicators, intensity markers"
+    },
+    "neutral": {
+      "50": "#fafafa",
+      "100": "#f5f5f5",
+      "200": "#e5e5e5",
+      "300": "#d4d4d4",
+      "400": "#a3a3a3",
+      "500": "#737373",
+      "600": "#525252",
+      "700": "#404040",
+      "800": "#262626",
+      "900": "#171717",
+      "950": "#0a0a0a"
+    },
+    "semantic": {
+      "success": { "hex": "#4a7c3f", "name": "Pepper Green", "usage": "Available, open registration" },
+      "warning": { "hex": "#f97316", "name": "Heat Orange", "usage": "Filling up, limited spots" },
+      "error": { "hex": "#ef4444", "name": "Sold Out Red", "usage": "Full, closed registration" },
+      "info": { "hex": "#3b82f6", "name": "Info Blue", "usage": "Tournament info, schedules" }
+    },
+    "surfaces": {
+      "background": "#0a0a0a",
+      "foreground": "#fafafa",
+      "card": "#171717",
+      "cardForeground": "#fafafa",
+      "muted": "#262626",
+      "mutedForeground": "#a3a3a3",
+      "border": "#404040"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Bebas Neue",
+      "fallbacks": ["Impact", "sans-serif"],
+      "classification": "display",
+      "weights": [400],
+      "variable": false,
+      "googleFonts": "Bebas+Neue",
+      "cssVariable": "--font-display",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.02
+    },
+    "body": {
+      "family": "Inter",
+      "fallbacks": ["system-ui", "sans-serif"],
+      "classification": "sans-serif",
+      "weights": [400, 500, 600, 700],
+      "variable": true,
+      "googleFonts": "Inter:wght@400;500;600;700",
+      "cssVariable": "--font-body",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "mono": {
+      "family": "Space Mono",
+      "fallbacks": ["Menlo", "monospace"],
+      "classification": "monospace",
+      "weights": [400, 700],
+      "variable": false,
+      "googleFonts": "Space+Mono:wght@400;700",
+      "cssVariable": "--font-mono",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.05
+    },
+    "scale": {
+      "baseSizePx": 16,
+      "ratio": "perfect-fourth",
+      "steps": [
+        { "name": "hero", "sizeRem": 6, "sizeMobileRem": 3.5, "lineHeight": 0.9, "weight": 400, "font": "display" },
+        { "name": "h2", "sizeRem": 3.5, "sizeMobileRem": 2.25, "lineHeight": 1.0, "weight": 400, "font": "display" },
+        { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.2, "weight": 600, "font": "body" },
+        { "name": "body-lg", "sizeRem": 1.125, "sizeMobileRem": 1, "lineHeight": 1.6, "weight": 400, "font": "body" },
+        { "name": "body", "sizeRem": 1, "sizeMobileRem": 0.875, "lineHeight": 1.5, "weight": 400, "font": "body" },
+        { "name": "label", "sizeRem": 0.75, "sizeMobileRem": 0.75, "lineHeight": 1.4, "weight": 700, "font": "mono" }
+      ]
+    }
+  },
+  "spacing": {
+    "1": 0.25,
+    "2": 0.5,
+    "3": 0.75,
+    "4": 1,
+    "6": 1.5,
+    "8": 2,
+    "12": 3,
+    "16": 4,
+    "24": 6
+  },
+  "radius": {
+    "none": 0,
+    "sm": 0.25,
+    "md": 0.5,
+    "lg": 0.75,
+    "xl": 1,
+    "2xl": 1.5,
+    "full": 9999
+  },
+  "layout": {
+    "maxContentWidth": 80,
+    "breakpoints": {
+      "sm": 640,
+      "md": 768,
+      "lg": 1024,
+      "xl": 1280,
+      "2xl": 1536
+    },
+    "sectionPadding": "24",
+    "containerPadding": "6"
+  },
+  "voice": {
+    "attributes": [
+      { "trait": "playful", "description": "Fun-first but competitive — never corny", "example": "Bring your friends. Leave your egos. Play some grass volleyball." },
+      { "trait": "heat-themed", "description": "Uses pepper/spice metaphors consistently", "example": "This tournament is a Jalapeño — not too hot, not too mild." },
+      { "trait": "community-driven", "description": "Celebrates the players, not the organizers", "example": "12 teams showed up. Nobody went home disappointed." },
+      { "trait": "direct", "description": "Short, punchy, no corporate filler", "example": "3v3. Grass. $150/team. Let's go." }
+    ],
+    "antiPatterns": [
+      {
+        "category": "corporate-sports",
+        "patterns": ["exciting opportunity", "amazing community", "we're thrilled to announce", "register today for an unforgettable experience"],
+        "severity": "error",
+        "suggestion": "Talk like a player, not a marketing department."
+      },
+      {
+        "category": "over-explaining",
+        "patterns": ["grass triples is a format where", "for those who don't know", "in case you're wondering"],
+        "severity": "warning",
+        "suggestion": "The audience knows volleyball. Don't explain the basics."
+      }
+    ],
+    "structuralPatterns": [
+      { "name": "heat-level-framing", "description": "Frame tournament difficulty using pepper heat levels", "required": false, "example": "Bell Pepper (chill) → Jalapeño (competitive) → Ghost Pepper (elite)" }
+    ],
+    "examples": [
+      {
+        "intent": "Announce a tournament",
+        "good": "New drop: Jalapeño Series, April 12th. 3v3 grass. Waveland Park. $150/team. Limited to 16 teams.",
+        "bad": "We're excited to announce our next amazing grass volleyball tournament! Join us for an incredible day of competition and community!"
+      },
+      {
+        "intent": "Describe a heat level",
+        "good": "Ghost Pepper is invite-only. If you have to ask, you're not ready yet.",
+        "bad": "Our Ghost Pepper tier is designed for advanced competitive players seeking a challenging tournament environment."
+      }
+    ],
+    "minimumScore": 70
+  },
+  "media": {
+    "logos": {
+      "clearSpace": 0.25,
+      "minSizePx": 32,
+      "variations": []
+    },
+    "templates": [
+      {
+        "id": "social-card",
+        "name": "Tournament Social Card",
+        "description": "OG image for tournament announcements",
+        "sizes": [{ "width": 1200, "height": 675, "dpi": 72, "label": "OG Image" }],
+        "format": "png",
+        "dataFields": [
+          { "name": "title", "type": "string", "required": true },
+          { "name": "subtitle", "type": "string", "required": false }
+        ]
+      },
+      {
+        "id": "story",
+        "name": "Tournament Story",
+        "description": "Instagram story for tournament drops",
+        "sizes": [{ "width": 1080, "height": 1920, "dpi": 72, "label": "IG Story" }],
+        "format": "png",
+        "dataFields": [
+          { "name": "title", "type": "string", "required": true },
+          { "name": "date", "type": "string", "required": false },
+          { "name": "location", "type": "string", "required": false }
+        ]
+      }
+    ],
+    "creative": {
+      "basePrompt": "BRAND: Let's Pepper — grass triples volleyball tournament series, Chicago IL.\nAESTHETIC: Playful mascot-driven brand with anthropomorphic pepper characters.\n\nKEY VISUAL LANGUAGE:\n- Anthropomorphic pepper mascots with expressive cartoon faces\n- Volleyball as a central prop (green and cream striped)\n- Heat levels as tournament tiers (Bell Pepper → Ghost Pepper)\n- Dark backgrounds with heat-colored accent lighting\n- Clean vector mascot illustration style\n- Athletic energy, celebration poses, sports action\n\nMASCOT SYSTEM:\n- Bell Pepper (yellow, round, friendly) — entry level\n- Jalapeño (green, elongated, competitive) — mid tier\n- Poblano (dark green, gritty) — defensive focus\n- Ghost Pepper (red-orange, gnarly, intense) — elite\n- Carolina Reaper (deep red, scorpion tail) — max intensity\n\nCRITICAL:\n- Mascots MUST have expressive cartoon faces (eyes, eyebrows, mouth)\n- NO text, words, or typography in AI-generated images\n- Bold black outlines, solid color fills, professional mascot quality\n- NOT sketch/doodle style — clean polished vector illustration",
+      "conceptMap": {
+        "bell": "round bulbous bell pepper, yellow (#F5B91A), friendly welcoming",
+        "jalapeno": "elongated tapered jalapeño, bright green (#4CAF50), competitive",
+        "poblano": "wide dark green (#1B5E20) poblano, gritty determined",
+        "ghost": "wrinkled gnarly ghost pepper, red-orange (#E64A19), intense elite",
+        "reaper": "gnarly carolina reaper, deep red (#C62828), scorpion tail, max intensity",
+        "spike": "jumping volleyball spike, arm raised, excited face",
+        "celebrate": "victory pose, fists raised, huge smile",
+        "volleyball": "green and cream striped volleyball, grass volleyball brand",
+        "dark": "dark background (#0a0a0a) with heat-colored glow and ember effects"
+      },
+      "formatModifiers": {
+        "web": "High detail, transparent PNG, crisp at 400px+",
+        "sticker": "Die-cut friendly silhouette, extra bold outlines",
+        "instagram-story": "Vertical 1080x1920, dark background, heat-colored accents",
+        "instagram-post": "Square 1080x1080, dark background, centered mascot"
+      },
+      "visualKeywords": ["mascot", "pepper", "volleyball", "cartoon", "athletic", "heat-levels", "grass"],
+      "avoid": ["text in AI-generated images", "faceless peppers", "sketch/doodle style", "bodybuilder muscles", "realistic rendering", "angry expressions"]
+    },
+    "assets": []
+  },
+  "defaultMode": "dark"
+}

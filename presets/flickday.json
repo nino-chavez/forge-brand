@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "schemaVersion": 1,
+    "id": "flickday-media",
+    "created": "2025-01-15T00:00:00.000Z",
+    "updated": "2026-03-23T00:00:00.000Z",
+    "author": "Nino Chavez",
+    "version": "1.0.0"
+  },
+  "identity": {
+    "name": "Flickday Media",
+    "tagline": "Every Day's a Flickday",
+    "mission": "Grassroots sports media — raw, fast, and player-first",
+    "audience": ["volleyball players", "tournament organizers", "sports parents", "grassroots sports community"],
+    "personality": ["authentic", "energetic", "bold", "player-focused", "grassroots"],
+    "positioning": "Chicago-based action sports media for the grassroots volleyball community",
+    "domain": "sports media",
+    "links": {
+      "email": "flickday@ninochavez.co",
+      "instagram": "https://instagram.com/flickday.media",
+      "photography": "https://ninochavez.co/photography",
+      "tournaments": "https://letspepper.com"
+    }
+  },
+  "colors": {
+    "primary": {
+      "hex": "#facc15",
+      "name": "Flickday Yellow",
+      "usage": "Primary accent, CTAs, highlights, hover borders"
+    },
+    "secondary": {
+      "hex": "#fde047",
+      "name": "Yellow Hover",
+      "usage": "Hover states, lighter yellow highlights"
+    },
+    "accent": {
+      "hex": "#f97316",
+      "name": "Event Orange",
+      "usage": "Event highlights, video badges"
+    },
+    "neutral": {
+      "50": "#fafafa",
+      "100": "#f5f5f5",
+      "200": "#e5e5e5",
+      "300": "#d1d5db",
+      "400": "#a3a3a3",
+      "500": "#6b7280",
+      "600": "#525252",
+      "700": "#374151",
+      "800": "#262626",
+      "900": "#111827",
+      "950": "#0a0a0f"
+    },
+    "semantic": {
+      "success": { "hex": "#22c55e", "name": "Live Green", "usage": "Now Booking indicators, live status" },
+      "warning": { "hex": "#f97316", "name": "Event Orange", "usage": "Event highlights, alerts" },
+      "error": { "hex": "#ef4444", "name": "Error Red", "usage": "Error states" },
+      "info": { "hex": "#3b82f6", "name": "Info Blue", "usage": "Informational states" }
+    },
+    "surfaces": {
+      "background": "#000000",
+      "foreground": "#ffffff",
+      "card": "#0a0a0f",
+      "cardForeground": "#ffffff",
+      "muted": "#111827",
+      "mutedForeground": "#d1d5db",
+      "border": "#374151"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Bebas Neue",
+      "fallbacks": ["Impact", "sans-serif"],
+      "classification": "display",
+      "weights": [400],
+      "variable": false,
+      "googleFonts": "Bebas+Neue",
+      "cssVariable": "--font-display",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.02
+    },
+    "body": {
+      "family": "Inter",
+      "fallbacks": ["system-ui", "sans-serif"],
+      "classification": "sans-serif",
+      "weights": [400, 500, 600, 700],
+      "variable": true,
+      "googleFonts": "Inter:wght@400;500;600;700",
+      "cssVariable": "--font-body",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "fallbacks": ["Menlo", "monospace"],
+      "classification": "monospace",
+      "weights": [400, 500, 700],
+      "variable": true,
+      "googleFonts": "JetBrains+Mono:wght@400;500;700",
+      "cssVariable": "--font-mono",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.1
+    },
+    "scale": {
+      "baseSizePx": 16,
+      "ratio": "perfect-fourth",
+      "steps": [
+        { "name": "hero", "sizeRem": 8, "sizeMobileRem": 4, "lineHeight": 0.85, "weight": 400, "font": "display" },
+        { "name": "h2", "sizeRem": 4, "sizeMobileRem": 2.5, "lineHeight": 1.1, "weight": 400, "font": "display" },
+        { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.2, "weight": 600, "font": "body" },
+        { "name": "body-lg", "sizeRem": 1.125, "sizeMobileRem": 1, "lineHeight": 1.6, "weight": 400, "font": "body" },
+        { "name": "body", "sizeRem": 1, "sizeMobileRem": 0.875, "lineHeight": 1.5, "weight": 400, "font": "body" },
+        { "name": "label", "sizeRem": 0.75, "sizeMobileRem": 0.625, "lineHeight": 1.4, "weight": 500, "font": "mono" }
+      ]
+    }
+  },
+  "spacing": {
+    "1": 0.25,
+    "2": 0.5,
+    "3": 0.75,
+    "4": 1,
+    "6": 1.5,
+    "8": 2,
+    "12": 3,
+    "16": 4,
+    "24": 6
+  },
+  "radius": {
+    "none": 0,
+    "sm": 0.125,
+    "md": 0.375,
+    "lg": 0.5,
+    "xl": 0.75,
+    "2xl": 1,
+    "full": 9999
+  },
+  "layout": {
+    "maxContentWidth": 80,
+    "breakpoints": {
+      "sm": 640,
+      "md": 768,
+      "lg": 1024,
+      "xl": 1280,
+      "2xl": 1536
+    },
+    "sectionPadding": "24",
+    "containerPadding": "6"
+  },
+  "voice": {
+    "attributes": [
+      { "trait": "authentic", "description": "Real grassroots energy, not polished corporate", "example": "We're courtside, not in the boardroom." },
+      { "trait": "energetic", "description": "High-energy, action-forward language", "example": "Every rally, every dive, every point — we're there." },
+      { "trait": "player-focused", "description": "Always centers the athlete, not the brand", "example": "Your game. Your moment. We just capture it." },
+      { "trait": "direct", "description": "Short sentences, no filler, no jargon", "example": "Book us. Show up. Get your shots." }
+    ],
+    "antiPatterns": [
+      {
+        "category": "corporate-jargon",
+        "patterns": ["leverage", "synergy", "holistic", "paradigm", "ecosystem", "circle back", "deep dive", "unpack"],
+        "severity": "error",
+        "suggestion": "Use plain language. Say what you mean."
+      },
+      {
+        "category": "passive-voice",
+        "patterns": ["was captured", "has been provided", "will be delivered"],
+        "severity": "warning",
+        "suggestion": "Use active voice. The photographer shoots. The player spikes."
+      },
+      {
+        "category": "generic-hype",
+        "patterns": ["world-class", "best-in-class", "cutting-edge", "next-level", "game-changing"],
+        "severity": "warning",
+        "suggestion": "Show, don't tell. Describe the specific thing instead of using superlatives."
+      }
+    ],
+    "structuralPatterns": [
+      { "name": "short-punchy", "description": "Keep sentences under 15 words where possible", "required": false },
+      { "name": "action-verbs", "description": "Lead with verbs: Shoot. Capture. Deliver.", "required": false }
+    ],
+    "examples": [
+      {
+        "intent": "Describe the service",
+        "good": "We shoot grassroots volleyball. Tournaments, open gyms, beach sessions. Raw action, fast turnaround.",
+        "bad": "Flickday Media provides comprehensive sports media solutions leveraging our extensive experience in the volleyball ecosystem."
+      },
+      {
+        "intent": "Call to action",
+        "good": "Book us for your next tournament.",
+        "bad": "Don't hesitate to reach out to discuss how we can elevate your event's media presence."
+      }
+    ],
+    "minimumScore": 70
+  },
+  "media": {
+    "logos": {
+      "primary": { "id": "lockup-full", "label": "Full lockup", "path": "assets/lockup-flickday-media-v2b.png", "tags": ["lockup", "full"] },
+      "icon": { "id": "icon-aperture", "label": "Ball aperture icon", "path": "assets/logo-ball-aperture-motion.png", "tags": ["icon", "mark"] },
+      "wordmark": { "id": "lockup-header", "label": "Header lockup", "path": "assets/lockup-header.png", "tags": ["wordmark", "header"] },
+      "variations": [
+        { "id": "lockup-slogan", "label": "Slogan lockup", "path": "assets/lockup-slogan-pro.png", "tags": ["lockup", "slogan"] },
+        { "id": "icon-favicon", "label": "Favicon", "path": "assets/icon-favicon.png", "width": 32, "height": 32, "tags": ["favicon"] },
+        { "id": "icon-social", "label": "Social circle", "path": "assets/icon-social-circle.png", "tags": ["social", "circle"] }
+      ],
+      "clearSpace": 0.25,
+      "minSizePx": 24
+    },
+    "templates": [
+      {
+        "id": "social-card",
+        "name": "Social Media Card",
+        "description": "OG image / social share card",
+        "sizes": [{ "width": 1200, "height": 675, "dpi": 72, "label": "OG Image" }],
+        "format": "png",
+        "dataFields": [
+          { "name": "title", "type": "string", "required": true },
+          { "name": "subtitle", "type": "string", "required": false },
+          { "name": "backgroundImage", "type": "image-url", "required": false }
+        ]
+      },
+      {
+        "id": "story",
+        "name": "Instagram Story",
+        "description": "Vertical story format",
+        "sizes": [{ "width": 1080, "height": 1920, "dpi": 72, "label": "IG Story" }],
+        "format": "png",
+        "dataFields": [
+          { "name": "title", "type": "string", "required": true },
+          { "name": "date", "type": "string", "required": false },
+          { "name": "location", "type": "string", "required": false }
+        ]
+      },
+      {
+        "id": "flyer",
+        "name": "Event Flyer",
+        "description": "Tournament/event flyer for print or digital",
+        "sizes": [
+          { "width": 2550, "height": 3300, "dpi": 300, "label": "Letter Portrait" },
+          { "width": 1080, "height": 1080, "dpi": 72, "label": "Square Digital" }
+        ],
+        "format": "png",
+        "dataFields": [
+          { "name": "eventName", "type": "string", "required": true },
+          { "name": "date", "type": "string", "required": true },
+          { "name": "location", "type": "string", "required": true },
+          { "name": "price", "type": "string", "required": false },
+          { "name": "backgroundImage", "type": "image-url", "required": false }
+        ]
+      }
+    ],
+    "creative": {
+      "basePrompt": "BRAND: Flickday Media — grassroots sports media company specializing in volleyball and action sports content. Chicago-based.\nAESTHETIC: Sports press credential meets high-energy action photography. Think press badges, media passes, contact sheets, shutter speed displays, and field-side energy.\n\nKEY VISUAL LANGUAGE:\n- Camera aperture blades (6-blade iris) — the core brand motif\n- Volleyball panel lines merged with aperture geometry\n- Motion trails, speed lines, kinetic energy\n- Press credential badges, lanyards, media passes\n- Film strip frames, contact sheet grids\n- Shutter speed / ISO / f-stop readouts as decorative type\n- High contrast: yellow on black, or black on yellow\n- Clean geometric shapes, no ornamental flourishes",
+      "conceptMap": {
+        "aperture": "camera aperture iris blades, 6-blade pattern, the core brand icon",
+        "shutter": "shutter mechanism, curtain reveal, decisive moment",
+        "volleyball": "volleyball with visible panel lines, slightly stylized, clean",
+        "motion": "speed lines, motion blur trails, kinetic energy, movement",
+        "credential": "press badge, media pass, VIP credential, accreditation",
+        "viewfinder": "camera viewfinder overlay, focus brackets, exposure readout",
+        "grain": "film grain texture, high-ISO noise, analog warmth",
+        "photos": "photography badge, yellow accent, static captures",
+        "video": "video badge, orange accent, motion content",
+        "reels": "reels badge, pink accent, short-form edits"
+      },
+      "formatModifiers": {
+        "dtf-front": "Vertical composition for center chest print. 2400x3000px (8x10 at 300dpi). Yellow and white on transparent.",
+        "dtf-back": "Tall vertical composition for full back print. 3000x3600px (10x12 at 300dpi). More detail permitted.",
+        "dtf-pocket": "Small square for left chest. 1200x1200px (4x4 at 300dpi). Simplified, icon-like.",
+        "web": "Standard web resolution. 1200x675px. Landscape format.",
+        "print": "High-res output. 300dpi minimum."
+      },
+      "visualKeywords": ["aperture", "volleyball", "motion", "speed", "press-credential", "film-grain", "high-contrast", "geometric"],
+      "avoid": ["text in AI-generated images", "ornamental flourishes", "gradients without purpose", "stock photo aesthetics", "corporate polish"]
+    },
+    "assets": []
+  },
+  "defaultMode": "dark"
+}

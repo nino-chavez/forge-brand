@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "schemaVersion": 1,
+    "id": "volley-rx",
+    "created": "2024-09-01T00:00:00.000Z",
+    "updated": "2026-03-23T00:00:00.000Z",
+    "author": "Nino Chavez",
+    "version": "1.0.0"
+  },
+  "identity": {
+    "name": "Volley Rx",
+    "tagline": "Your Dose of Competitive Volleyball",
+    "mission": "Adult volleyball tournament series with retro-pharmaceutical brand identity",
+    "audience": ["adult volleyball players", "competitive recreational athletes", "tournament junkies"],
+    "personality": ["retro", "playful-authoritative", "competitive", "collectible", "premium-nostalgia"],
+    "positioning": "The prescription for your competitive volleyball fix — Chicago tournament series",
+    "domain": "sports tournaments",
+    "links": {
+      "tournaments": "https://rallyhq.app"
+    }
+  },
+  "colors": {
+    "primary": {
+      "hex": "#c4923a",
+      "name": "Aged Gold",
+      "usage": "Primary accent, metallic accents, premium elements"
+    },
+    "secondary": {
+      "hex": "#2dd4bf",
+      "name": "Pharmacy Teal",
+      "usage": "Secondary accent, depth, contrast on dark backgrounds"
+    },
+    "accent": {
+      "hex": "#c4453a",
+      "name": "Rx Red",
+      "usage": "Warnings, alerts, hot-level indicators"
+    },
+    "neutral": {
+      "50": "#fdf8f0",
+      "100": "#f5e6d3",
+      "200": "#e8d5b8",
+      "300": "#d4b896",
+      "400": "#b8956e",
+      "500": "#9a7a55",
+      "600": "#7d6040",
+      "700": "#5a4530",
+      "800": "#3a2d1f",
+      "900": "#1a1a2e",
+      "950": "#0a0a0a"
+    },
+    "semantic": {
+      "success": { "hex": "#4a7c59", "name": "Pharmacy Green", "usage": "Available, in stock, success" },
+      "warning": { "hex": "#c4923a", "name": "Aged Gold", "usage": "Caution, limited availability" },
+      "error": { "hex": "#c4453a", "name": "Rx Red", "usage": "Sold out, critical" },
+      "info": { "hex": "#2dd4bf", "name": "Teal Light", "usage": "Informational, dosage info" }
+    },
+    "surfaces": {
+      "background": "#0a0a0a",
+      "foreground": "#fdf8f0",
+      "card": "#1a1a2e",
+      "cardForeground": "#fdf8f0",
+      "muted": "#1a1a2e",
+      "mutedForeground": "#b8956e",
+      "border": "#3a2d1f"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Playfair Display",
+      "fallbacks": ["Georgia", "serif"],
+      "classification": "serif",
+      "weights": [400, 500, 600, 700],
+      "variable": true,
+      "googleFonts": "Playfair+Display:wght@400;500;600;700",
+      "cssVariable": "--font-display",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "body": {
+      "family": "Inter",
+      "fallbacks": ["system-ui", "sans-serif"],
+      "classification": "sans-serif",
+      "weights": [400, 500, 600, 700],
+      "variable": true,
+      "googleFonts": "Inter:wght@400;500;600;700",
+      "cssVariable": "--font-body",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "mono": {
+      "family": "JetBrains Mono",
+      "fallbacks": ["Menlo", "monospace"],
+      "classification": "monospace",
+      "weights": [400, 500, 700],
+      "variable": true,
+      "googleFonts": "JetBrains+Mono:wght@400;500;700",
+      "cssVariable": "--font-mono",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.05
+    },
+    "scale": {
+      "baseSizePx": 16,
+      "ratio": "perfect-fourth",
+      "steps": [
+        { "name": "hero", "sizeRem": 4, "sizeMobileRem": 2.5, "lineHeight": 1.1, "weight": 700, "font": "display" },
+        { "name": "h2", "sizeRem": 2.5, "sizeMobileRem": 1.75, "lineHeight": 1.2, "weight": 600, "font": "display" },
+        { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.3, "weight": 500, "font": "display" },
+        { "name": "body-lg", "sizeRem": 1.125, "lineHeight": 1.6, "weight": 400, "font": "body" },
+        { "name": "body", "sizeRem": 1, "lineHeight": 1.5, "weight": 400, "font": "body" },
+        { "name": "label", "sizeRem": 0.75, "lineHeight": 1.4, "weight": 500, "font": "mono" },
+        { "name": "caption", "sizeRem": 0.875, "lineHeight": 1.5, "weight": 400, "font": "body" }
+      ]
+    }
+  },
+  "spacing": {
+    "1": 0.25,
+    "2": 0.5,
+    "3": 0.75,
+    "4": 1,
+    "6": 1.5,
+    "8": 2,
+    "12": 3,
+    "16": 4,
+    "24": 6
+  },
+  "radius": {
+    "none": 0,
+    "sm": 0.125,
+    "md": 0.25,
+    "lg": 0.5,
+    "xl": 0.75,
+    "2xl": 1,
+    "full": 9999
+  },
+  "layout": {
+    "maxContentWidth": 72,
+    "breakpoints": {
+      "sm": 640,
+      "md": 768,
+      "lg": 1024,
+      "xl": 1280,
+      "2xl": 1536
+    },
+    "sectionPadding": "16",
+    "containerPadding": "6"
+  },
+  "voice": {
+    "attributes": [
+      { "trait": "playful-authoritative", "description": "Pharmacy metaphor played straight — tongue-in-cheek but committed", "example": "Your prescription has been filled. Report to Court 3." },
+      { "trait": "retro-nostalgic", "description": "1950s pharmaceutical advertising tone", "example": "Ask your doctor about Volley Rx. Side effects include: obsession." },
+      { "trait": "competitive", "description": "Respects the players' competitiveness", "example": "This isn't rec league. This is your dose." }
+    ],
+    "antiPatterns": [
+      {
+        "category": "breaking-the-bit",
+        "patterns": ["just kidding", "lol", "haha get it", "pun intended"],
+        "severity": "error",
+        "suggestion": "Commit to the pharmaceutical metaphor. Never wink at the audience."
+      },
+      {
+        "category": "corporate-sports",
+        "patterns": ["exciting opportunity", "amazing community", "inclusive environment", "family-friendly"],
+        "severity": "warning",
+        "suggestion": "This brand is competitive adult volleyball, not youth rec. Keep the edge."
+      }
+    ],
+    "structuralPatterns": [
+      { "name": "prescription-metaphor", "description": "Frame tournaments as prescriptions, doses, treatments", "required": false, "example": "Dosage: 2 sets, best of 3. Administer every Saturday." }
+    ],
+    "examples": [
+      {
+        "intent": "Announce a tournament",
+        "good": "New prescription available. Coed 4s, January 18th. Dosage: pool play into single elimination. Side effects may include excessive celebration.",
+        "bad": "Hey everyone! We're excited to announce our next amazing tournament! Come join the fun!"
+      }
+    ],
+    "minimumScore": 70
+  },
+  "media": {
+    "logos": {
+      "clearSpace": 0.25,
+      "minSizePx": 32,
+      "variations": []
+    },
+    "templates": [
+      {
+        "id": "tournament-flyer",
+        "name": "Tournament Announcement",
+        "description": "Prescription-style tournament flyer",
+        "sizes": [
+          { "width": 1080, "height": 1080, "dpi": 72, "label": "Instagram Square" },
+          { "width": 1080, "height": 1920, "dpi": 72, "label": "Instagram Story" }
+        ],
+        "format": "png",
+        "dataFields": [
+          { "name": "tournamentName", "type": "string", "required": true },
+          { "name": "date", "type": "string", "required": true },
+          { "name": "format", "type": "string", "required": true },
+          { "name": "location", "type": "string", "required": true },
+          { "name": "price", "type": "string", "required": false }
+        ]
+      }
+    ],
+    "creative": {
+      "basePrompt": "BRAND: Volley Rx — competitive adult volleyball tournament series, Chicago IL.\nAESTHETIC: 1950s pharmaceutical advertising meets atomic age retro-futurism.\nThink vintage apothecary labels, propaganda posters, Bioshock/Fallout art deco.\n\nKEY VISUAL LANGUAGE:\n- Aged paper textures, halftone dot patterns, sepia warmth\n- Art deco borders, ornamental dividers, starburst rays\n- Brass/gold metallic accents on dark or cream backgrounds\n- Volleyball as the central subject/icon\n- Rx symbol as the brand mark",
+      "conceptMap": {
+        "rx": "pharmacy prescription Rx symbol, vintage apothecary style",
+        "prescription": "vintage prescription pad or pharmacy label aesthetic",
+        "dose": "medicine bottle or pill capsule shape with volleyball inside",
+        "pharmacy": "apothecary shelves, medicine bottles, vintage pharmacy counter",
+        "atomic": "atomic age starburst, atom symbol, 1950s futurism",
+        "propaganda": "bold flat shapes, limited palette, WPA/Soviet poster composition",
+        "halftone": "Ben-Day dots pattern, vintage comic/print texture",
+        "gold": "metallic gold/brass texture with realistic reflection and depth",
+        "crest": "symmetrical emblem/seal design, heraldic but modern"
+      },
+      "formatModifiers": {
+        "dtf-front": "Vertical for center chest. 2400x3000px (8x10 at 300dpi). Full color on black fabric.",
+        "dtf-back": "Tall vertical for full back. 3000x3600px (10x12 at 300dpi). More detail permitted.",
+        "dtf-pocket": "Small square for left chest. 1200x1200px (4x4 at 300dpi). Simplified, icon-like.",
+        "web": "Standard web resolution. 1200x675px. Landscape format.",
+        "print": "High-res CMYK-safe. 300dpi minimum."
+      },
+      "visualKeywords": ["retro", "pharmaceutical", "art-deco", "gold", "vintage", "halftone", "propaganda", "atomic"],
+      "avoid": ["text in AI-generated images", "modern minimalism", "flat/corporate design", "bright neon colors", "stock photography"]
+    },
+    "assets": []
+  },
+  "defaultMode": "dark"
+}
