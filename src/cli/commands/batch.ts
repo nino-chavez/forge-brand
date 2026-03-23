@@ -16,7 +16,9 @@ import { exportCssTokens } from '../../core/exporters/css-tokens.js';
 import { exportTailwindPreset } from '../../core/exporters/tailwind.js';
 import { exportMarkdown } from '../../core/exporters/markdown.js';
 import { exportSignalForgeTheme } from '../../core/exporters/signal-forge-theme.js';
+import { exportSignalForgeVoice } from '../../core/exporters/signal-forge-voice.js';
 import { exportImageGenStyle } from '../../core/exporters/image-gen-style.js';
+import { exportFigmaTokens } from '../../core/exporters/figma-tokens.js';
 import { getTemplate, listTemplateIds } from '../../media/templates/index.js';
 import { renderToFile } from '../../media/renderer.js';
 
@@ -48,7 +50,9 @@ export function registerBatchCommand(program: Command) {
         { name: 'Tailwind Preset', fn: exportTailwindPreset, ext: '.tailwind.ts' },
         { name: 'Design System Docs', fn: exportMarkdown, ext: '.md' },
         { name: 'Signal Forge Theme', fn: exportSignalForgeTheme, ext: '.theme.json' },
+        { name: 'Signal Forge Voice', fn: exportSignalForgeVoice, ext: '.voice.json' },
         { name: 'Image Gen Style', fn: exportImageGenStyle, ext: '.style.json' },
+        { name: 'Figma Tokens', fn: exportFigmaTokens, ext: '.figma.json' },
       ];
 
       const exportDir = path.join(outDir, 'exports');

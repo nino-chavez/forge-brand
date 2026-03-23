@@ -14,7 +14,9 @@ import { exportCssTokens } from '../../core/exporters/css-tokens.js';
 import { exportTailwindPreset } from '../../core/exporters/tailwind.js';
 import { exportMarkdown } from '../../core/exporters/markdown.js';
 import { exportSignalForgeTheme } from '../../core/exporters/signal-forge-theme.js';
+import { exportSignalForgeVoice } from '../../core/exporters/signal-forge-voice.js';
 import { exportImageGenStyle } from '../../core/exporters/image-gen-style.js';
+import { exportFigmaTokens } from '../../core/exporters/figma-tokens.js';
 
 const EXPORTERS: Record<string, { fn: (kit: any) => string; ext: string; label: string }> = {
   css: { fn: exportCssTokens, ext: '.css', label: 'CSS Tokens' },
@@ -22,7 +24,9 @@ const EXPORTERS: Record<string, { fn: (kit: any) => string; ext: string; label: 
   docs: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
   markdown: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
   'signal-forge': { fn: exportSignalForgeTheme, ext: '.theme.json', label: 'Signal Forge Theme' },
+  'signal-forge-voice': { fn: exportSignalForgeVoice, ext: '.voice.json', label: 'Signal Forge Voice' },
   'image-gen': { fn: exportImageGenStyle, ext: '.style.json', label: 'Image Gen Style' },
+  figma: { fn: exportFigmaTokens, ext: '.figma.json', label: 'Figma Tokens' },
 };
 
 export function registerExportCommand(program: Command) {

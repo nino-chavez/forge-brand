@@ -10,6 +10,7 @@ import { Favicon } from './favicon.js';
 import { PrescriptionLabel } from './prescription-label.js';
 import { HeatCard } from './heat-card.js';
 import { EmailHeader } from './email-header.js';
+import { BusinessCard } from './business-card.js';
 
 type TemplateRenderer = (kit: BrandKit, data: Record<string, unknown>) => any;
 
@@ -73,6 +74,17 @@ const TEMPLATES: Record<string, { render: TemplateRenderer; defaultWidth: number
     }),
     defaultWidth: 600,
     defaultHeight: 200,
+  },
+  'business-card': {
+    render: (kit, data) => BusinessCard(kit, {
+      name: data.name as string,
+      title: data.title as string | undefined,
+      email: data.email as string | undefined,
+      phone: data.phone as string | undefined,
+      website: data.website as string | undefined,
+    }),
+    defaultWidth: 1050,
+    defaultHeight: 600,
   },
 };
 
