@@ -1,7 +1,5 @@
 /**
  * Template Registry
- *
- * Maps template IDs to their render functions.
  */
 
 import type { BrandKit } from '../../core/schema/brand-kit.js';
@@ -9,6 +7,9 @@ import { SocialCard } from './social-card.js';
 import { Story } from './story.js';
 import { Flyer } from './flyer.js';
 import { Favicon } from './favicon.js';
+import { PrescriptionLabel } from './prescription-label.js';
+import { HeatCard } from './heat-card.js';
+import { EmailHeader } from './email-header.js';
 
 type TemplateRenderer = (kit: BrandKit, data: Record<string, unknown>) => any;
 
@@ -38,6 +39,40 @@ const TEMPLATES: Record<string, { render: TemplateRenderer; defaultWidth: number
     render: (kit, data) => Favicon(kit, { letter: data.letter as string | undefined }),
     defaultWidth: 512,
     defaultHeight: 512,
+  },
+  'prescription-label': {
+    render: (kit, data) => PrescriptionLabel(kit, {
+      rxName: data.rxName as string,
+      format: data.format as string,
+      date: data.date as string,
+      location: data.location as string,
+      price: data.price as string | undefined,
+      dosage: data.dosage as string | undefined,
+      sideEffects: data.sideEffects as string | undefined,
+      rxNumber: data.rxNumber as string | undefined,
+    }),
+    defaultWidth: 1080,
+    defaultHeight: 1080,
+  },
+  'heat-card': {
+    render: (kit, data) => HeatCard(kit, {
+      variety: data.variety as string,
+      heatLevel: data.heatLevel as number,
+      tournamentName: data.tournamentName as string,
+      date: data.date as string | undefined,
+      format: data.format as string | undefined,
+      tagline: data.tagline as string | undefined,
+    }),
+    defaultWidth: 1080,
+    defaultHeight: 1080,
+  },
+  'email-header': {
+    render: (kit, data) => EmailHeader(kit, {
+      title: data.title as string | undefined,
+      subtitle: data.subtitle as string | undefined,
+    }),
+    defaultWidth: 600,
+    defaultHeight: 200,
   },
 };
 
