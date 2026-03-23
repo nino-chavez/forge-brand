@@ -15,6 +15,7 @@ import { generatePalettes } from '../../core/generators/palette.js';
 import { generateVoice } from '../../core/generators/voice.js';
 import { generateFontPairings } from '../../core/generators/fonts.js';
 import { generateIdentity } from '../../core/generators/identity.js';
+import { generateLogos } from '../../core/generators/logo.js';
 
 export function registerGenerateCommand(program: Command) {
   const gen = program
@@ -231,5 +232,42 @@ export function registerGenerateCommand(program: Command) {
       kit.meta.updated = new Date().toISOString();
       fs.writeFileSync(path.resolve(options.kit), JSON.stringify(kit, null, 2), 'utf-8');
       console.log(chalk.green(`Applied identity to ${options.kit}`));
+    });
+
+  // --- Logo ---
+  gen
+    .command('logo')
+    .description('Generate logo concepts via AI image models')
+    .option('-k, --kit <path>', 'Path to brand-kit.json', 'brand-kit.json')
+    .option('-n, --count <n>', 'Number of concepts', '3')
+    .option('-o, --output <dir>', 'Output directory', './output/logos')
+    .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
+    .action(async (options: { kit: string; count: string; output: string; model: string }) => {
+      const kit = parseBrandKit(JSON.parse(fs.readFileSync(path.resolve(options.kit), 'utf-8')));
+
+      console.log(chalk.bold(`\nGenerating ${options.count} logo concepts for ${kit.identity.name}...\n`));
+
+      const concepts = await generateLogos({
+        name: kit.identity.name,
+        personality: kit.identity.personality,
+        basePrompt: kit.media.creative?.basePrompt,
+        avoid: kit.media.creative?.avoid,
+        visualKeywords: kit.media.creative?.visualKeywords,
+        count: parseInt(options.count),
+        outputDir: options.output,
+        model: options.model,
+      });
+
+      for (let i = 0; i < concepts.length; i++) {
+        console.log(chalk.green(`  Concept ${i + 1} → ${concepts[i].path}`));
+      }
+
+      if (concepts.length === 0) {
+        console.log(chalk.yellow('No concepts generated. Check API key and model availability.'));
+        return;
+      }
+
+      console.log(chalk.dim(`\nReview the concepts in ${options.output}/`));
+      console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
     });
 }
