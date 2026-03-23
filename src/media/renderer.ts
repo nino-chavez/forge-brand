@@ -85,6 +85,19 @@ async function loadFonts(kit: BrandKit): Promise<SatoriFont[]> {
     return interRegular;
   }
 
+  async function fetchGoogleFontSafe(
+    googleFonts: string,
+    weight: number,
+    fallback: (w: number) => Promise<Buffer>,
+  ): Promise<Buffer> {
+    const familyName = googleFonts.split(':')[0].replace(/\+/g, ' ');
+    try {
+      return await fetchGoogleFont(familyName, weight);
+    } catch {
+      return fallback(weight);
+    }
+  }
+
   for (const { stack } of stacks) {
     // Determine which weights to load — pick representative weights
     // that cover the range used in templates (typically 400 and 700)
@@ -93,18 +106,20 @@ async function loadFonts(kit: BrandKit): Promise<SatoriFont[]> {
     for (const weight of weightsToLoad) {
       let buffer: Buffer;
 
-      if (stack.googleFonts) {
-        // Extract the base family name from the Google Fonts string
-        // e.g. "Bebas+Neue" → "Bebas Neue", "Inter:wght@400;500;600;700" → "Inter"
-        const familyName = stack.googleFonts.split(':')[0].replace(/\+/g, ' ');
+      if (stack.localPath) {
+        // Local TTF/OTF file — load from disk
         try {
-          buffer = await fetchGoogleFont(familyName, weight);
+          buffer = fs.readFileSync(path.resolve(stack.localPath));
         } catch {
-          // Font weight not available on Google Fonts — fall back to Inter
-          buffer = await getInterFallback(weight);
+          // Local file not found — try Google Fonts or Inter fallback
+          buffer = stack.googleFonts
+            ? await fetchGoogleFontSafe(stack.googleFonts, weight, getInterFallback)
+            : await getInterFallback(weight);
         }
+      } else if (stack.googleFonts) {
+        buffer = await fetchGoogleFontSafe(stack.googleFonts, weight, getInterFallback);
       } else {
-        // No Google Fonts (e.g. Adobe Typekit, local font) — use Inter fallback
+        // No font source (e.g. Adobe Typekit without local file) — use Inter fallback
         buffer = await getInterFallback(weight);
       }
 

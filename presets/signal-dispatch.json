@@ -73,6 +73,7 @@
       "weights": [400, 500, 700],
       "variable": false,
       "typekitId": "tjp7ihm",
+      "localPath": "fonts/RivalSans-Regular.ttf",
       "cssVariable": "--font-display",
       "textTransform": "none",
       "letterSpacing": -0.02
