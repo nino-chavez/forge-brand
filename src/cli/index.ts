@@ -13,6 +13,7 @@ import { registerInitCommand } from './commands/init.js';
 import { registerGenerateCommand } from './commands/generate.js';
 import { registerMediaCommand } from './commands/media.js';
 import { registerSiteCommand } from './commands/site.js';
+import { registerBatchCommand } from './commands/batch.js';
 
 program
   .name('brand-forge')
@@ -24,6 +25,7 @@ registerGenerateCommand(program);
 registerExportCommand(program);
 registerMediaCommand(program);
 registerSiteCommand(program);
+registerBatchCommand(program);
 registerReviewCommand(program);
 registerDiffCommand(program);
 
