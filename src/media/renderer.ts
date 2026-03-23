@@ -17,20 +17,62 @@ import type { FontStack } from '../core/schema/typography.js';
 // Font Cache
 // ---------------------------------------------------------------------------
 
-/** Cache fetched font buffers by "family:weight" key to avoid re-downloading */
-const fontCache = new Map<string, Buffer>();
+/**
+ * Two-tier font cache:
+ * 1. In-memory Map (survives within a single process / batch run)
+ * 2. Disk cache at ~/.brand-forge/fonts/ (survives across CLI invocations)
+ */
+const memoryCache = new Map<string, Buffer>();
+
+const DISK_CACHE_DIR = path.join(
+  process.env.HOME || process.env.USERPROFILE || '/tmp',
+  '.brand-forge',
+  'fonts',
+);
+
+function diskCachePath(family: string, weight: number): string {
+  const safeName = family.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+  return path.join(DISK_CACHE_DIR, `${safeName}-${weight}.ttf`);
+}
+
+function readDiskCache(family: string, weight: number): Buffer | null {
+  const p = diskCachePath(family, weight);
+  try {
+    return fs.readFileSync(p);
+  } catch {
+    return null;
+  }
+}
+
+function writeDiskCache(family: string, weight: number, data: Buffer): void {
+  try {
+    fs.mkdirSync(DISK_CACHE_DIR, { recursive: true });
+    fs.writeFileSync(diskCachePath(family, weight), data);
+  } catch {
+    // Non-fatal — disk cache is a performance optimization, not required
+  }
+}
 
 /**
  * Fetch a single font weight from Google Fonts as TTF.
- * Satori requires TTF/OTF — woff2 is not supported.
+ * Checks memory cache → disk cache → network (Google Fonts).
  */
 async function fetchGoogleFont(family: string, weight: number): Promise<Buffer> {
   const cacheKey = `${family}:${weight}`;
-  const cached = fontCache.get(cacheKey);
-  if (cached) return cached;
 
+  // 1. Memory cache
+  const mem = memoryCache.get(cacheKey);
+  if (mem) return mem;
+
+  // 2. Disk cache
+  const disk = readDiskCache(family, weight);
+  if (disk) {
+    memoryCache.set(cacheKey, disk);
+    return disk;
+  }
+
+  // 3. Network fetch
   const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}`;
-  // User-agent that returns TTF (not woff2)
   const cssResp = await fetch(cssUrl, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; brand-forge/0.1)' },
   });
@@ -40,7 +82,11 @@ async function fetchGoogleFont(family: string, weight: number): Promise<Buffer> 
 
   const fontResp = await fetch(match[1]);
   const buffer = Buffer.from(await fontResp.arrayBuffer());
-  fontCache.set(cacheKey, buffer);
+
+  // Populate both caches
+  memoryCache.set(cacheKey, buffer);
+  writeDiskCache(family, weight, buffer);
+
   return buffer;
 }
 

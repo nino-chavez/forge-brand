@@ -1,0 +1,126 @@
+/**
+ * Exporter snapshot tests
+ *
+ * Same input must always produce identical output (deterministic).
+ */
+
+import { describe, it, expect } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+import { parseBrandKit } from '../src/core/schema/brand-kit.js';
+import { exportCssTokens } from '../src/core/exporters/css-tokens.js';
+import { exportTailwindPreset } from '../src/core/exporters/tailwind.js';
+import { exportMarkdown } from '../src/core/exporters/markdown.js';
+import { exportSignalForgeTheme } from '../src/core/exporters/signal-forge-theme.js';
+import { exportImageGenStyle } from '../src/core/exporters/image-gen-style.js';
+
+const flickdayKit = parseBrandKit(
+  JSON.parse(fs.readFileSync(path.resolve(__dirname, '../presets/flickday.json'), 'utf-8')),
+);
+
+describe('exportCssTokens', () => {
+  it('produces deterministic output', () => {
+    const a = exportCssTokens(flickdayKit);
+    const b = exportCssTokens(flickdayKit);
+    expect(a).toBe(b);
+  });
+
+  it('contains :root block', () => {
+    const css = exportCssTokens(flickdayKit);
+    expect(css).toContain(':root {');
+  });
+
+  it('contains brand primary color', () => {
+    const css = exportCssTokens(flickdayKit);
+    expect(css).toContain('--brand-primary: #facc15;');
+  });
+
+  it('contains font variables', () => {
+    const css = exportCssTokens(flickdayKit);
+    expect(css).toContain("--font-display: 'Bebas Neue'");
+  });
+
+  it('contains DO NOT EDIT warning', () => {
+    const css = exportCssTokens(flickdayKit);
+    expect(css).toContain('DO NOT EDIT');
+  });
+});
+
+describe('exportTailwindPreset', () => {
+  it('produces deterministic output', () => {
+    const a = exportTailwindPreset(flickdayKit);
+    const b = exportTailwindPreset(flickdayKit);
+    expect(a).toBe(b);
+  });
+
+  it('exports valid-looking JS module', () => {
+    const tw = exportTailwindPreset(flickdayKit);
+    expect(tw).toContain('export default {');
+    expect(tw).toContain('theme: {');
+  });
+
+  it('includes brand colors', () => {
+    const tw = exportTailwindPreset(flickdayKit);
+    expect(tw).toContain("primary: '#facc15'");
+  });
+});
+
+describe('exportMarkdown', () => {
+  it('produces deterministic output', () => {
+    const a = exportMarkdown(flickdayKit);
+    const b = exportMarkdown(flickdayKit);
+    expect(a).toBe(b);
+  });
+
+  it('includes brand name as title', () => {
+    const md = exportMarkdown(flickdayKit);
+    expect(md).toContain('# Flickday Media Design System');
+  });
+
+  it('includes color table', () => {
+    const md = exportMarkdown(flickdayKit);
+    expect(md).toContain('Flickday Yellow');
+    expect(md).toContain('`#facc15`');
+  });
+
+  it('includes voice section', () => {
+    const md = exportMarkdown(flickdayKit);
+    expect(md).toContain('## Voice & Tone');
+    expect(md).toContain('authentic');
+  });
+});
+
+describe('exportSignalForgeTheme', () => {
+  it('produces valid JSON', () => {
+    const json = exportSignalForgeTheme(flickdayKit);
+    const parsed = JSON.parse(json);
+    expect(parsed.id).toBe('flickday-media');
+  });
+
+  it('strips # from hex colors', () => {
+    const json = exportSignalForgeTheme(flickdayKit);
+    const parsed = JSON.parse(json);
+    expect(parsed.colors.primary).toBe('facc15');
+    expect(parsed.colors.primary).not.toContain('#');
+  });
+});
+
+describe('exportImageGenStyle', () => {
+  it('produces valid JSON', () => {
+    const json = exportImageGenStyle(flickdayKit);
+    const parsed = JSON.parse(json);
+    expect(parsed.name).toBe('flickday-media');
+  });
+
+  it('includes basePrompt from creative context', () => {
+    const json = exportImageGenStyle(flickdayKit);
+    const parsed = JSON.parse(json);
+    expect(parsed.basePrompt).toContain('Flickday Media');
+  });
+
+  it('includes conceptMap', () => {
+    const json = exportImageGenStyle(flickdayKit);
+    const parsed = JSON.parse(json);
+    expect(parsed.conceptMap.aperture).toBeTruthy();
+  });
+});

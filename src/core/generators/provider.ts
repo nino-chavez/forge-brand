@@ -73,14 +73,22 @@ export async function callModel(prompt: string, model?: string): Promise<string>
     return textBlock.text;
   }
 
-  // 3. AI Gateway (for Vercel-deployed apps)
+  // 3. AI Gateway (for Vercel-deployed apps — requires `ai` package installed separately)
   if (process.env.VERCEL_OIDC_TOKEN) {
-    const { generateText } = await import('ai');
-    const result = await generateText({
-      model: selectedModel,
-      prompt,
-    });
-    return result.text;
+    try {
+      // Dynamic import — ai package is optional, not in dependencies
+      const aiModule = await (Function('return import("ai")')() as Promise<any>);
+      const result = await aiModule.generateText({
+        model: selectedModel,
+        prompt,
+      });
+      return result.text;
+    } catch {
+      throw new Error(
+        'VERCEL_OIDC_TOKEN is set but the `ai` package is not installed.\n' +
+        'Run: npm install ai   — or use OPENROUTER_API_KEY instead.',
+      );
+    }
   }
 
   throw new Error(
