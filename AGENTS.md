@@ -2,6 +2,28 @@
 
 This file is the entry point for AI agents (Claude Code, Cursor, Copilot, etc.) working with this repo. Read this first, then CLAUDE.md for rules.
 
+## Fastest Path: agent-prompt
+
+Skip reading docs entirely. Run this to get a self-contained prompt payload:
+
+```bash
+# Full context with a specific brand kit
+npm run dev -- agent-prompt --kit presets/flickday.json
+
+# Scoped to a specific task
+npm run dev -- agent-prompt --kit presets/flickday.json --task media
+
+# List available presets
+npm run dev -- agent-prompt --list-presets
+
+# Include full kit JSON in output
+npm run dev -- agent-prompt --kit presets/flickday.json --full
+
+# Available tasks: init, generate, export, media, batch, review, site, all
+```
+
+The output is your complete instruction set — brand context, commands, rules, and validation steps. Copy-paste it into your agent context and go.
+
 ## What This Is
 
 CLI-first design agency toolkit. One brand kit schema drives every output — tokens, media, components, docs.
