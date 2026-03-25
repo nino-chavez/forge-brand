@@ -1,8 +1,12 @@
-# brand-forge
+# brand-forge — Agent Ingress
+
+This file is the entry point for AI agents (Claude Code, Cursor, Copilot, etc.) working with this repo. Read this first, then CLAUDE.md for rules.
+
+## What This Is
 
 CLI-first design agency toolkit. One brand kit schema drives every output — tokens, media, components, docs.
 
-## Architecture
+## Quick Orient
 
 ```
 brand-forge/
@@ -14,10 +18,78 @@ brand-forge/
 ├── src/media/           # Visual asset pipeline (Satori templates + AI creative)
 ├── src/site/            # Web design scaffolding
 ├── src/cli/             # Commander CLI
-└── presets/             # Saved brand kits (flickday, 630, letspepper, etc.)
+├── presets/             # Saved brand kits (flickday, 630, letspepper, etc.)
+└── docs/                # Architecture, developer, CLI reference docs
 ```
 
-## Dependency Graph
+## Agent Workflow
+
+When a human points you at this repo, follow this sequence:
+
+### 1. Load Context (automatic for Claude Code)
+
+- Read `CLAUDE.md` — project rules, module boundaries, pre-commit checklist
+- Read `docs/architecture/README.md` — full system design, data flow diagrams
+- Read `docs/developer/README.md` — setup, commands, module rules
+- Read `docs/user/reference/cli.md` — every CLI command with options
+
+### 2. Ask the Human
+
+You cannot do useful work without knowing **which brand** and **what task**. Prompt:
+
+```
+I've loaded the brand-forge project. To help you, I need:
+
+1. Which brand kit? (pick one or tell me a new brand name)
+   Available presets: 630volleyball, flickday, letspepper, signal-dispatch, volley-rx
+
+2. What do you want to do?
+   - Create a new brand from scratch (init)
+   - Extract tokens from a website prototype (init --from-exploration)
+   - Generate creative proposals — palette, fonts, voice, identity, logo (generate)
+   - Export to a format — CSS, Tailwind, Figma, Markdown, etc. (export)
+   - Render media — social card, flyer, favicon, business card, etc. (media)
+   - Full asset package (batch)
+   - Review/validate an existing kit (review)
+   - Scaffold a branded site — Next.js, SvelteKit, or static (site)
+   - Something else?
+```
+
+### 3. Execute
+
+All commands run through the CLI:
+
+```bash
+# Dev mode (from source)
+npm run dev -- <command> [options]
+
+# Always specify the kit
+npm run dev -- review --kit presets/flickday.json
+npm run dev -- export css --kit presets/signal-dispatch.json
+npm run dev -- batch --kit presets/volley-rx.json --output ./output
+```
+
+### 4. Validate Before Committing
+
+Always run before committing changes:
+
+```bash
+npm run lint          # Type-check
+npm test              # Run test suite
+npm run dev -- review --kit presets/<name>.json  # QA gates on any modified preset
+```
+
+## Key Rules for Agents
+
+1. **Exporters are pure functions.** No AI, no network, no randomness. If you modify an exporter, the output must be deterministic.
+2. **Generators propose, humans approve.** Never auto-apply AI-generated output. The interactive prompt step is mandatory.
+3. **Extractors are pure.** Regex-based parsing only. No AI, no prompts.
+4. **Schema changes cascade everywhere.** If you change `src/core/schema/`, update ALL presets and run ALL tests.
+5. **Review gates must pass before export.** Don't use `--skip-review` unless the human explicitly asks.
+6. **All imports use `.js` extension.** ESM project.
+7. **All colors are `#rrggbb`.** 6-digit hex with `#` prefix. No shorthand, no rgb(), no named colors.
+
+## Dependency Direction
 
 ```
 website-exploration (DISCOVERY) → winning variant (source files)
@@ -28,13 +100,17 @@ signal-forge (CONSUMER) — reads brand kit → PresentationTheme + VoiceRules
 image-gen (CONSUMER)    — reads brand kit → style systems + prompt context
 ```
 
-## Key Principles
+Do NOT introduce imports from signal-forge or image-gen. The arrow is one-way.
 
-1. **Schema is the contract** — every generator reads from BrandKit, every exporter serializes from it. Nothing freehand.
-2. **Exporters are pure functions** — `(BrandKit, options) => output`. No AI, no side effects. Deterministic.
-3. **Generators propose, humans approve** — AI suggests palettes/fonts/voice. Approved outputs lock into the schema.
-4. **Review gates block** — contrast, font compat, and consistency checks must pass before any export.
-5. **Templates are parameterized, not generated** — Satori templates take brand tokens as input. AI fills parameters, not layouts.
+## Environment
+
+Generators need an AI provider key. Everything else works without one.
+
+| Variable | Purpose |
+|----------|---------|
+| `OPENROUTER_API_KEY` | Primary AI provider (preferred) |
+| `ANTHROPIC_API_KEY` | Fallback AI provider |
+| `VERCEL_OIDC_TOKEN` | Vercel AI Gateway (requires `ai` package) |
 
 ## Anti-Slop Rules
 
@@ -44,12 +120,13 @@ image-gen (CONSUMER)    — reads brand kit → style systems + prompt context
 - No "inspired by trends" — every design decision traces to a brand attribute
 - No freehand generation — all output parameterized by brand-kit.json
 
-## File Conventions
+## Deeper Documentation
 
-- Schema files: `src/core/schema/*.ts` — Zod schemas with `.js` extensions in imports
-- Review gates: `src/core/review/*.ts` — pure functions returning `{ passed, issues }`
-- Exporters: `src/core/exporters/*.ts` — pure functions `(BrandKit) => string`
-- Extractors: `src/core/extractors/*.ts` — pure functions `(string[]) => PartialBrandKit`
-- Generators: `src/core/generators/*.ts` — async functions that call AI providers
-- Presets: `presets/*.json` — validated BrandKit JSON files
-- All imports use `.js` extension (ESM)
+| Doc | When to Read |
+|-----|-------------|
+| `CLAUDE.md` | Always — project rules and boundaries |
+| `docs/architecture/README.md` | Understanding system design, data flows, decisions |
+| `docs/developer/README.md` | Setup, module rules, troubleshooting |
+| `docs/developer/contributing.md` | Adding new exporters, generators, templates, extractors |
+| `docs/user/reference/cli.md` | Complete CLI command reference |
+| `docs/audit-report.md` | Documentation coverage gaps |
