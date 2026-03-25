@@ -10,6 +10,7 @@ brand-forge/
 ├── src/core/review/     # QA gates — blocks export if brand kit fails checks
 ├── src/core/exporters/  # Deterministic transforms (brand kit → CSS, Tailwind, etc.)
 ├── src/core/generators/ # AI-assisted creative proposals (palette, fonts, voice, logo)
+├── src/core/extractors/ # Parse design tokens from exploration variants (pure, no AI)
 ├── src/media/           # Visual asset pipeline (Satori templates + AI creative)
 ├── src/site/            # Web design scaffolding
 ├── src/cli/             # Commander CLI
@@ -19,6 +20,8 @@ brand-forge/
 ## Dependency Graph
 
 ```
+website-exploration (DISCOVERY) → winning variant (source files)
+    ↓
 brand-forge (PRODUCER) → brand-kit.json
     ↓
 signal-forge (CONSUMER) — reads brand kit → PresentationTheme + VoiceRules
@@ -46,6 +49,7 @@ image-gen (CONSUMER)    — reads brand kit → style systems + prompt context
 - Schema files: `src/core/schema/*.ts` — Zod schemas with `.js` extensions in imports
 - Review gates: `src/core/review/*.ts` — pure functions returning `{ passed, issues }`
 - Exporters: `src/core/exporters/*.ts` — pure functions `(BrandKit) => string`
+- Extractors: `src/core/extractors/*.ts` — pure functions `(string[]) => PartialBrandKit`
 - Generators: `src/core/generators/*.ts` — async functions that call AI providers
 - Presets: `presets/*.json` — validated BrandKit JSON files
 - All imports use `.js` extension (ESM)

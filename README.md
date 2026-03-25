@@ -21,6 +21,9 @@ npx tsx src/cli/index.ts init
 
 # Fork from existing preset
 npx tsx src/cli/index.ts init --from presets/flickday.json -o my-brand.json
+
+# Extract from a website-exploration winning variant
+npx tsx src/cli/index.ts init --from-exploration ./explorations/winning-slug/ -o my-brand.json
 ```
 
 ### AI generators
@@ -131,6 +134,8 @@ Required fields: `meta` (schemaVersion, id, created, updated), `identity` (name)
 ## Architecture
 
 ```
+website-exploration (DISCOVERY) → winning variant (source files)
+    ↓
 brand-forge (PRODUCER) → brand-kit.json
     ↓
 signal-forge (CONSUMER) → reads theme + voice bridges
@@ -141,6 +146,7 @@ image-gen (CONSUMER)    → reads style system + creative context
 - **Review gates** (`src/core/review/`) — contrast, font compat, consistency; blocks export on failure
 - **Exporters** (`src/core/exporters/`) — pure deterministic transforms, no AI
 - **Generators** (`src/core/generators/`) — AI proposals via OpenRouter, human-approved
+- **Extractors** (`src/core/extractors/`) — parse design tokens from exploration variants, pure regex-based
 - **Media** (`src/media/`) — Satori + Resvg renderer, JSX templates
 - **CLI** (`src/cli/`) — Commander commands
 - **Presets** (`presets/`) — validated brand kit JSONs

@@ -8,6 +8,7 @@ CLI-first design agency toolkit. One brand kit schema drives every output.
 - **Review gates**: `src/core/review/` — QA checks that block export on failure.
 - **Exporters**: `src/core/exporters/` — Pure deterministic transforms.
 - **Generators**: `src/core/generators/` — AI-assisted creative proposals.
+- **Extractors**: `src/core/extractors/` — Parse design tokens from exploration variants.
 - **Media**: `src/media/` — Satori templates + AI image generation.
 - **Presets**: `presets/` — Saved brand kits as validated JSON.
 - **CLI**: `src/cli/` — Commander commands.
@@ -40,14 +41,18 @@ Before committing changes to this project:
 3. If preset changed: `reviewBrandKit()` still passes (no errors)
 4. If exporter changed: output is deterministic (same input → same output)
 5. If generator changed: output conforms to BrandKit schema
+6. If extractor changed: extraction is pure (no AI, no prompts, regex-based only)
 
 ## Dependency Direction
 
 ```
-brand-forge (this project) → produces brand-kit.json
+website-exploration → produces winning variant (source files)
+    ↓
+brand-forge (this project) → extracts + produces brand-kit.json
     ↓
 signal-forge → consumes as PresentationTheme + VoiceRules
 image-gen    → consumes as style system + prompt context
 ```
 
 Do not introduce dependencies from brand-forge TO signal-forge or image-gen. The arrow goes one way.
+website-exploration is an upstream producer — brand-forge extracts from its output but does not depend on it at runtime.
