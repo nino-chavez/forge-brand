@@ -13,6 +13,7 @@ import { reviewBrandKit } from '../../core/review/index.js';
 import { exportCssTokens } from '../../core/exporters/css-tokens.js';
 import { exportTailwindPreset } from '../../core/exporters/tailwind.js';
 import { exportMarkdown } from '../../core/exporters/markdown.js';
+import { exportDesignMd } from '../../core/exporters/design-md.js';
 import { exportSignalForgeTheme } from '../../core/exporters/signal-forge-theme.js';
 import { exportSignalForgeVoice } from '../../core/exporters/signal-forge-voice.js';
 import { exportImageGenStyle } from '../../core/exporters/image-gen-style.js';
@@ -23,6 +24,7 @@ const EXPORTERS: Record<string, { fn: (kit: any) => string; ext: string; label: 
   tailwind: { fn: exportTailwindPreset, ext: '.ts', label: 'Tailwind Preset' },
   docs: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
   markdown: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
+  'design-md': { fn: exportDesignMd, ext: '.DESIGN.md', label: 'DESIGN.md (google-labs spec)' },
   'signal-forge': { fn: exportSignalForgeTheme, ext: '.theme.json', label: 'Signal Forge Theme' },
   'signal-forge-voice': { fn: exportSignalForgeVoice, ext: '.voice.json', label: 'Signal Forge Voice' },
   'image-gen': { fn: exportImageGenStyle, ext: '.style.json', label: 'Image Gen Style' },
