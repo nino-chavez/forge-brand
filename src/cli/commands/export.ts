@@ -18,6 +18,7 @@ import { exportSignalForgeTheme } from '../../core/exporters/signal-forge-theme.
 import { exportSignalForgeVoice } from '../../core/exporters/signal-forge-voice.js';
 import { exportImageGenStyle } from '../../core/exporters/image-gen-style.js';
 import { exportFigmaTokens } from '../../core/exporters/figma-tokens.js';
+import { exportGlossary } from '../../core/exporters/glossary.js';
 
 const EXPORTERS: Record<string, { fn: (kit: any) => string; ext: string; label: string }> = {
   css: { fn: exportCssTokens, ext: '.css', label: 'CSS Tokens' },
@@ -25,6 +26,7 @@ const EXPORTERS: Record<string, { fn: (kit: any) => string; ext: string; label: 
   docs: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
   markdown: { fn: exportMarkdown, ext: '.md', label: 'Design System Docs' },
   'design-md': { fn: exportDesignMd, ext: '.DESIGN.md', label: 'DESIGN.md (google-labs spec)' },
+  glossary: { fn: exportGlossary, ext: '.CONTEXT.md', label: 'Brand Glossary (CONTEXT.md)' },
   'signal-forge': { fn: exportSignalForgeTheme, ext: '.theme.json', label: 'Signal Forge Theme' },
   'signal-forge-voice': { fn: exportSignalForgeVoice, ext: '.voice.json', label: 'Signal Forge Voice' },
   'image-gen': { fn: exportImageGenStyle, ext: '.style.json', label: 'Image Gen Style' },
