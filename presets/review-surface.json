@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "schemaVersion": 1,
+    "id": "review-surface",
+    "created": "2026-03-26T00:00:00Z",
+    "updated": "2026-03-26T00:00:00Z",
+    "author": "Nino Chavez",
+    "version": "0.1.0"
+  },
+  "identity": {
+    "name": "Review Surface",
+    "tagline": "See through the document to the thinking underneath",
+    "mission": "Bridge the gap between AI-generated insight and team consensus by preserving reasoning, grounding, and iterative history in a shareable, interactive surface",
+    "audience": [
+      "enterprise architects",
+      "engineering managers",
+      "product managers",
+      "strategy leads",
+      "cross-functional reviewers"
+    ],
+    "personality": [
+      "transparent",
+      "precise",
+      "quietly confident",
+      "layered",
+      "responsive"
+    ],
+    "positioning": "GitHub Pull Requests for strategy documents — where AI reasoning survives the handoff from author to reviewer",
+    "domain": "collaborative AI document review",
+    "links": {}
+  },
+  "colors": {
+    "primary": {
+      "hex": "#4338ca",
+      "name": "Indigo Depth",
+      "usage": "Primary accent, active annotations, drawer highlights, agent responses"
+    },
+    "secondary": {
+      "hex": "#4f46e5",
+      "name": "Indigo Light",
+      "usage": "Hover states, secondary interactive elements, annotation badges"
+    },
+    "accent": {
+      "hex": "#0ea5e9",
+      "name": "Clarity Blue",
+      "usage": "Links, source-confirmed markers, live agent indicator"
+    },
+    "neutral": {
+      "50": "#fafafa",
+      "100": "#f4f4f5",
+      "200": "#e4e4e7",
+      "300": "#d4d4d8",
+      "400": "#a1a1aa",
+      "500": "#71717a",
+      "600": "#52525b",
+      "700": "#3f3f46",
+      "800": "#27272a",
+      "900": "#18181b",
+      "950": "#09090b"
+    },
+    "semantic": {
+      "success": {
+        "hex": "#16a34a",
+        "name": "Confirmed",
+        "usage": "Source-confirmed claims, resolved comments, verified status"
+      },
+      "warning": {
+        "hex": "#d97706",
+        "name": "Assumption",
+        "usage": "Unverified claims, assumptions flagged for validation"
+      },
+      "error": {
+        "hex": "#dc2626",
+        "name": "Conflict",
+        "usage": "Contradicted claims, blocking comments, errors"
+      },
+      "info": {
+        "hex": "#2563eb",
+        "name": "Internal",
+        "usage": "Internal knowledge markers, informational notes"
+      }
+    },
+    "surfaces": {
+      "background": "#fafafa",
+      "foreground": "#18181b",
+      "card": "#ffffff",
+      "cardForeground": "#18181b",
+      "muted": "#f5f3ff",
+      "mutedForeground": "#52525b",
+      "border": "#e4e4e7"
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Geist",
+      "fallbacks": ["system-ui", "sans-serif"],
+      "classification": "sans-serif",
+      "weights": [400, 500, 600, 700],
+      "variable": true,
+      "cssVariable": "--font-display",
+      "textTransform": "none",
+      "letterSpacing": -0.02
+    },
+    "body": {
+      "family": "Geist",
+      "fallbacks": ["system-ui", "sans-serif"],
+      "classification": "sans-serif",
+      "weights": [400, 500],
+      "variable": true,
+      "cssVariable": "--font-body",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "mono": {
+      "family": "Geist Mono",
+      "fallbacks": ["JetBrains Mono", "Menlo", "monospace"],
+      "classification": "monospace",
+      "weights": [400, 500],
+      "variable": true,
+      "cssVariable": "--font-mono",
+      "textTransform": "none",
+      "letterSpacing": 0
+    },
+    "scale": {
+      "baseSizePx": 16,
+      "ratio": "major-third",
+      "steps": [
+        {
+          "name": "hero",
+          "sizeRem": 2.5,
+          "sizeMobileRem": 1.75,
+          "lineHeight": 1.1,
+          "weight": 700,
+          "font": "display"
+        },
+        {
+          "name": "h2",
+          "sizeRem": 1.5,
+          "sizeMobileRem": 1.25,
+          "lineHeight": 1.25,
+          "weight": 600,
+          "font": "display"
+        },
+        {
+          "name": "h3",
+          "sizeRem": 1.125,
+          "sizeMobileRem": 1,
+          "lineHeight": 1.35,
+          "weight": 600,
+          "font": "display"
+        },
+        {
+          "name": "body-lg",
+          "sizeRem": 1.0625,
+          "lineHeight": 1.7,
+          "weight": 400,
+          "font": "body"
+        },
+        {
+          "name": "body",
+          "sizeRem": 0.9375,
+          "lineHeight": 1.65,
+          "weight": 400,
+          "font": "body"
+        },
+        {
+          "name": "caption",
+          "sizeRem": 0.8125,
+          "lineHeight": 1.5,
+          "weight": 400,
+          "font": "body"
+        },
+        {
+          "name": "label",
+          "sizeRem": 0.6875,
+          "lineHeight": 1.4,
+          "weight": 500,
+          "font": "mono"
+        },
+        {
+          "name": "code",
+          "sizeRem": 0.8125,
+          "lineHeight": 1.6,
+          "weight": 400,
+          "font": "mono"
+        }
+      ]
+    }
+  },
+  "spacing": {
+    "1": 0.25,
+    "2": 0.5,
+    "3": 0.75,
+    "4": 1,
+    "6": 1.5,
+    "8": 2,
+    "12": 3,
+    "16": 4,
+    "24": 6
+  },
+  "radius": {
+    "none": 0,
+    "sm": 0.25,
+    "md": 0.375,
+    "lg": 0.5,
+    "xl": 0.75,
+    "full": 9999
+  },
+  "layout": {
+    "maxContentWidth": 720,
+    "maxPageWidth": 1120,
+    "breakpoints": {
+      "sm": 640,
+      "md": 768,
+      "lg": 1024,
+      "xl": 1280
+    }
+  },
+  "voice": {
+    "tone": "Precise and quietly confident. Never salesy. Speaks like an architect reviewing blueprints with colleagues — direct, grounded, respectful of the reader's time.",
+    "attributes": [
+      { "trait": "transparent", "description": "Always show the reasoning behind claims. Never hide assumptions or present guesses as facts." },
+      { "trait": "precise", "description": "Use specific evidence over vague statements. Name the API, quote the doc, cite the source." },
+      { "trait": "grounded", "description": "Every claim traces to a source tier — confirmed, internal, or assumption. No floating assertions." },
+      { "trait": "direct", "description": "One sentence where one works. No preamble, no hedging that adds no information." },
+      { "trait": "peer-level", "description": "The reader is a colleague, not an audience. Speak as an architect to architects." }
+    ],
+    "principles": [
+      "Show the reasoning, not just the conclusion",
+      "Distinguish what we know from what we assume",
+      "Let the evidence speak — don't oversell",
+      "Be direct — one sentence where one sentence works",
+      "The reader is a peer, not an audience"
+    ],
+    "avoid": [
+      "Marketing language (leverage, synergy, unlock)",
+      "Hedging that adds no information",
+      "Exclamation points",
+      "Emoji in professional context",
+      "Anthropomorphizing the AI"
+    ]
+  },
+  "media": {
+    "logos": {
+      "primary": {
+        "id": "rs-wordmark",
+        "label": "Review Surface wordmark",
+        "path": "media/logos/review-surface-wordmark.svg",
+        "tags": ["wordmark", "primary"]
+      }
+    },
+    "ogImage": {
+      "width": 1200,
+      "height": 630,
+      "background": "#fafafa",
+      "accentBar": "#4338ca"
+    }
+  },
+  "defaultMode": "light"
+}

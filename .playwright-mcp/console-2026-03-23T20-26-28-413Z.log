@@ -1,0 +1,2 @@
+[     177ms] [ERROR] Document policy violation: js-profiling is not allowed in this document. @ https://app.chatprd.ai/_next/static/chunks/5565c6d9b54e467c.js?dpl=dpl_ErAtA9bQF2UWe8VxDNfwgeAHP1aL:19
+[     291ms] [WARNING] Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props @ https://app.chatprd.ai/_next/static/chunks/5565c6d9b54e467c.js?dpl=dpl_ErAtA9bQF2UWe8VxDNfwgeAHP1aL:9

@@ -1,0 +1,11 @@
+[    2987ms] [WARNING]   WARN  [Statsig] Attempting to retrieve a StatsigClient but none was set. @ https://www.figma.com/_netlify/_next/static/chunks/3914-5d787a03443b4baf.js:4
+[    3264ms] [WARNING] ReactPlayer: Vimeo player could not call %cplay%c – The player was not available font-weight: bold  @ https://www.figma.com/_netlify/_next/static/chunks/3914-5d787a03443b4baf.js:4
+[    4354ms] [WARNING] [GSI_LOGGER]: Your client application uses one of the Google One Tap prompt UI status methods that may stop functioning when FedCM becomes mandatory. Refer to the migration guide to update your code accordingly and opt-in to FedCM to test your changes. Learn more: https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#display_moment and https://developers.google.com/identity/gsi/web/guides/fedcm-migration?s=dc#skipped_moment @ https://www.figma.com/_netlify/_next/static/chunks/3914-5d787a03443b4baf.js:4
+[    5348ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.figma.com/:0
+[   11184ms] [ERROR] Attestation check for Attribution Reporting on https://www.facebook.com failed. @ https://www.figma.com/:0
+[   21823ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/195-d9b84b48e5514497.min.js.br:6
+[   21823ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/195-d9b84b48e5514497.min.js.br:6
+[   25886ms] [ERROR] Error retrieving a token. @ https://www.figma.com/files/team/1552115635881898246/recents-and-sharing?fuid=1552115632731685849:0
+[   27095ms] [WARNING] Statsig is not ready to log exposures, will retry in 1 seconds @ https://www.figma.com/webpack-artifacts/assets/vendor-core-83c17265f2588e9e.min.js.br:53
+[   27330ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   27859ms] [WARNING] Specifying 'overflow: visible' on img, video and canvas tags may cause them to produce visual content outside of the element bounds. See https://github.com/WICG/view-transitions/blob/main/debugging_overflow_on_images.md for details. @ https://www.figma.com/files/team/1552115635881898246/recents-and-sharing?fuid=1552115632731685849:0

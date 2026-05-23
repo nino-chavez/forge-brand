@@ -1,0 +1,2 @@
+[     752ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://resend.com/docs?_rsc=iyv1n:0
+[    6518ms] [WARNING] The resource https://resend.com/_next/static/chunks/0t8e5ww2hmbf9.css?dpl=dpl_FAdqMkRzMy6x8RryNqZM7AwaPb2a was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ https://resend.com/metrics:0

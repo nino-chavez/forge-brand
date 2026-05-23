@@ -1,0 +1,2 @@
+[    3692ms] [WARNING] bootstrap-slider.js - WARNING: $.fn.slider namespace is already bound. Use the $.fn.bootstrapSlider namespace instead. @ https://assets2.analog.com/lib/scripts/plugins/bootstrap-slider.min.js:1068
+[    3859ms] [WARNING] VIDEOJS: WARN: videojs.mergeOptions is deprecated and will be removed in 9.0; please use videojs.obj.merge instead. @ https://players.brightcove.net/706011717001/AQ1ZKQZJE_default/index.min.js:0
