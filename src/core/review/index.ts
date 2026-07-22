@@ -83,9 +83,12 @@ export {
 export {
   reviewDecisions,
   checkGenerationReadiness,
+  resolveDecisionState,
   matchesPattern,
   violatedPatterns,
   type DecisionsReport,
   type DecisionsIssue,
   type GenerationReadiness,
+  type DecisionState,
+  type GateState,
 } from './decisions.js';

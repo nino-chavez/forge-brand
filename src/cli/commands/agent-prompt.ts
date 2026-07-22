@@ -13,6 +13,7 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseBrandKit, safeParseBrandKit } from '../../core/schema/brand-kit.js';
+import { resolveDecisionState } from '../../core/review/decisions.js';
 import { reviewBrandKit } from '../../core/review/index.js';
 import { listTemplateIds } from '../../media/templates/index.js';
 
@@ -167,19 +168,27 @@ export function registerAgentPromptCommand(program: Command) {
             sections.push('');
           }
 
-          const decided = new Set(
-            d.ledger.filter((e) => e.decision === 'approved').map((e) => e.gate),
-          );
+          // Shared resolver, `decided` semantics: a gate whose winner has
+          // since been rejected is not decided, however many approvals its
+          // history holds. This used to be computed here independently and
+          // said DECIDED for a gate holding nothing.
+          const state = resolveDecisionState(d);
           sections.push('**Gates**');
           sections.push('');
           for (const g of d.gates) {
-            const blockedBy = g.requires.filter((r) => !decided.has(r));
-            const state = decided.has(g.id)
-              ? 'DECIDED'
-              : blockedBy.length > 0
-                ? `BLOCKED (needs ${blockedBy.join(', ')})`
-                : 'OPEN';
-            sections.push(`- ${g.id} — ${state}`);
+            const blockedBy = g.requires.filter((r) => !state.decided(r));
+            const winner = state.winner(g.id);
+            let label: string;
+            if (state.decided(g.id)) {
+              label = `DECIDED (${winner})`;
+            } else if (state.everApproved(g.id)) {
+              label = 'UNRESOLVED — approved once, but no candidate holds it now';
+            } else if (blockedBy.length > 0) {
+              label = `BLOCKED (needs ${blockedBy.join(', ')})`;
+            } else {
+              label = 'OPEN';
+            }
+            sections.push(`- ${g.id} — ${label}`);
           }
           sections.push('');
 

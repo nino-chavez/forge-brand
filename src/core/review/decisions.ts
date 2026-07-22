@@ -237,6 +237,10 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
 
   // --- Rule 3: gates advance in order ----------------------------------------
 
+  // `everApproved` semantics: this rule is about the ORDER decisions were
+  // recorded in, and a later reversal does not un-happen an approval. The
+  // "no live winner" case is a separate error above, so it is not repeated
+  // here as a cascade.
   for (const gate of d.gates) {
     if (!approvedGates.has(gate.id)) continue;
     for (const req of gate.requires) {
@@ -475,6 +479,88 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
 }
 
 // ---------------------------------------------------------------------------
+// Decision state — one place that answers "where does this gate stand"
+// ---------------------------------------------------------------------------
+
+export interface GateState {
+  id: string;
+  /** The ledger contains an approval for this gate, whenever it happened. */
+  hasApproval: boolean;
+  /** Ledger position of the most recent approval, or null. */
+  lastApprovalIndex: number | null;
+  /** The candidate currently holding the position — status `approved`. */
+  winner: string | null;
+  /**
+   * Settled RIGHT NOW: approved at some point, and someone still holds it.
+   * Approve a candidate, then reject it, and `hasApproval` stays true while
+   * this goes false.
+   */
+  decided: boolean;
+}
+
+export interface DecisionState {
+  gates: Map<string, GateState>;
+  /** Currently settled — an approval that still has a live winner. */
+  decided(gate: string): boolean;
+  /** Ever approved, regardless of whether the winner survived. */
+  everApproved(gate: string): boolean;
+  winner(gate: string): string | null;
+}
+
+/**
+ * Three places computed "is this gate decided" independently, and all three
+ * asked the easy question — does an approval entry exist — rather than the
+ * real one. A kit whose only approved candidate had since been rejected
+ * failed review as broken while readiness cheerfully unblocked every gate
+ * downstream of it.
+ *
+ * The two questions are both legitimate and they are not the same:
+ *
+ *   `everApproved` — was a decision recorded here? Correct for checking the
+ *      ORDER decisions were made in; a later reversal does not un-happen it.
+ *   `decided`      — is it settled now? Correct for anything acting on the
+ *      current state: generating, reporting, unblocking.
+ *
+ * Consumers pick deliberately and say which they mean. The bug was not
+ * choosing wrong, it was three copies of one computation that only ever
+ * expressed the first.
+ */
+export function resolveDecisionState(d: DecisionSystem): DecisionState {
+  const gates = new Map<string, GateState>();
+
+  const ids = new Set<string>([
+    ...d.gates.map((g) => g.id),
+    ...d.ledger.map((e) => e.gate),
+  ]);
+
+  for (const id of ids) {
+    let lastIndex: number | null = null;
+    d.ledger.forEach((e, i) => {
+      if (e.decision === 'approved' && e.gate === id) lastIndex = i;
+    });
+
+    // At most one by rule 2; take the first defensively.
+    const winner =
+      d.candidates.find((c) => c.gate === id && c.status === 'approved')?.id ?? null;
+
+    gates.set(id, {
+      id,
+      hasApproval: lastIndex !== null,
+      lastApprovalIndex: lastIndex,
+      winner,
+      decided: lastIndex !== null && winner !== null,
+    });
+  }
+
+  return {
+    gates,
+    decided: (gate) => gates.get(gate)?.decided ?? false,
+    everApproved: (gate) => gates.get(gate)?.hasApproval ?? false,
+    winner: (gate) => gates.get(gate)?.winner ?? null,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Generation readiness
 // ---------------------------------------------------------------------------
 
@@ -525,16 +611,21 @@ export function checkGenerationReadiness(
       `Gate "${gate}" is not defined. Declared gates: ${d.gates.map((g) => g.id).join(', ') || '(none)'}`,
     );
   } else {
-    const approved = new Set(
-      d.ledger.filter((e) => e.decision === 'approved').map((e) => e.gate),
-    );
-    const open = def.requires.filter((r) => !approved.has(r));
+    // `decided`, not `everApproved`. Generating downstream of a gate whose
+    // winner has since been rejected means building on nothing — which used
+    // to be allowed while review called the same kit broken.
+    const state = resolveDecisionState(d);
+    const open = def.requires.filter((r) => !state.decided(r));
     if (open.length > 0) {
       blockers.push(
-        `Gate "${gate}" is blocked until ${open.join(', ')} ${open.length === 1 ? 'is' : 'are'} decided.`,
+        `Gate "${gate}" is blocked until ${open.join(', ')} ${open.length === 1 ? 'is' : 'are'} decided${
+          open.some((r) => state.everApproved(r))
+            ? ' — an approval was recorded but no candidate holds the position any more'
+            : ''
+        }.`,
       );
     }
-    if (approved.has(gate) && !options.reopen) {
+    if (state.decided(gate) && !options.reopen) {
       blockers.push(
         `Gate "${gate}" is already decided. Pass --reopen to run another round — approving a new candidate there supersedes the current winner and keeps both ledger entries.`,
       );
