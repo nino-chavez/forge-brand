@@ -37,8 +37,13 @@ describe('exportCssTokens', () => {
   });
 
   it('contains font variables', () => {
+    // Reads the family from the kit rather than naming one. Hardcoding
+    // "Bebas Neue" here pinned a value that had drifted from the live site
+    // months earlier, so the suite was holding the stale fact in place and
+    // the correction looked like a regression.
     const css = exportCssTokens(flickdayKit);
-    expect(css).toContain("--font-display: 'Bebas Neue'");
+    expect(css).toContain(`--font-display: '${flickdayKit.typography.display.family}'`);
+    expect(css).toContain('--font-body:');
   });
 
   it('contains DO NOT EDIT warning', () => {
