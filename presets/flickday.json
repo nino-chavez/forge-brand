@@ -546,7 +546,9 @@
         "Redesigning the website",
         "Changing the palette or type system",
         "Animating anything before the static mark works",
-        "Matching any legacy wordmark outline — systems A-D are forensic evidence of type drift, not geometry to preserve"
+        "Matching any legacy wordmark outline — systems A-D are forensic evidence of type drift, not geometry to preserve",
+        "Algorithmic kerning correction before finalists are chosen — equalising measured white area manufactures a preference and produced a k-d gap twice as tight as c-k in Sora. Native kerning until two or three finalists remain, then correct by eye",
+        "Letting a font being easy to fetch decide the identity — the first specimen pool was ten Google Fonts, mostly close relatives, which made the winner close to inevitable"
       ],
       "priorApprovals": [
         "Yellow on near-black as the primary contrast pair (live site :root)",
@@ -564,9 +566,10 @@
       "openQuestions": [
         {
           "id": "logotype-typeface",
-          "question": "Which typeface is the lowercase logotype? BRAND-PRIORS says it is a heavy rounded geometric sans and explicitly unidentified, and that wordmark type is OPEN. A lowercase-over-all-caps preference is recorded, but no wordmark has been approved.",
+          "question": "Which typeface is the production logotype? The traced marks (systems B/C/D) have no recoverable type identity. System A is documented as Avenir Next Heavy converted to paths, chosen because earlier sessions favoured Avenir — but that README calls the production typeface an open design decision, so it is a control to test, not an answer.",
           "sources": [
             "apps/flickdaymedia/BRAND-PRIORS.md — 'Wordmark type is OPEN and being redesigned' (2026-07-05)",
+            "concepts/2026-07-modular-wordmark/round-1/README.md — base is Avenir Next Heavy converted to paths; 'The exact production typeface is still a design decision'",
             "Rejection no-bebas-caps-wordmark records what was ruled out, not what was chosen"
           ],
           "blocks": [
@@ -816,7 +819,7 @@
       },
       {
         "id": "no-variant-type-drift",
-        "reason": "Typography changing between lockup variants means there is no system. Already happened: verified 2026-07-22 by fingerprinting glyph outlines across the shipped assets, which carry at least three separate letterform systems (modular set, traced play, traced reel, traced twotone) — all outlined, so none can be regenerated. See apps/flickdaymedia/flickday-assets/wordmarks/existing-type-drift.png",
+        "reason": "Typography changing between lockup variants means there is no system. Already happened: fingerprinting glyph outlines 2026-07-22 found at least three separate letterform systems across the shipped assets. System A (modular set) is Avenir Next Heavy converted to paths and IS regenerable via scripts/build-modular-wordmarks.mjs; systems B/C/D are potrace traces with no recoverable type identity. See apps/flickdaymedia/flickday-assets/wordmarks/existing-type-drift.png and concepts/2026-07-modular-wordmark/round-1/README.md",
         "class": "judgment",
         "patterns": [
           "different font in",
