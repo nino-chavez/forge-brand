@@ -151,6 +151,22 @@ export function registerAgentPromptCommand(program: Command) {
           }
           sections.push('');
 
+          const open = d.constitution?.openQuestions ?? [];
+          if (open.length > 0) {
+            sections.push('**Open questions — do not resolve these yourself**');
+            sections.push('');
+            for (const q of open) {
+              const scope = q.blocks.length > 0 ? ` _(blocks: ${q.blocks.join(', ')})_` : '';
+              sections.push(`- \`${q.id}\`${scope} — ${q.question}`);
+              for (const s of q.sources) sections.push(`  - source: ${s}`);
+            }
+            sections.push('');
+            sections.push(
+              '> These are recorded because two real sources disagree or nobody has decided yet. Surface them; do not pick an answer and proceed as though it were settled.',
+            );
+            sections.push('');
+          }
+
           const decided = new Set(
             d.ledger.filter((e) => e.decision === 'approved').map((e) => e.gate),
           );

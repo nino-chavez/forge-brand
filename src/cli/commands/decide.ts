@@ -101,7 +101,12 @@ function commit(kit: BrandKit, resolved: string, summary: string): void {
  * and unreadable. URLs pass through untouched.
  */
 export function normalizeAssetPath(input: string, kitPath: string): string {
-  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(input)) return input;
+  // Any URI scheme, not just hierarchical ones. Requiring `://` let
+  // `data:image/png;base64,...` fall through to the path logic, which read
+  // its embedded slashes as directory separators and stored a filesystem
+  // path in place of the URI. Two-or-more characters before the colon so a
+  // Windows drive letter (`C:`) is not mistaken for a scheme.
+  if (/^[a-z][a-z0-9+.-]+:/i.test(input)) return input;
   const absolute = path.resolve(process.cwd(), input);
   const relative = path.relative(path.dirname(path.resolve(kitPath)), absolute);
   if (relative.startsWith('..')) return absolute;

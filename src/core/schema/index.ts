@@ -64,6 +64,7 @@ export {
 // Decisions
 export {
   Constitution,
+  OpenQuestion,
   GateDefinition,
   RubricCriterion,
   RejectionConstraint,

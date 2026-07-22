@@ -57,6 +57,26 @@ const IsoDate = z
  * captures only what identity cannot: the brief in prose, what is out of
  * scope, and what has already been settled.
  */
+/**
+ * Something unsettled that an agent must not settle on its own.
+ *
+ * Two real sources disagreeing, a fact nobody has decided yet, a question
+ * raised by evidence. Recorded because the first attempt at capturing one
+ * used an unknown JSON key — Zod strips those, so it survived in the file
+ * until the next write and then vanished. An open question that disappears
+ * when someone records a candidate is worse than never writing it down: it
+ * reads as settled.
+ */
+export const OpenQuestion = z.object({
+  id: z.string().min(1),
+  question: z.string().min(1),
+  /** The conflicting or incomplete evidence, cited */
+  sources: z.array(z.string()).default([]),
+  /** Gates this must be answered at, if it blocks. Empty means informational. */
+  blocks: z.array(z.string()).default([]),
+});
+export type OpenQuestion = z.infer<typeof OpenQuestion>;
+
 export const Constitution = z.object({
   /** The actual brief, in prose. What this identity has to accomplish. */
   brief: z.string().min(1),
@@ -76,6 +96,8 @@ export const Constitution = z.object({
   priorApprovals: z.array(z.string()).default([]),
   /** Where the brief came from (site audit, prior session, stakeholder call) */
   sources: z.array(z.string()).default([]),
+  /** Conflicts and unsettled points — see OpenQuestion */
+  openQuestions: z.array(OpenQuestion).default([]),
 });
 export type Constitution = z.infer<typeof Constitution>;
 
@@ -256,12 +278,39 @@ export type DecisionEntry = z.infer<typeof DecisionEntry>;
 // Full Decision System
 // ---------------------------------------------------------------------------
 
+/**
+ * Ids are the only handle anything else has on these records — ledger
+ * entries name candidates, acknowledgements name rejections, gates name
+ * prerequisites. A duplicate makes every one of those references ambiguous,
+ * and the dangerous case is not theoretical: two judgment constraints
+ * sharing an id means one `reviewed` entry silently satisfies both, so a
+ * typo defeats the mandatory look.
+ *
+ * Enforced at the schema so no writer can route around it — `candidate add
+ * --id` hands an operator the collision directly.
+ */
+function uniqueIds<T extends { id: string }>(field: string) {
+  return (rows: T[], ctx: z.RefinementCtx) => {
+    const seen = new Set<string>();
+    for (const [i, row] of rows.entries()) {
+      if (seen.has(row.id)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [i, 'id'],
+          message: `Duplicate ${field} id "${row.id}" — ids are how everything else refers to this record`,
+        });
+      }
+      seen.add(row.id);
+    }
+  };
+}
+
 export const DecisionSystem = z.object({
   constitution: Constitution.optional(),
-  gates: z.array(GateDefinition).default([]),
-  rubric: z.array(RubricCriterion).default([]),
-  rejections: z.array(RejectionConstraint).default([]),
-  candidates: z.array(Candidate).default([]),
+  gates: z.array(GateDefinition).superRefine(uniqueIds('gate')).default([]),
+  rubric: z.array(RubricCriterion).superRefine(uniqueIds('rubric criterion')).default([]),
+  rejections: z.array(RejectionConstraint).superRefine(uniqueIds('rejection')).default([]),
+  candidates: z.array(Candidate).superRefine(uniqueIds('candidate')).default([]),
   ledger: z.array(DecisionEntry).default([]),
 });
 export type DecisionSystem = z.infer<typeof DecisionSystem>;
