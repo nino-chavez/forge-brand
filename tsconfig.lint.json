@@ -1,0 +1,18 @@
+{
+  // Type-checking scope, wider than the build.
+  //
+  // tsconfig.json sets rootDir: "src" so the emitted layout stays flat, which
+  // means scripts/ and tests/ are invisible to `tsc`. A required parameter was
+  // added to a generator and its only caller — a script — kept "passing"
+  // because tsx strips types instead of checking them. Lint was green while
+  // the caller sent `undefined` to an image model.
+  //
+  // No emit here, so rootDir does not apply and everything can be checked.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src/**/*", "scripts/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

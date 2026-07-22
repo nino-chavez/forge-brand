@@ -12,6 +12,8 @@ const dirA = await iterateLogoConcept({
   name: 'Flickday Media',
   basePrompt: kit.media.creative.basePrompt,
   avoid: kit.media.creative.avoid,
+  accentHex: kit.colors.primary.hex,
+  accentName: kit.colors.primary.name,
   outputDir: './output/flickday-iterate/direction-a',
 });
 for (const v of dirA) console.log(`  ${v.variant} → ${v.path}`);
@@ -23,6 +25,8 @@ const dirB = await iterateLogoConcept({
   name: 'Flickday Media',
   basePrompt: kit.media.creative.basePrompt,
   avoid: kit.media.creative.avoid,
+  accentHex: kit.colors.primary.hex,
+  accentName: kit.colors.primary.name,
   outputDir: './output/flickday-iterate/direction-b',
 });
 for (const v of dirB) console.log(`  ${v.variant} → ${v.path}`);

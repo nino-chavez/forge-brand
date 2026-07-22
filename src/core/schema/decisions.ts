@@ -39,7 +39,13 @@ const IsoDate = z
   .regex(
     /^\d{4}-\d{2}-\d{2}(T[\d:.]+(Z|[+-]\d{2}:?\d{2})?)?$/,
     'Must be YYYY-MM-DD, optionally with a time part',
-  );
+  )
+  // The regex alone admits 2026-13-45, which sorts after every real date.
+  .refine((v) => {
+    const [y, m, d] = v.slice(0, 10).split('-').map(Number);
+    if (m < 1 || m > 12 || d < 1) return false;
+    return d <= new Date(Date.UTC(y, m, 0)).getUTCDate();
+  }, 'Not a real calendar date');
 
 // ---------------------------------------------------------------------------
 // Constitution — the reconciled brief

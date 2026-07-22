@@ -599,6 +599,47 @@ describe('rule 7 — judgment constraints require a recorded look', () => {
     expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
   });
 
+  it('reads the declared day regardless of the machine timezone', () => {
+    // Date.parse treats a date-time without an offset as LOCAL, so this
+    // becomes the 21st on a UTC-5 machine and the 20th in CI — the gate's
+    // verdict would depend on where it runs.
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], recorded: '2026-07-20T20:00:00' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino', date: '2026-07-20' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
+  });
+
+  it('rejects an impossible calendar date at parse time', () => {
+    expect(() =>
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, recorded: '2026-13-45' }],
+      }),
+    ).toThrow();
+    expect(() =>
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, recorded: '2026-02-30' }],
+      }),
+    ).toThrow();
+  });
+
   it('rejects a non-ISO date at parse time', () => {
     expect(() =>
       withDecisions({

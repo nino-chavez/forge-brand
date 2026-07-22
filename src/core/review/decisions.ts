@@ -459,10 +459,31 @@ function postdates(
   return recorded > decided;
 }
 
-/** `YYYY-MM-DD` in UTC, or null if absent/unparseable. */
+/**
+ * The calendar day the author wrote, or null if absent or not a real date.
+ *
+ * Deliberately does NOT go through `Date.parse`. Per spec that treats a
+ * date-only string as UTC but a date-time without an offset as LOCAL time,
+ * so `"2026-07-20T20:00:00"` becomes the 21st on a UTC-5 machine and the
+ * 20th in CI — the same fail-open as the old string comparison, plus a gate
+ * whose verdict depends on where it runs.
+ *
+ * Comparing the declared day is also the honest semantic: someone who wrote
+ * `2026-07-20T20:00:00` meant the 20th.
+ *
+ * The calendar check matters because a `slice(0, 10)` would let `2026-13-45`
+ * through, and it sorts after every real date — fail-open again.
+ */
 function utcDay(value: string | undefined): string | null {
   if (!value) return null;
-  const ms = Date.parse(value);
-  if (Number.isNaN(ms)) return null;
-  return new Date(ms).toISOString().slice(0, 10);
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!m) return null;
+  const [, y, mo, d] = m;
+  return isRealDate(+y, +mo, +d) ? `${y}-${mo}-${d}` : null;
+}
+
+function isRealDate(year: number, month: number, day: number): boolean {
+  if (month < 1 || month > 12 || day < 1) return false;
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return day <= daysInMonth;
 }
