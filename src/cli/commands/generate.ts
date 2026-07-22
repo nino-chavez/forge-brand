@@ -370,6 +370,20 @@ export function registerGenerateCommand(program: Command) {
         process.exit(1);
       }
 
+      // Iteration drives the same image model, so it needs the same refusal.
+      // Gating only `generate logo` covered half the path that produces the
+      // drift: a wordmark specimen recorded as a PNG — which is exactly what
+      // the wordmark refusal tells you to produce — could still be fed here,
+      // and a diffusion model would "preserve the geometry" of letterforms it
+      // is incapable of setting.
+      const refusal = refusalFor(candidate.gate);
+      if (refusal) {
+        console.error(chalk.red(`\nAn image model is the wrong tool at "${candidate.gate}".\n`));
+        console.error(chalk.red(`  ${refusal.reason}\n`));
+        console.error(chalk.yellow(`  Instead: ${refusal.instead}\n`));
+        process.exit(1);
+      }
+
       // Iteration means producing variants OF a mark. With no image the model
       // only ever saw the descriptor, so it re-invented the mark each time
       // while the command called the result a variant.

@@ -83,6 +83,32 @@ function commit(kit: BrandKit, resolved: string, summary: string): void {
   }
 }
 
+/**
+ * Store an asset path the way the schema says it is stored.
+ *
+ * `AssetRef.path` is documented as "relative to brand kit root, or URL", but
+ * this writer stored whatever the operator typed — which is naturally
+ * CWD-relative, like every other path flag in this CLI. The reader then
+ * resolved it against the kit's directory, so a hand-typed
+ * `output/logos/x.png` became `presets/output/logos/x.png` and the file
+ * "didn't exist". It only ever worked because the paths the tool prints are
+ * absolute, which makes the rebase a no-op by accident.
+ *
+ * So: interpret input against CWD, like the other flags. Store relative to
+ * the kit when the asset actually lives under it — that is what makes a kit
+ * portable — and absolute when it does not. A kit outside the asset tree
+ * would otherwise store `../../../../../..` chains that are correct, fragile,
+ * and unreadable. URLs pass through untouched.
+ */
+export function normalizeAssetPath(input: string, kitPath: string): string {
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(input)) return input;
+  const absolute = path.resolve(process.cwd(), input);
+  const relative = path.relative(path.dirname(path.resolve(kitPath)), absolute);
+  if (relative.startsWith('..')) return absolute;
+  // Keep POSIX separators so a kit written on Windows still reads elsewhere.
+  return relative.split(path.sep).join('/');
+}
+
 /** Next free `C-NNN`. */
 function nextCandidateId(kit: BrandKit): string {
   const used = (kit.decisions?.candidates ?? [])
@@ -137,7 +163,7 @@ export function registerCandidateCommand(program: Command) {
         status: 'candidate',
         ...(options.parent ? { parent: options.parent } : {}),
         ...(options.asset
-          ? { asset: { id, label: id, path: options.asset, tags: [] } }
+          ? { asset: { id, label: id, path: normalizeAssetPath(options.asset, resolved), tags: [] } }
           : {}),
       });
 
