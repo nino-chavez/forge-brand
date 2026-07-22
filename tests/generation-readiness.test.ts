@@ -13,6 +13,7 @@ import path from 'node:path';
 import { parseBrandKit, type BrandKit } from '../src/core/schema/brand-kit.js';
 import { checkGenerationReadiness } from '../src/core/review/decisions.js';
 import { buildLogoPrompt } from '../src/core/generators/logo.js';
+import { buildIterationPrompt, VARIANT_IDS } from '../src/core/generators/logo-iterate.js';
 
 const PRESETS_DIR = path.resolve(__dirname, '../presets');
 
@@ -183,5 +184,41 @@ describe('buildLogoPrompt carries the recorded state', () => {
     expect(prompt).not.toContain('CONCEPTUAL ANCHOR');
     expect(prompt).not.toContain('ALREADY REJECTED');
     expect(prompt).not.toContain('JUDGED AGAINST');
+  });
+});
+
+describe('buildIterationPrompt carries the recorded state', () => {
+  const base = {
+    direction: 'Asymmetric contact burst',
+    name: 'Test Brand',
+    accentHex: '#123456',
+    accentName: 'Test Accent',
+  };
+
+  it('carries the anchor and the rejections into every variant', () => {
+    for (const id of VARIANT_IDS) {
+      const prompt = buildIterationPrompt(
+        { ...base, anchor: 'The instant of contact', rejected: ['Reads as the Meta mark'] },
+        id,
+      );
+      expect(prompt, id).toContain('The instant of contact');
+      expect(prompt, id).toContain('ALREADY REJECTED');
+      expect(prompt, id).toContain('Reads as the Meta mark');
+    }
+  });
+
+  it('uses the kit accent in the background variants, never a hardcoded one', () => {
+    for (const id of ['on-black', 'on-white']) {
+      const prompt = buildIterationPrompt(base, id);
+      expect(prompt, id).toContain('Test Accent (#123456)');
+      expect(prompt, id).not.toContain('#facc15');
+      expect(prompt, id).not.toContain('undefined');
+    }
+  });
+
+  it('falls back to the bare hex when the accent has no name', () => {
+    const prompt = buildIterationPrompt({ ...base, accentName: undefined }, 'on-black');
+    expect(prompt).toContain('#123456');
+    expect(prompt).not.toContain('undefined');
   });
 });

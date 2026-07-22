@@ -172,6 +172,20 @@ brand-forge decide -k kit.json -g territory --approve C-002 \
 
 Both ledger entries survive. The old candidate becomes `superseded`, so the gate still resolves to exactly one live winner and nothing has to be deleted to change your mind.
 
+Iteration takes a recorded candidate rather than a free-typed direction, and refuses to refine one that's already dead:
+
+```bash
+brand-forge generate iterate -k kit.json -c C-002
+# → simplified / standard / detailed / on-black / on-white
+
+brand-forge generate iterate -k kit.json -c C-001
+# → Candidate C-001 is superseded. Refining a direction that was already
+#   killed is how a project ends up rescuing an artifact instead of
+#   solving the brief.
+```
+
+That refusal is the point of the whole feature. Iteration is where a project quietly stops solving the brief and starts repairing whatever appeared first.
+
 The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
 
 ```bash

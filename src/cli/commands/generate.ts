@@ -16,6 +16,7 @@ import { generateVoice } from '../../core/generators/voice.js';
 import { generateFontPairings } from '../../core/generators/fonts.js';
 import { generateIdentity } from '../../core/generators/identity.js';
 import { generateLogos } from '../../core/generators/logo.js';
+import { iterateLogoConcept } from '../../core/generators/logo-iterate.js';
 import {
   checkGenerationReadiness,
   type GenerationReadiness,
@@ -318,6 +319,80 @@ export function registerGenerateCommand(program: Command) {
         }
       } else {
         console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
+      }
+    });
+
+  // --- Iterate ---
+  //
+  // Iteration is the path that produced the drift this whole system exists
+  // to prevent: an early artifact appears, and every round after it is spent
+  // repairing that artifact instead of solving the brief. So it takes a
+  // recorded candidate rather than a free-floating direction string, and it
+  // refuses to refine one that has already been killed.
+  gen
+    .command('iterate')
+    .description('Generate size and background variants of a recorded candidate')
+    .requiredOption('-c, --candidate <id>', 'Candidate to iterate on')
+    .option('-k, --kit <path>', 'Path to brand-kit.json', 'brand-kit.json')
+    .option('-o, --output <dir>', 'Output directory', './output/logo-iterations')
+    .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
+    .action(async (options: { kit: string; candidate: string; output: string; model: string }) => {
+      const kit = parseBrandKit(JSON.parse(fs.readFileSync(path.resolve(options.kit), 'utf-8')));
+      if (!kit.decisions) {
+        console.error(chalk.red('This kit has no `decisions` block, so there are no candidates to iterate on.'));
+        process.exit(1);
+      }
+
+      const candidate = kit.decisions.candidates.find((c) => c.id === options.candidate);
+      if (!candidate) {
+        console.error(chalk.red(`Candidate "${options.candidate}" does not exist.`));
+        process.exit(1);
+      }
+
+      if (candidate.status === 'rejected' || candidate.status === 'superseded') {
+        console.error(
+          chalk.red(
+            `\nCandidate ${candidate.id} is ${candidate.status}. Refining a direction that was already killed is how a project ends up rescuing an artifact instead of solving the brief.\n`,
+          ),
+        );
+        process.exit(1);
+      }
+
+      const readiness = checkGenerationReadiness(kit, candidate.gate, { reopen: true });
+      if (!readiness.ready) {
+        console.error(chalk.red('\nNot ready to iterate:\n'));
+        for (const b of readiness.blockers) console.error(chalk.red(`  - ${b}`));
+        console.error('');
+        process.exit(1);
+      }
+
+      console.log(chalk.bold(`\nIterating ${candidate.id} at gate "${candidate.gate}"\n`));
+      console.log(chalk.dim(`  ${candidate.descriptor}\n`));
+
+      const variants = await iterateLogoConcept({
+        direction: candidate.descriptor,
+        name: kit.identity.name,
+        basePrompt: kit.media.creative?.basePrompt,
+        avoid: kit.media.creative?.avoid,
+        accentHex: kit.colors.primary.hex,
+        accentName: kit.colors.primary.name,
+        outputDir: options.output,
+        model: options.model,
+        anchor: readiness.anchor,
+        rejected: readiness.avoid,
+      });
+
+      for (const v of variants) {
+        console.log(chalk.green(`  ${v.variant.padEnd(12)} → ${v.path}`));
+      }
+
+      if (variants.length > 0) {
+        console.log(chalk.dim('\nRecord any that change the mark rather than just its size:'));
+        console.log(
+          chalk.dim(
+            `  brand-forge candidate add -k ${options.kit} -g ${candidate.gate} -m ai-image -p ${candidate.id} -a <path> -d "<what it IS>"`,
+          ),
+        );
       }
     });
 }

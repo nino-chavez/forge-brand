@@ -33,6 +33,16 @@ export interface LogoIterationOptions {
   outputDir?: string;
   /** Model */
   model?: string;
+  /** The idea being expressed, from the kit's conceptual anchor */
+  anchor?: string;
+  /**
+   * Recorded rejections in scope for this gate.
+   *
+   * Iteration is where they matter most: this is the path that takes an
+   * existing artifact and refines it, so without them a variant round will
+   * happily polish a direction that was already killed.
+   */
+  rejected?: string[];
 }
 
 export interface LogoVariation {
@@ -75,6 +85,41 @@ const VARIANTS: Array<{
   },
 ];
 
+/** Exposed so the recorded state reaching the prompt can be asserted directly. */
+export function buildIterationPrompt(
+  options: LogoIterationOptions,
+  variantId: string,
+): string {
+  const variant = VARIANTS.find((v) => v.id === variantId);
+  if (!variant) throw new Error(`Unknown variant: ${variantId}`);
+  const instruction =
+    typeof variant.instruction === 'function'
+      ? variant.instruction(options)
+      : variant.instruction;
+
+  return `${options.basePrompt || ''}
+${options.anchor ? `\nCONCEPTUAL ANCHOR — the idea this expresses:\n${options.anchor}\n` : ''}
+LOGO DIRECTION TO ITERATE ON:
+${options.direction}
+
+VARIANT: ${instruction}
+
+BRAND: ${options.name}
+
+CRITICAL:
+- NO text, words, letters, or typography
+- Generate ONLY the graphic mark / symbol
+- Clean vector-quality edges
+${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('\n')}` : ''}
+${
+  options.rejected?.length
+    ? `\nALREADY REJECTED — refining toward any of these is wasted work:\n${options.rejected.map((r) => `- ${r}`).join('\n')}`
+    : ''
+}`;
+}
+
+export const VARIANT_IDS = VARIANTS.map((v) => v.id);
+
 export async function iterateLogoConcept(
   options: LogoIterationOptions,
 ): Promise<LogoVariation[]> {
@@ -88,25 +133,7 @@ export async function iterateLogoConcept(
   const results: LogoVariation[] = [];
 
   for (const variant of VARIANTS) {
-    const instruction =
-      typeof variant.instruction === 'function'
-        ? variant.instruction(options)
-        : variant.instruction;
-
-    const prompt = `${options.basePrompt || ''}
-
-LOGO DIRECTION TO ITERATE ON:
-${options.direction}
-
-VARIANT: ${instruction}
-
-BRAND: ${options.name}
-
-CRITICAL:
-- NO text, words, letters, or typography
-- Generate ONLY the graphic mark / symbol
-- Clean vector-quality edges
-${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('\n')}` : ''}`;
+    const prompt = buildIterationPrompt(options, variant.id);
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
