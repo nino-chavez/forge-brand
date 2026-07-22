@@ -17,6 +17,7 @@ import { generateFontPairings } from '../../core/generators/fonts.js';
 import { generateIdentity } from '../../core/generators/identity.js';
 import { generateLogos } from '../../core/generators/logo.js';
 import { iterateLogoConcept } from '../../core/generators/logo-iterate.js';
+import { profileFor, refusalFor } from '../../core/generators/gate-profiles.js';
 import {
   checkGenerationReadiness,
   type GenerationReadiness,
@@ -274,6 +275,15 @@ export function registerGenerateCommand(program: Command) {
           console.error('');
           process.exit(1);
         }
+
+        // Being ready is not the same as this being the right instrument.
+        const refusal = refusalFor(options.gate);
+        if (refusal) {
+          console.error(chalk.red(`\nAn image model is the wrong tool at "${options.gate}".\n`));
+          console.error(chalk.red(`  ${refusal.reason}\n`));
+          console.error(chalk.yellow(`  Instead: ${refusal.instead}\n`));
+          process.exit(1);
+        }
       }
 
       console.log(chalk.bold(`\nGenerating ${options.count} logo concepts for ${kit.identity.name}...\n`));
@@ -296,6 +306,7 @@ export function registerGenerateCommand(program: Command) {
         anchor: readiness.anchor,
         rejected: readiness.avoid,
         criteria: readiness.criteria,
+        profile: options.gate ? profileFor(options.gate) ?? undefined : undefined,
       });
 
       for (let i = 0; i < concepts.length; i++) {
@@ -359,6 +370,26 @@ export function registerGenerateCommand(program: Command) {
         process.exit(1);
       }
 
+      // Iteration means producing variants OF a mark. With no image the model
+      // only ever saw the descriptor, so it re-invented the mark each time
+      // while the command called the result a variant.
+      const assetPath = candidate.asset?.path
+        ? path.resolve(path.dirname(path.resolve(options.kit)), candidate.asset.path)
+        : null;
+
+      if (!assetPath) {
+        console.error(
+          chalk.red(
+            `\nCandidate ${candidate.id} has no recorded asset, so there is no mark to iterate on. Record one with \`candidate add -a <path>\`, or use \`generate logo\` to explore fresh.\n`,
+          ),
+        );
+        process.exit(1);
+      }
+      if (!fs.existsSync(assetPath)) {
+        console.error(chalk.red(`\nRecorded asset is missing on disk: ${assetPath}\n`));
+        process.exit(1);
+      }
+
       const readiness = checkGenerationReadiness(kit, candidate.gate, { reopen: true });
       if (!readiness.ready) {
         console.error(chalk.red('\nNot ready to iterate:\n'));
@@ -368,7 +399,8 @@ export function registerGenerateCommand(program: Command) {
       }
 
       console.log(chalk.bold(`\nIterating ${candidate.id} at gate "${candidate.gate}"\n`));
-      console.log(chalk.dim(`  ${candidate.descriptor}\n`));
+      console.log(chalk.dim(`  ${candidate.descriptor}`));
+      console.log(chalk.dim(`  conditioned on ${path.relative(process.cwd(), assetPath)}\n`));
 
       const variants = await iterateLogoConcept({
         direction: candidate.descriptor,
@@ -385,6 +417,7 @@ export function registerGenerateCommand(program: Command) {
         model: options.model,
         anchor: readiness.anchor,
         rejected: readiness.avoid,
+        sourceImagePath: assetPath,
       });
 
       for (const v of variants) {

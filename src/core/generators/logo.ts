@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { nonClobberingPath, slug } from './paths.js';
+import { GATE_PROFILES, type GateProfile } from './gate-profiles.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -41,6 +42,12 @@ export interface LogoGeneratorOptions {
   rejected?: string[];
   /** Evaluation criteria in scope for this gate */
   criteria?: string[];
+  /**
+   * Gate-specific directions and hard rules. Without one the prompt used a
+   * fixed hint list that asked for wordmarks and lockups while forbidding
+   * all text — a contradiction the model resolved arbitrarily.
+   */
+  profile?: GateProfile;
 }
 
 export interface LogoConcept {
@@ -59,15 +66,10 @@ export interface LogoConcept {
 export function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): string {
   const { name, personality, basePrompt, avoid, visualKeywords } = options;
 
-  const variationHints = [
-    'minimal geometric mark — simple shapes, one or two colors, works at any size',
-    'wordmark with custom letterforms — the brand name styled as the logo itself',
-    'icon + wordmark lockup — a distinct symbol paired with the brand name',
-    'abstract mark — non-literal, captures the brand feeling through shape and movement',
-    'monogram — first letter or initials of the brand, stylized as a mark',
-  ];
-
-  const hint = variationHints[variation % variationHints.length];
+  // Defaults to the symbol profile rather than the old self-contradicting
+  // list, so an ungated call still gets internally consistent instructions.
+  const profile = options.profile ?? GATE_PROFILES.symbol;
+  const hint = profile.hints[variation % profile.hints.length];
 
   let prompt = '';
 
@@ -93,17 +95,13 @@ ${
 }
 
 REQUIREMENTS:
-- Clean, professional logo design
+- Clean, professional design
 - Must work on both light and dark backgrounds
-- Must be recognizable at small sizes (32px favicon)
-- Vector-quality: clean edges, solid shapes, no gradients unless intentional
-- NO photographic elements — this is a logo, not an illustration
+- No photographic elements
+- Output on a transparent or solid neutral background
 
 CRITICAL:
-- NO text, words, letters, or typography in the image
-- Generate ONLY the graphic mark / symbol / icon
-- Typography will be composited separately
-- Output on a transparent or solid neutral background
+${profile.rules.map((r) => `- ${r}`).join('\n')}
 ${avoid?.length ? `\nAVOID:\n${avoid.map((a) => `- ${a}`).join('\n')}` : ''}`;
 
   return prompt;
