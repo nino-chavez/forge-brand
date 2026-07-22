@@ -803,7 +803,7 @@
       },
       {
         "id": "no-variant-type-drift",
-        "reason": "Typography changing between lockup variants means there is no system",
+        "reason": "Typography changing between lockup variants means there is no system. Already happened: verified 2026-07-22 by fingerprinting glyph outlines across the shipped assets, which carry at least three separate letterform systems (modular set, traced play, traced reel, traced twotone) — all outlined, so none can be regenerated. See apps/flickdaymedia/flickday-assets/wordmarks/existing-type-drift.png",
         "class": "judgment",
         "patterns": [
           "different font in",
