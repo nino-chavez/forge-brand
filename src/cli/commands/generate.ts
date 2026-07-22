@@ -16,6 +16,10 @@ import { generateVoice } from '../../core/generators/voice.js';
 import { generateFontPairings } from '../../core/generators/fonts.js';
 import { generateIdentity } from '../../core/generators/identity.js';
 import { generateLogos } from '../../core/generators/logo.js';
+import {
+  checkGenerationReadiness,
+  type GenerationReadiness,
+} from '../../core/review/decisions.js';
 
 export function registerGenerateCommand(program: Command) {
   const gen = program
@@ -242,10 +246,40 @@ export function registerGenerateCommand(program: Command) {
     .option('-n, --count <n>', 'Number of concepts', '3')
     .option('-o, --output <dir>', 'Output directory', './output/logos')
     .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
-    .action(async (options: { kit: string; count: string; output: string; model: string }) => {
-      const kit = parseBrandKit(JSON.parse(fs.readFileSync(path.resolve(options.kit), 'utf-8')));
+    .option('-g, --gate <id>', 'Gate to generate at (required for kits with a decisions block)')
+    .action(async (options: { kit: string; count: string; output: string; model: string; gate?: string }) => {
+      const kitPath = path.resolve(options.kit);
+      const kit = parseBrandKit(JSON.parse(fs.readFileSync(kitPath, 'utf-8')));
+
+      // A managed kit does not generate freehand. Refusing here is cheap;
+      // discovering afterward that a round was generated with no anchor, or
+      // at a gate whose prerequisites are open, costs the round.
+      let readiness: GenerationReadiness = { ready: true, blockers: [], avoid: [], criteria: [] };
+      if (kit.decisions) {
+        if (!options.gate) {
+          console.error(
+            chalk.red('This kit records decisions. Pass --gate so generation is scoped to an open decision point.'),
+          );
+          console.error(
+            chalk.dim(`Gates: ${kit.decisions.gates.map((g) => g.id).join(', ') || '(none defined)'}`),
+          );
+          process.exit(1);
+        }
+        readiness = checkGenerationReadiness(kit, options.gate);
+        if (!readiness.ready) {
+          console.error(chalk.red('\nNot ready to generate:\n'));
+          for (const b of readiness.blockers) console.error(chalk.red(`  - ${b}`));
+          console.error('');
+          process.exit(1);
+        }
+      }
 
       console.log(chalk.bold(`\nGenerating ${options.count} logo concepts for ${kit.identity.name}...\n`));
+      if (readiness.anchor) {
+        console.log(chalk.dim(`  anchor:   ${readiness.anchor}`));
+        console.log(chalk.dim(`  avoiding: ${readiness.avoid.length} recorded rejections`));
+        console.log('');
+      }
 
       const concepts = await generateLogos({
         name: kit.identity.name,
@@ -256,6 +290,9 @@ export function registerGenerateCommand(program: Command) {
         count: parseInt(options.count),
         outputDir: options.output,
         model: options.model,
+        anchor: readiness.anchor,
+        rejected: readiness.avoid,
+        criteria: readiness.criteria,
       });
 
       for (let i = 0; i < concepts.length; i++) {
@@ -268,6 +305,18 @@ export function registerGenerateCommand(program: Command) {
       }
 
       console.log(chalk.dim(`\nReview the concepts in ${options.output}/`));
-      console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
+
+      if (kit.decisions && options.gate) {
+        console.log(chalk.dim('\nRecord the ones worth keeping, describing the construction rather than the vibe:'));
+        for (const c of concepts) {
+          console.log(
+            chalk.dim(
+              `  brand-forge candidate add -k ${options.kit} -g ${options.gate} -m ai-image -a ${c.path} -d "<what it IS>"`,
+            ),
+          );
+        }
+      } else {
+        console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
+      }
     });
 }

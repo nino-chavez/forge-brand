@@ -131,6 +131,35 @@ Two limits worth knowing. This is a **soft control on authorship**: the gate che
 npx tsx src/cli/index.ts agent-prompt --kit presets/flickday.json
 ```
 
+### The loop
+
+Generation is scoped to a gate, and a managed kit refuses to generate at the wrong moment — before the anchor exists, at a gate whose prerequisites are open, or at one already decided. When it does generate, the anchor, the in-scope rejections, and the criteria go into the prompt, so a generator can't re-propose a direction you already killed.
+
+```bash
+# refuses: no anchor yet, so there is nothing to generate toward
+brand-forge generate logo -k kit.json -g territory
+
+# record a candidate — describe the construction, not the vibe;
+# the descriptor is what rejection constraints match against
+brand-forge candidate add -k kit.json -g territory -m other \
+  -d "The instant of contact — the mark is the moment the ball is struck"
+
+brand-forge candidate list -k kit.json
+
+# refuses, and prints the exact flag to re-run with once you have looked
+brand-forge decide -k kit.json -g territory --approve C-001 \
+  --rationale "Reads across stills and video without a camera cliche." --by nino
+
+brand-forge decide -k kit.json -g territory --approve C-001 \
+  --rationale "Reads across stills and video without a camera cliche." --by nino \
+  --reviewed no-multi-metaphor
+
+# now the downstream gates open
+brand-forge generate logo -k kit.json -g symbol
+```
+
+`candidate add` and `decide` validate the whole kit before writing and refuse to persist anything the review gate would reject, so the file on disk is always in a state you can trust.
+
 The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
 
 ```bash

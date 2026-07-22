@@ -16,6 +16,7 @@ import { registerMediaCommand } from './commands/media.js';
 import { registerSiteCommand } from './commands/site.js';
 import { registerBatchCommand } from './commands/batch.js';
 import { registerAgentPromptCommand } from './commands/agent-prompt.js';
+import { registerCandidateCommand, registerDecideCommand } from './commands/decide.js';
 
 program
   .name('brand-forge')
@@ -31,5 +32,7 @@ registerBatchCommand(program);
 registerReviewCommand(program);
 registerDiffCommand(program);
 registerAgentPromptCommand(program);
+registerCandidateCommand(program);
+registerDecideCommand(program);
 
 program.parse();

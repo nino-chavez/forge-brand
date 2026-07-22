@@ -28,6 +28,7 @@ npm test                    # Vitest
 1. Exporters are pure functions. No AI, no network, no randomness.
 2. Generators propose. Review gates validate. Humans approve. Then it locks into the schema.
 2b. Identity work advances on a `decisions.ledger` entry, never on a status field an agent set. Recorded rejections are enforced against live candidates — do not relitigate one by rewording the descriptor.
+2c. Use `candidate add` and `decide` rather than hand-editing the `decisions` block. Both validate before writing, so the kit on disk always passes review. Never fill in a ledger entry's `reviewed` on the operator's behalf — that field asserts a human looked at the artifact.
 3. All imports use `.js` extension (ESM).
 4. All colors are `#rrggbb` format.
 5. Every preset must pass `parseBrandKit()` and `reviewBrandKit()`.

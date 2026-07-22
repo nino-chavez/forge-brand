@@ -30,6 +30,16 @@ export interface LogoGeneratorOptions {
   outputDir?: string;
   /** Image model to use (OpenRouter model ID) */
   model?: string;
+  /**
+   * Recorded creative state for the gate being generated at, from
+   * `checkGenerationReadiness`. Without it a generator has no idea which
+   * directions were already rejected and will happily re-propose them.
+   */
+  anchor?: string;
+  /** Recorded rejections in scope for this gate */
+  rejected?: string[];
+  /** Evaluation criteria in scope for this gate */
+  criteria?: string[];
 }
 
 export interface LogoConcept {
@@ -45,7 +55,7 @@ export interface LogoConcept {
 // Prompt
 // ---------------------------------------------------------------------------
 
-function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): string {
+export function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): string {
   const { name, personality, basePrompt, avoid, visualKeywords } = options;
 
   const variationHints = [
@@ -65,11 +75,21 @@ function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): stri
   }
 
   prompt += `Generate a logo concept for "${name}".
-
+${options.anchor ? `\nCONCEPTUAL ANCHOR — everything must express this idea, not a set of props:\n${options.anchor}\n` : ''}
 DIRECTION: ${hint}
 
 BRAND PERSONALITY: ${personality.join(', ')}
 ${visualKeywords?.length ? `VISUAL KEYWORDS: ${visualKeywords.join(', ')}` : ''}
+${
+  options.criteria?.length
+    ? `\nJUDGED AGAINST:\n${options.criteria.map((c) => `- ${c}`).join('\n')}`
+    : ''
+}
+${
+  options.rejected?.length
+    ? `\nALREADY REJECTED — do not re-propose any of these:\n${options.rejected.map((r) => `- ${r}`).join('\n')}`
+    : ''
+}
 
 REQUIREMENTS:
 - Clean, professional logo design

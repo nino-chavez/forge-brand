@@ -82,8 +82,10 @@ export {
 } from './consistency.js';
 export {
   reviewDecisions,
+  checkGenerationReadiness,
   matchesPattern,
   violatedPatterns,
   type DecisionsReport,
   type DecisionsIssue,
+  type GenerationReadiness,
 } from './decisions.js';

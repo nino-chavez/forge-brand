@@ -418,6 +418,87 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Generation readiness
+// ---------------------------------------------------------------------------
+
+export interface GenerationReadiness {
+  ready: boolean;
+  /** Why generation must not proceed */
+  blockers: string[];
+  /** The anchor to generate toward, if locked */
+  anchor?: string;
+  /** In-scope rejections, phrased for a prompt */
+  avoid: string[];
+  /** In-scope rubric criteria, phrased for a prompt */
+  criteria: string[];
+}
+
+/**
+ * May a generator produce candidates at this gate, and with what constraints?
+ *
+ * The refusals matter more than the constraints. Generating before the anchor
+ * exists is what produces a parts list instead of an idea, and generating at
+ * a gate whose prerequisites are open is how a project ends up defending an
+ * early artifact instead of solving the brief. Both are cheap to check and
+ * expensive to discover afterward.
+ *
+ * A kit with no `decisions` block is unmanaged and generates freely — this
+ * is opt-in, not a tax on every kit.
+ */
+export function checkGenerationReadiness(
+  kit: BrandKit,
+  gate: string,
+): GenerationReadiness {
+  const d = kit.decisions;
+  if (!d) return { ready: true, blockers: [], avoid: [], criteria: [] };
+
+  const blockers: string[] = [];
+  const anchor = d.constitution?.conceptualAnchor;
+
+  if (!anchor) {
+    blockers.push(
+      'No conceptual anchor recorded. Find the metaphor first and set decisions.constitution.conceptualAnchor — generating against apparatus instead of an idea is what this refusal exists to prevent.',
+    );
+  }
+
+  const def = d.gates.find((g) => g.id === gate);
+  if (!def) {
+    blockers.push(
+      `Gate "${gate}" is not defined. Declared gates: ${d.gates.map((g) => g.id).join(', ') || '(none)'}`,
+    );
+  } else {
+    const approved = new Set(
+      d.ledger.filter((e) => e.decision === 'approved').map((e) => e.gate),
+    );
+    const open = def.requires.filter((r) => !approved.has(r));
+    if (open.length > 0) {
+      blockers.push(
+        `Gate "${gate}" is blocked until ${open.join(', ')} ${open.length === 1 ? 'is' : 'are'} decided.`,
+      );
+    }
+    if (approved.has(gate)) {
+      blockers.push(
+        `Gate "${gate}" is already decided. Supersede the approved candidate before opening a new round.`,
+      );
+    }
+  }
+
+  const inScope = d.rejections.filter((r) => appliesToGate(r.gates, gate));
+
+  return {
+    ready: blockers.length === 0,
+    blockers,
+    anchor,
+    avoid: inScope.map((r) =>
+      r.suggestion ? `${r.reason}. Instead: ${r.suggestion}` : r.reason,
+    ),
+    criteria: d.rubric
+      .filter((c) => appliesToGate(c.gates, gate))
+      .map((c) => c.criterion),
+  };
+}
+
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
 }
