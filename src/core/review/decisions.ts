@@ -632,6 +632,21 @@ export function checkGenerationReadiness(
     }
   }
 
+  // `blocks` was written, printed, and never enforced — the field promised a
+  // gate it did not have. Found by running a real round: the symbol gate
+  // generated freely while an unanswered question about the symbol's central
+  // construction sat in the record saying it blocked exactly that.
+  //
+  // Mechanical, not judgment: whether a question has an answer is decidable
+  // from the record, so it blocks rather than warns.
+  for (const q of d.constitution?.openQuestions ?? []) {
+    if (q.blocks.includes(gate)) {
+      blockers.push(
+        `Open question "${q.id}" blocks this gate: ${q.question} Answer it in decisions.constitution.openQuestions — remove the entry once it is settled.`,
+      );
+    }
+  }
+
   const inScope = d.rejections.filter((r) => appliesToGate(r.gates, gate));
 
   return {

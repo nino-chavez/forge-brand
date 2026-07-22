@@ -52,6 +52,53 @@ const REJECTIONS = [
   },
 ];
 
+describe('open questions block the gates they name', () => {
+  // The field was printed but never consulted, so a question recorded as
+  // blocking the symbol gate did not block it. A promise the record makes
+  // and the tool ignores is worse than no promise.
+  const kit = () =>
+    withDecisions({
+      constitution: {
+        ...ANCHORED,
+        openQuestions: [
+          {
+            id: 'play-mark',
+            question: 'Signature idea or rejected construction?',
+            sources: ['two sources disagree'],
+            blocks: ['symbol'],
+          },
+        ],
+      },
+      gates: GATES,
+      candidates: [
+        { id: 'C-001', gate: 'territory', descriptor: 'A', method: 'other', status: 'approved' },
+      ],
+      ledger: [
+        {
+          gate: 'territory',
+          decision: 'approved',
+          candidates: ['C-001'],
+          rationale: 'x',
+          decidedBy: 'nino',
+        },
+      ],
+    });
+
+  it('blocks the named gate and quotes the question', () => {
+    const r = checkGenerationReadiness(kit(), 'symbol');
+    expect(r.ready).toBe(false);
+    expect(r.blockers.join(' ')).toContain('play-mark');
+  });
+
+  it('leaves gates it does not name alone', () => {
+    expect(checkGenerationReadiness(kit(), 'territory', { reopen: true }).ready).toBe(true);
+  });
+
+  it('--reopen does not waive it, because it is not a re-decision', () => {
+    expect(checkGenerationReadiness(kit(), 'symbol', { reopen: true }).ready).toBe(false);
+  });
+});
+
 describe('checkGenerationReadiness', () => {
   it('lets an unmanaged kit generate freely', () => {
     // The decisions block is opt-in; a kit without one is not taxed.
