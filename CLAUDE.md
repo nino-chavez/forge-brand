@@ -27,6 +27,7 @@ npm test                    # Vitest
 
 1. Exporters are pure functions. No AI, no network, no randomness.
 2. Generators propose. Review gates validate. Humans approve. Then it locks into the schema.
+2b. Identity work advances on a `decisions.ledger` entry, never on a status field an agent set. Recorded rejections are enforced against live candidates — do not relitigate one by rewording the descriptor.
 3. All imports use `.js` extension (ESM).
 4. All colors are `#rrggbb` format.
 5. Every preset must pass `parseBrandKit()` and `reviewBrandKit()`.
@@ -38,6 +39,7 @@ Before committing changes to this project:
 
 1. `npm run lint` passes (no type errors)
 2. If schema changed: all presets still parse
+2b. If a candidate was rejected this session: the reason is recorded in `decisions.rejections`, not just said in chat
 3. If preset changed: `reviewBrandKit()` still passes (no errors)
 4. If exporter changed: output is deterministic (same input → same output)
 5. If generator changed: output conforms to BrandKit schema

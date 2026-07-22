@@ -102,11 +102,29 @@ npx tsx src/cli/index.ts batch --kit presets/volley-rx.json
 ### Quality review
 
 ```bash
-# Run QA gates (contrast, font compat, consistency)
+# Run QA gates (contrast, font compat, consistency, decisions)
 npx tsx src/cli/index.ts review --kit brand-kit.json
 
 # Diff two kit versions
 npx tsx src/cli/index.ts diff old-kit.json new-kit.json
+```
+
+### Decisions — durable creative state
+
+An identity that is still being developed carries a `decisions` block. It records the brief, the ordered gates, the evaluation rubric, every candidate, the decision ledger, and the rejections. The `review` command enforces it and exits non-zero on failure:
+
+- A candidate marked `approved` with no matching ledger entry is an **error**. A gate advances on a recorded human decision, not on a status field an agent set.
+- A live candidate whose descriptor matches a recorded rejection is an **error**. "Looks like Facebook" gets written down once and enforced forever instead of rediscovered next session.
+- A gate approved before its prerequisite is an **error**. Generating at the symbol gate before territory is settled is how a project ends up defending an early artifact instead of solving the brief.
+- Candidates with an empty rubric is a **warning**. Agree the bar before generating, or the first artifact becomes the bar.
+
+The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
+
+```bash
+npx tsx src/cli/index.ts review --kit presets/flickday.json
+# Decisions
+#   0 live candidates against 7 rejection constraints
+#   PASSED
 ```
 
 ## Presets

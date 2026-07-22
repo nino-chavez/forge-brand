@@ -60,3 +60,16 @@ export {
   RadiusScale,
   LayoutConstraints,
 } from './spacing.js';
+
+// Decisions
+export {
+  Constitution,
+  GateDefinition,
+  RubricCriterion,
+  RejectionConstraint,
+  CandidateStatus,
+  GenerationMethod,
+  Candidate,
+  DecisionEntry,
+  DecisionSystem,
+} from './decisions.js';

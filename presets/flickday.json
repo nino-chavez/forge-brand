@@ -193,13 +193,13 @@
   },
   "media": {
     "logos": {
-      "primary": { "id": "lockup-full", "label": "Full lockup", "path": "assets/lockup-flickday-media-v2b.png", "tags": ["lockup", "full"] },
+      "primary": { "id": "lockup-full", "label": "Full lockup", "path": "assets/site/og-share-card.png", "tags": ["lockup", "full"] },
       "icon": { "id": "icon-aperture", "label": "Ball aperture icon", "path": "assets/logo-ball-aperture-motion.png", "tags": ["icon", "mark"] },
-      "wordmark": { "id": "lockup-header", "label": "Header lockup", "path": "assets/lockup-header.png", "tags": ["wordmark", "header"] },
+      "wordmark": { "id": "lockup-header", "label": "Header lockup", "path": "assets/site/header-logo.png", "tags": ["wordmark", "header"] },
       "variations": [
-        { "id": "lockup-slogan", "label": "Slogan lockup", "path": "assets/lockup-slogan-pro.png", "tags": ["lockup", "slogan"] },
-        { "id": "icon-favicon", "label": "Favicon", "path": "assets/icon-favicon.png", "width": 32, "height": 32, "tags": ["favicon"] },
-        { "id": "icon-social", "label": "Social circle", "path": "assets/icon-social-circle.png", "tags": ["social", "circle"] }
+        { "id": "lockup-slogan", "label": "Slogan lockup", "path": "assets/site/slogan-card.png", "tags": ["lockup", "slogan"] },
+        { "id": "icon-favicon", "label": "Favicon", "path": "assets/site/favicon/favicon-32x32.png", "width": 32, "height": 32, "tags": ["favicon"] },
+        { "id": "icon-social", "label": "Social circle", "path": "assets/site/social-avatar.png", "tags": ["social", "circle"] }
       ],
       "clearSpace": 0.25,
       "minSizePx": 24
@@ -273,5 +273,99 @@
     },
     "assets": []
   },
-  "defaultMode": "dark"
+  "defaultMode": "dark",
+  "decisions": {
+    "constitution": {
+      "brief": "Resolve the Flickday Media identity: a wordmark that stands alone, a symbol that stands alone, and a lockup for the two together. The website, palette, and voice are already settled and stay. Only the marks are open.",
+      "nonGoals": [
+        "Redesigning the website",
+        "Changing the palette or type system",
+        "Animating anything before the static mark works"
+      ],
+      "priorApprovals": [
+        "Wordmark set in Bebas Neue-class condensed display type",
+        "Yellow on near-black as the primary contrast pair",
+        "Tagline copy: Every Day's a Flickday"
+      ],
+      "sources": [
+        "flickdaymedia site (live)",
+        "Instagram @flickday.media",
+        "Prior identity sessions — see decisions.rejections for what they ruled out"
+      ]
+    },
+    "gates": [
+      { "id": "territory", "name": "Territory", "question": "Which strategic concept is this identity about?", "requires": [] },
+      { "id": "wordmark", "name": "Wordmark", "question": "Which typographic foundation carries the name?", "requires": ["territory"] },
+      { "id": "symbol", "name": "Symbol", "question": "Which mark works without the word?", "requires": ["territory"] },
+      { "id": "lockup", "name": "Lockup", "question": "How do wordmark and symbol relate?", "requires": ["wordmark", "symbol"] },
+      { "id": "stress-test", "name": "Stress test", "question": "Does it survive favicon, watermark, apparel, and 9:16 video?", "requires": ["lockup"] },
+      { "id": "production", "name": "Production", "question": "Are the masters true editable vectors in every format?", "requires": ["stress-test"] },
+      { "id": "motion", "name": "Motion", "question": "How does the approved mark behave over time?", "requires": ["production"] }
+    ],
+    "rubric": [
+      { "id": "distinctive", "criterion": "Distinctive and ownable", "weight": 5, "gates": ["territory", "symbol"] },
+      { "id": "personality", "criterion": "Reads as Flickday — authentic, energetic, player-first", "weight": 5, "gates": [] },
+      { "id": "type-quality", "criterion": "Typographic quality holds under scrutiny", "weight": 4, "gates": ["wordmark"] },
+      { "id": "small-size", "criterion": "Legible at favicon and watermark size", "weight": 5, "gates": ["symbol", "lockup", "stress-test"] },
+      { "id": "independence", "criterion": "Wordmark and symbol each work alone", "weight": 5, "gates": ["lockup"] },
+      { "id": "site-fit", "criterion": "Sits correctly in the existing site header", "weight": 3, "gates": ["stress-test"] },
+      { "id": "avatar", "criterion": "Survives a circular social avatar crop", "weight": 4, "gates": ["stress-test"] },
+      { "id": "watermark", "criterion": "Holds as a CapCut watermark over footage", "weight": 4, "gates": ["stress-test"] },
+      { "id": "one-color", "criterion": "Reproduces in one color on apparel", "weight": 4, "gates": ["stress-test"] },
+      { "id": "no-cliche", "criterion": "Free of film-production cliches", "weight": 4, "gates": ["territory", "symbol"] },
+      { "id": "durable", "criterion": "Current without chasing a disposable trend", "weight": 3, "gates": [] }
+    ],
+    "rejections": [
+      {
+        "id": "no-meta-lookalike",
+        "reason": "Reads as the Meta/Facebook mark",
+        "patterns": ["facebook", "\\bmeta\\b", "rounded blue f", "infinity loop"],
+        "severity": "error",
+        "suggestion": "Break the symmetry — asymmetric counterform, non-continuous stroke"
+      },
+      {
+        "id": "no-filmstrip-letter",
+        "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
+        "patterns": ["filmstrip.*(letter|bowl|counter|\\bd\\b)", "perforation.*(letter|bowl|counter)", "sprocket.*(letter|bowl)"],
+        "severity": "error",
+        "suggestion": "If the film metaphor earns its place, let it be the symbol — not a substituted glyph"
+      },
+      {
+        "id": "no-broken-aperture",
+        "reason": "Aperture blades drawn with mechanically impossible geometry",
+        "patterns": ["aperture", "iris blade", "shutter blade"],
+        "severity": "warning",
+        "suggestion": "Aperture forms need real blade count and rotation; verify against a lens diagram before proposing"
+      },
+      {
+        "id": "no-symbol-eating-word",
+        "reason": "Symbol inserted into the word reduces readability of the name",
+        "patterns": ["replaces the .? in", "symbol as the letter", "glyph substitution", "icon inside the word"],
+        "severity": "error",
+        "suggestion": "Keep the symbol adjacent, not substituted"
+      },
+      {
+        "id": "no-raster-as-vector",
+        "reason": "A traced raster is not a vector master; the flaws survive the trace",
+        "patterns": ["traced", "autotrace", "vectorized from", "image-trace"],
+        "severity": "error",
+        "suggestion": "Rebuild the geometry from scratch at the production gate"
+      },
+      {
+        "id": "no-variant-type-drift",
+        "reason": "Typography changing between lockup variants means there is no system",
+        "patterns": ["different font in", "alternate typeface for", "swapped the type"],
+        "severity": "error"
+      },
+      {
+        "id": "no-multi-metaphor",
+        "reason": "Multiple media metaphors stacked into one word never resolve",
+        "patterns": ["combines .*(film|camera|lens|shutter).*(and|plus).*(ball|net|court)", "both a .* and a"],
+        "severity": "warning",
+        "suggestion": "One metaphor per mark"
+      }
+    ],
+    "candidates": [],
+    "ledger": []
+  }
 }
