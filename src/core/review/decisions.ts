@@ -3,11 +3,18 @@
  *
  * Enforces the two rules that keep a creative process from drifting:
  *
- * 1. Only a recorded human decision advances a gate. An agent marking a
- *    candidate "approved" without a ledger entry is not an approval.
- * 2. A recorded rejection stays rejected. Live candidates are matched against
- *    every rejection constraint, so "looks like Facebook" is enforced by the
- *    tool instead of being rediscovered three days later.
+ * 1. A gate advances only on a ledger entry carrying a rationale and an
+ *    author. This is a soft control by construction — the gate cannot prove
+ *    a human wrote the entry, and a forged one passes. What it buys is that
+ *    approval becomes an explicit, explained, diff-able act instead of a
+ *    silently flipped status field, which is what makes review possible.
+ * 2. A recorded rejection stays rejected — but only as far as it honestly
+ *    can. `mechanical` constraints are decidable from text and block on a
+ *    descriptor match. `judgment` constraints ("reads as the Facebook mark")
+ *    are not decidable from text at all; a match only warns, and the real
+ *    enforcement is that approving in their scope requires the human to
+ *    record that they looked. Automating a judgment call produces a gate
+ *    that misses the real cases and cries wolf on the honest ones.
  *
  * Plus the ordering and generate-before-criteria checks that catch the
  * classic failure: producing artifacts before the evaluation bar exists,
@@ -142,7 +149,7 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
       issues.push({
         area: `decisions.candidates[${c.id}].status`,
         message:
-          'Marked approved with no matching ledger entry. A gate advances on a recorded human decision, not on a status field. Add a decisions.ledger entry naming this candidate, or set status back to "candidate".',
+          'Marked approved with no matching ledger entry. Approval has to be an explained, attributed entry, not a silently flipped status field. Add a decisions.ledger entry naming this candidate, or set status back to "candidate".',
         severity: 'error',
       });
     }
@@ -200,17 +207,112 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
     }
   }
 
-  // --- Rule 4: recorded rejections stay rejected ------------------------------
+  // --- Rule 4: a trace is never the master ------------------------------------
+  //
+  // Checked structurally off `method`, not off descriptor text. Someone
+  // defending a trace does not write "traced" in the descriptor — but the
+  // method field is already there and already honest. Prefer a structured
+  // field over a string match whenever the data exists.
+
+  for (const c of d.candidates) {
+    if (c.status === 'approved' && c.method === 'trace') {
+      issues.push({
+        area: `decisions.candidates[${c.id}].method`,
+        message:
+          'Approved with method "trace". A traced raster is not a master — the flaws survive the trace. Rebuild the geometry, record the rebuild as a new candidate with method "hand-vector" and parent set to this one, then approve that.',
+        severity: 'error',
+      });
+    }
+  }
+
+  // --- Rule 5: recorded rejections stay rejected ------------------------------
+  //
+  // Mechanical constraints are decidable from text, so a hit is a verdict.
+  // Judgment constraints are not, so a hit is only a prompt to look — their
+  // real enforcement is rule 7.
 
   const live = d.candidates.filter((c) => LIVE.includes(c.status));
   for (const c of live) {
     for (const r of d.rejections) {
+      if (!appliesToGate(r.gates, c.gate)) continue;
       const hits = violatedPatterns(r, c.descriptor);
       if (hits.length === 0) continue;
+      const mechanical = r.class === 'mechanical';
       issues.push({
         area: `decisions.candidates[${c.id}]`,
-        message: `Violates rejection "${r.id}" (${r.reason}) — matched: ${hits.join(', ')}.${r.suggestion ? ` Instead: ${r.suggestion}` : ''}`,
-        severity: r.severity,
+        message: mechanical
+          ? `Violates rejection "${r.id}" (${r.reason}) — matched: ${hits.join(', ')}.${r.suggestion ? ` Instead: ${r.suggestion}` : ''}`
+          : `Descriptor matches judgment constraint "${r.id}" (${r.reason}) — matched: ${hits.join(', ')}. Look at the artifact before approving; the text match is a prompt, not a verdict.${r.suggestion ? ` Instead: ${r.suggestion}` : ''}`,
+        severity: mechanical ? r.severity : 'warning',
+      });
+    }
+  }
+
+  // --- Rule 6: a ledger rejection actually rejects -----------------------------
+  //
+  // The approval rail was already bidirectional; this is its missing mirror.
+  // Without it a human's recorded rejection is inert — the candidate stays
+  // live, keeps competing, and gets re-proposed.
+
+  const ledgerRejected = new Set(
+    d.ledger
+      .filter((e) => e.decision === 'rejected')
+      .flatMap((e) => e.candidates),
+  );
+  for (const cid of ledgerRejected) {
+    const c = d.candidates.find((x) => x.id === cid);
+    if (c && LIVE.includes(c.status)) {
+      issues.push({
+        area: `decisions.candidates[${cid}].status`,
+        message: `Ledger records a rejection for this candidate but its status is "${c.status}", so it is still competing. Set status to "rejected".`,
+        severity: 'error',
+      });
+    }
+  }
+
+  // --- Rule 7: judgment constraints require a recorded look --------------------
+  //
+  // The only honest enforcement for "reads as the Facebook mark" is that a
+  // human confirms they considered it. Not automatable; made mandatory.
+
+  const judgment = d.rejections.filter((r) => r.class === 'judgment');
+  for (const [i, entry] of d.ledger.entries()) {
+    if (entry.decision !== 'approved') continue;
+    const inScope = judgment.filter((r) => appliesToGate(r.gates, entry.gate));
+    const missed = inScope.filter((r) => !entry.reviewed.includes(r.id));
+    if (missed.length > 0) {
+      issues.push({
+        area: `decisions.ledger[${i}].reviewed`,
+        message: `Approves gate "${entry.gate}" without confirming these judgment constraints were looked at: ${missed.map((r) => r.id).join(', ')}. Add their ids to "reviewed" once you have actually checked the artifact against each.`,
+        severity: 'error',
+      });
+    }
+    for (const id of entry.reviewed) {
+      if (!d.rejections.some((r) => r.id === id)) {
+        issues.push({
+          area: `decisions.ledger[${i}].reviewed`,
+          message: `References rejection constraint "${id}" which does not exist`,
+          severity: 'error',
+        });
+      }
+    }
+  }
+
+  // --- Rule 8: no generation before a conceptual anchor ------------------------
+
+  if (d.constitution && !d.constitution.conceptualAnchor) {
+    if (approvedGates.size > 0) {
+      issues.push({
+        area: 'decisions.constitution.conceptualAnchor',
+        message:
+          'A gate has been approved with no conceptual anchor recorded. Without the anchor written down, the next session has only the artifacts to reason from — which is how a project ends up describing camera parts instead of an idea.',
+        severity: 'error',
+      });
+    } else if (d.candidates.length > 0) {
+      issues.push({
+        area: 'decisions.constitution.conceptualAnchor',
+        message: 'Candidates exist with no conceptual anchor recorded. Find the metaphor before generating against it.',
+        severity: 'warning',
       });
     }
   }
@@ -275,4 +377,9 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+/** Empty scope means every gate. */
+function appliesToGate(scope: string[], gate: string): boolean {
+  return scope.length === 0 || scope.includes(gate);
 }

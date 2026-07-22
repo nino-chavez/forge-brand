@@ -113,10 +113,22 @@ npx tsx src/cli/index.ts diff old-kit.json new-kit.json
 
 An identity that is still being developed carries a `decisions` block. It records the brief, the ordered gates, the evaluation rubric, every candidate, the decision ledger, and the rejections. The `review` command enforces it and exits non-zero on failure:
 
-- A candidate marked `approved` with no matching ledger entry is an **error**. A gate advances on a recorded human decision, not on a status field an agent set.
-- A live candidate whose descriptor matches a recorded rejection is an **error**. "Looks like Facebook" gets written down once and enforced forever instead of rediscovered next session.
+- A candidate marked `approved` with no matching ledger entry is an **error**. Approval has to be an explained, attributed entry rather than a silently flipped flag.
+- A live candidate matching a **mechanical** rejection constraint is an **error** — those are decidable from text (a banned slogan, a forbidden font).
+- A **judgment** constraint ("reads as the Facebook mark") can't be decided from text, so a descriptor match only warns. Its real enforcement is that approving inside its gate scope requires the human to list it in the ledger entry's `reviewed`. That mandatory look is the honest version of enforcing a visual call.
+- A ledger entry rejecting a candidate that is still marked live is an **error**. Otherwise a recorded rejection is inert and the candidate keeps competing.
+- Approving any gate with no `conceptualAnchor` recorded is an **error**. Generating before the metaphor exists is how a project ends up describing camera parts instead of an idea.
+- An approved candidate with `method: "trace"` is an **error**. A traced raster is not a master. Rebuild it as `hand-vector` with `parent` pointing at the trace.
 - A gate approved before its prerequisite is an **error**. Generating at the symbol gate before territory is settled is how a project ends up defending an early artifact instead of solving the brief.
 - Candidates with an empty rubric is a **warning**. Agree the bar before generating, or the first artifact becomes the bar.
+
+Two limits worth knowing. This is a **soft control on authorship**: the gate checks that a ledger entry exists with a rationale and an author, not that a human wrote it — a forged entry passes, and git review is where that gets caught. And descriptor matching is a **self-report channel**: it catches an honest describer, not a motivated one. Describe candidates mechanically ("filmstrip perforations forming the d bowl"), not by vibe. Where a structured field already carries the fact — generation method, gate, parentage — the gate reads that field instead of the prose.
+
+`agent-prompt` emits the whole creative state: anchor, gate status, recorded rejections, criteria, and the instruction not to self-approve. Point a fresh session or a different harness at it and it inherits every past rejection instead of relitigating them.
+
+```bash
+npx tsx src/cli/index.ts agent-prompt --kit presets/flickday.json
+```
 
 The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
 

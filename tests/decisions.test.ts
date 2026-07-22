@@ -42,6 +42,7 @@ const RUBRIC = [
 
 const CONSTITUTION = {
   brief: 'Identity for a volleyball media brand that shoots and cuts its own footage.',
+  conceptualAnchor: 'The instant of contact',
 };
 
 function errorAreas(issues: { area: string; severity: string }[]): string[] {
@@ -222,24 +223,116 @@ describe('rule 3 — gates advance in order', () => {
   });
 });
 
-describe('rule 4 — recorded rejections stay rejected', () => {
+describe('rule 4 — a trace is never the master', () => {
+  const traced = {
+    id: 'C-040',
+    gate: 'symbol',
+    // Deliberately does NOT say "traced" — the point is that the rule reads
+    // the structured method field, not the prose.
+    descriptor: 'Ball-in-motion mark with a soft asymmetric counterform',
+    method: 'trace' as const,
+  };
+
+  it('errors when a traced candidate is approved', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+          { id: 'C-010', gate: 'wordmark', descriptor: 'Condensed grotesk lowercase', method: 'type-setting', status: 'approved' },
+          { ...traced, status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino' },
+          { gate: 'wordmark', decision: 'approved', candidates: ['C-010'], rationale: 'Reads well at small sizes.', decidedBy: 'nino' },
+          { gate: 'symbol', decision: 'approved', candidates: ['C-040'], rationale: 'Cleanest silhouette of the round.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.candidates[C-040].method');
+  });
+
+  it('allows a trace to circulate as an unapproved candidate', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [{ ...traced, status: 'candidate' }],
+      }),
+    );
+    expect(report.passed).toBe(true);
+  });
+
+  it('passes once the trace is rebuilt as a hand-vector child', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+          { id: 'C-010', gate: 'wordmark', descriptor: 'Condensed grotesk lowercase', method: 'type-setting', status: 'approved' },
+          { ...traced, status: 'superseded' },
+          { id: 'C-041', gate: 'symbol', descriptor: traced.descriptor, method: 'hand-vector', parent: 'C-040', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino' },
+          { gate: 'wordmark', decision: 'approved', candidates: ['C-010'], rationale: 'Reads well at small sizes.', decidedBy: 'nino' },
+          { gate: 'symbol', decision: 'approved', candidates: ['C-041'], rationale: 'Geometry rebuilt from scratch; curves are now real beziers.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+  });
+});
+
+describe('rule 5 — recorded rejections stay rejected', () => {
   const rejections = [
     {
-      id: 'no-meta-lookalike',
-      reason: 'Reads as the Facebook/Meta mark',
-      patterns: ['facebook', 'meta\\b', 'rounded blue f'],
+      id: 'banned-slogan',
+      reason: 'Slogan copy was ruled out',
+      class: 'mechanical' as const,
+      patterns: ['capture the moment'],
       severity: 'error' as const,
-      suggestion: 'Keep the counterform asymmetric',
     },
     {
       id: 'no-filmstrip-letter',
       reason: 'Filmstrip forced into a letterform never survives small sizes',
+      class: 'judgment' as const,
       patterns: ['filmstrip.*(letter|bowl|counter)', 'perforation'],
       severity: 'error' as const,
     },
   ];
 
-  it('blocks a live candidate that matches a recorded rejection', () => {
+  it('blocks a live candidate matching a mechanical constraint', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections,
+        candidates: [
+          {
+            id: 'C-020',
+            gate: 'wordmark',
+            descriptor: 'Lockup with "capture the moment" set beneath the name',
+            method: 'type-setting',
+            status: 'candidate',
+          },
+        ],
+        ledger: [],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(report.constraintsEnforced).toBe(2);
+    expect(errorAreas(report.issues)).toContain('decisions.candidates[C-020]');
+  });
+
+  it('only warns on a judgment constraint — a text match is not a verdict', () => {
     const report = reviewDecisions(
       withDecisions({
         constitution: CONSTITUTION,
@@ -258,10 +351,26 @@ describe('rule 4 — recorded rejections stay rejected', () => {
         ledger: [],
       }),
     );
-    expect(report.passed).toBe(false);
-    expect(report.constraintsEnforced).toBe(2);
-    const msg = report.issues.map((i) => i.message).join(' ');
-    expect(msg).toContain('no-filmstrip-letter');
+    expect(report.passed).toBe(true);
+    const warning = report.issues.find((i) => i.message.includes('no-filmstrip-letter'));
+    expect(warning?.severity).toBe('warning');
+    expect(warning?.message).toContain('prompt, not a verdict');
+  });
+
+  it('respects gate scoping', () => {
+    const scoped = [{ ...rejections[0], gates: ['wordmark'] }];
+    const atOtherGate = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: scoped,
+        candidates: [
+          { id: 'C-050', gate: 'territory', descriptor: 'capture the moment as a territory', method: 'other', status: 'candidate' },
+        ],
+      }),
+    );
+    expect(atOtherGate.passed).toBe(true);
   });
 
   it('leaves already-rejected candidates alone', () => {
@@ -303,6 +412,145 @@ describe('rule 4 — recorded rejections stay rejected', () => {
     expect(report.passed).toBe(true);
     const warnings = report.issues.filter((i) => i.severity === 'warning');
     expect(warnings.some((w) => w.message.includes('C-021'))).toBe(true);
+  });
+});
+
+describe('rule 6 — a ledger rejection actually rejects', () => {
+  it('errors when the ledger rejects a candidate still marked live', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-014', gate: 'symbol', descriptor: 'Aperture ring around the ball', method: 'ai-image', status: 'candidate' },
+        ],
+        ledger: [
+          { gate: 'symbol', decision: 'rejected', candidates: ['C-014'], rationale: 'Too close to a generic camera company.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.candidates[C-014].status');
+  });
+
+  it('passes once the status matches the recorded rejection', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-014', gate: 'symbol', descriptor: 'Aperture ring around the ball', method: 'ai-image', status: 'rejected' },
+        ],
+        ledger: [
+          { gate: 'symbol', decision: 'rejected', candidates: ['C-014'], rationale: 'Too close to a generic camera company.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+  });
+});
+
+describe('rule 7 — judgment constraints require a recorded look', () => {
+  const judgmentRejection = {
+    id: 'no-meta-lookalike',
+    reason: 'Reads as the Facebook/Meta mark',
+    class: 'judgment' as const,
+    patterns: ['facebook'],
+    gates: ['symbol'],
+  };
+
+  function kitWithApproval(reviewed: string[]) {
+    return withDecisions({
+      constitution: CONSTITUTION,
+      gates: GATES,
+      rubric: RUBRIC,
+      rejections: [judgmentRejection],
+      candidates: [
+        { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        { id: 'C-010', gate: 'wordmark', descriptor: 'Condensed grotesk lowercase', method: 'type-setting', status: 'approved' },
+        { id: 'C-060', gate: 'symbol', descriptor: 'Asymmetric contact burst', method: 'hand-vector', status: 'approved' },
+      ],
+      ledger: [
+        { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino' },
+        { gate: 'wordmark', decision: 'approved', candidates: ['C-010'], rationale: 'Reads well at small sizes.', decidedBy: 'nino' },
+        { gate: 'symbol', decision: 'approved', candidates: ['C-060'], rationale: 'Silhouette holds at 16px.', decidedBy: 'nino', reviewed },
+      ],
+    });
+  }
+
+  it('errors when an in-scope judgment constraint was not acknowledged', () => {
+    const report = reviewDecisions(kitWithApproval([]));
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.ledger[2].reviewed');
+  });
+
+  it('passes once the human records the look', () => {
+    const report = reviewDecisions(kitWithApproval(['no-meta-lookalike']));
+    expect(report.passed).toBe(true);
+  });
+
+  it('errors on an acknowledgement of a constraint that does not exist', () => {
+    const report = reviewDecisions(kitWithApproval(['no-meta-lookalike', 'no-such-rule']));
+    expect(report.passed).toBe(false);
+    const msg = report.issues.map((i) => i.message).join(' ');
+    expect(msg).toContain('no-such-rule');
+  });
+
+  it('does not demand acknowledgement at gates outside the constraint scope', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [judgmentRejection],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+  });
+});
+
+describe('rule 8 — no generation before a conceptual anchor', () => {
+  const noAnchor = { brief: 'Identity for a volleyball media brand.' };
+
+  it('warns when candidates exist with no anchor', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: noAnchor,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Aperture, shutter, viewfinder', method: 'ai-image', status: 'candidate' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+    expect(report.issues.some((i) => i.area === 'decisions.constitution.conceptualAnchor')).toBe(true);
+  });
+
+  it('errors when a gate is approved with no anchor', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: noAnchor,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Aperture, shutter, viewfinder', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Looks good.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.constitution.conceptualAnchor');
   });
 });
 
@@ -378,7 +626,7 @@ describe('pattern matching', () => {
 
   it('reports which patterns hit', () => {
     const hits = violatedPatterns(
-      { id: 'x', reason: 'y', patterns: ['aperture', 'blade'], severity: 'error' },
+      { id: 'x', reason: 'y', class: 'mechanical', gates: [], patterns: ['aperture', 'blade'], severity: 'error' },
       'aperture blades around a ball',
     );
     expect(hits).toEqual(['aperture', 'blade']);

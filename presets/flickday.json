@@ -277,6 +277,7 @@
   "decisions": {
     "constitution": {
       "brief": "Resolve the Flickday Media identity: a wordmark that stands alone, a symbol that stands alone, and a lockup for the two together. The website, palette, and voice are already settled and stay. Only the marks are open.",
+      "_conceptualAnchor_note": "Deliberately unset. Prior rounds generated against camera apparatus — aperture, shutter, viewfinder — which is a parts list, not an idea. Finding the anchor is the open first move; `review` and `agent-prompt` both refuse to advance without it.",
       "nonGoals": [
         "Redesigning the website",
         "Changing the palette or type system",
@@ -313,11 +314,13 @@
       { "id": "watermark", "criterion": "Holds as a CapCut watermark over footage", "weight": 4, "gates": ["stress-test"] },
       { "id": "one-color", "criterion": "Reproduces in one color on apparel", "weight": 4, "gates": ["stress-test"] },
       { "id": "no-cliche", "criterion": "Free of film-production cliches", "weight": 4, "gates": ["territory", "symbol"] },
+      { "id": "aperture-geometry", "criterion": "Any aperture form has real blade count and rotation — check against a lens diagram, not a vibe", "description": "Lives here rather than in rejections: the brand's own icon is a ball-aperture, so a constraint matching the word would fire on every honest candidate. Mechanically wrong geometry is also not detectable from a descriptor — it needs eyes on the artifact.", "weight": 4, "gates": ["symbol"] },
       { "id": "durable", "criterion": "Current without chasing a disposable trend", "weight": 3, "gates": [] }
     ],
     "rejections": [
       {
         "id": "no-meta-lookalike",
+        "class": "judgment",
         "reason": "Reads as the Meta/Facebook mark",
         "patterns": ["facebook", "\\bmeta\\b", "rounded blue f", "infinity loop"],
         "severity": "error",
@@ -325,42 +328,32 @@
       },
       {
         "id": "no-filmstrip-letter",
+        "class": "judgment",
         "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
         "patterns": ["filmstrip.*(letter|bowl|counter|\\bd\\b)", "perforation.*(letter|bowl|counter)", "sprocket.*(letter|bowl)"],
         "severity": "error",
         "suggestion": "If the film metaphor earns its place, let it be the symbol — not a substituted glyph"
       },
       {
-        "id": "no-broken-aperture",
-        "reason": "Aperture blades drawn with mechanically impossible geometry",
-        "patterns": ["aperture", "iris blade", "shutter blade"],
-        "severity": "warning",
-        "suggestion": "Aperture forms need real blade count and rotation; verify against a lens diagram before proposing"
-      },
-      {
         "id": "no-symbol-eating-word",
+        "class": "judgment",
         "reason": "Symbol inserted into the word reduces readability of the name",
         "patterns": ["replaces the .? in", "symbol as the letter", "glyph substitution", "icon inside the word"],
         "severity": "error",
         "suggestion": "Keep the symbol adjacent, not substituted"
       },
       {
-        "id": "no-raster-as-vector",
-        "reason": "A traced raster is not a vector master; the flaws survive the trace",
-        "patterns": ["traced", "autotrace", "vectorized from", "image-trace"],
-        "severity": "error",
-        "suggestion": "Rebuild the geometry from scratch at the production gate"
-      },
-      {
         "id": "no-variant-type-drift",
+        "class": "judgment",
         "reason": "Typography changing between lockup variants means there is no system",
         "patterns": ["different font in", "alternate typeface for", "swapped the type"],
         "severity": "error"
       },
       {
         "id": "no-multi-metaphor",
+        "class": "judgment",
         "reason": "Multiple media metaphors stacked into one word never resolve",
-        "patterns": ["combines .*(film|camera|lens|shutter).*(and|plus).*(ball|net|court)", "both a .* and a"],
+        "patterns": ["(combines|fuses|merges) .*(film|camera|lens|shutter).*(and|plus|with).*(ball|net|court)"],
         "severity": "warning",
         "suggestion": "One metaphor per mark"
       }

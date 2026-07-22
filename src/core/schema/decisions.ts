@@ -11,8 +11,10 @@
  *
  * Four things live here:
  * 1. Constitution     — the real brief, reconciled once
- * 2. Gates + ledger   — ordered decision points; only a recorded human
- *                       decision advances one. Agent enthusiasm does not.
+ * 2. Gates + ledger   — ordered decision points; a gate advances only on a
+ *                       ledger entry with a rationale and an author. Soft
+ *                       control, not a hard one: it makes approval explicit
+ *                       and diff-able so review can catch what it can't.
  * 3. Rubric           — evaluation criteria, agreed BEFORE generation
  * 4. Rejections       — durable "never again" constraints, enforced by the
  *                       decisions review gate against live candidates
@@ -37,6 +39,16 @@ import { AssetRef } from './media.js';
 export const Constitution = z.object({
   /** The actual brief, in prose. What this identity has to accomplish. */
   brief: z.string().min(1),
+  /**
+   * The conceptual metaphor this identity is built on — the idea, not the
+   * apparatus. "The instant of contact" is an anchor. "Aperture, shutter,
+   * viewfinder" is a list of camera parts, which is what gets produced when
+   * generation starts before an anchor exists.
+   *
+   * Recorded here rather than left to a session's memory: a fresh session or
+   * a different harness has no access to the last one's reasoning.
+   */
+  conceptualAnchor: z.string().optional(),
   /** Explicit non-goals — directions ruled out before work started */
   nonGoals: z.array(z.string()).default([]),
   /** Decisions carried in from before the ledger existed */
@@ -83,19 +95,47 @@ export type RubricCriterion = z.infer<typeof RubricCriterion>;
 // ---------------------------------------------------------------------------
 
 /**
+ * Two enforcement classes, because pretending otherwise is the trap.
+ *
+ * `mechanical` — the violation is decidable from text. A forbidden font
+ *   family, a banned slogan, a required lowercase spelling. Descriptor match
+ *   is proof; the gate blocks.
+ *
+ * `judgment` — the violation is a visual call: "reads as the Facebook mark",
+ *   "the aperture geometry is wrong", "the filmstrip feels forced". No string
+ *   match can decide these. A descriptor hit is a prompt to LOOK, not a
+ *   verdict, so it downgrades to a warning. The real enforcement is that
+ *   approving a candidate at a gate in this constraint's scope requires the
+ *   human to acknowledge the constraint in the ledger entry.
+ *
+ * Default is `judgment`. Claiming mechanical certainty you don't have is the
+ * more expensive mistake: it produces a gate that misses the real cases and
+ * cries wolf on the honest ones, which trains everyone to ignore it.
+ */
+export const ConstraintClass = z.enum(['mechanical', 'judgment']);
+export type ConstraintClass = z.infer<typeof ConstraintClass>;
+
+/**
  * Mirrors VoiceAntiPattern deliberately: same dual-rail idea, applied to
- * visual candidates instead of prose. A constraint recorded here is matched
- * against every live candidate's descriptor by the decisions review gate.
+ * visual candidates instead of prose.
  */
 export const RejectionConstraint = z.object({
   id: z.string().min(1),
   /** Why this was rejected — the durable rationale */
   reason: z.string().min(1),
+  class: ConstraintClass.default('judgment'),
   /**
    * Regex or literal strings matched against a candidate's descriptor.
    * Invalid regex falls back to case-insensitive substring match.
+   *
+   * For `mechanical` constraints a hit is a verdict. For `judgment`
+   * constraints a hit is an early warning — most real violations will not
+   * announce themselves in the descriptor.
    */
   patterns: z.array(z.string()).min(1),
+  /** Applies only when approving at these gates. Empty means all gates. */
+  gates: z.array(z.string()).default([]),
+  /** Severity of a descriptor hit. Forced to `warning` for judgment class. */
   severity: z.enum(['error', 'warning']).default('error'),
   /** What to do instead */
   suggestion: z.string().optional(),
@@ -166,6 +206,12 @@ export const DecisionEntry = z.object({
   rationale: z.string().min(1),
   /** Who decided. The human, not the agent. */
   decidedBy: z.string().min(1),
+  /**
+   * Ids of `judgment`-class rejection constraints looked at before approving.
+   * An approval must cover every judgment constraint in scope for the gate —
+   * that mandatory look is the only real enforcement a judgment call has.
+   */
+  reviewed: z.array(z.string()).default([]),
   /** ISO 8601 date */
   date: z.string().optional(),
 });

@@ -117,6 +117,9 @@ export function registerAgentPromptCommand(program: Command) {
         sections.push(`- Contrast: ${report.gates.contrast.passed ? 'PASS' : 'FAIL'}`);
         sections.push(`- Font Compatibility: ${report.gates.fontCompat.passed ? 'PASS' : 'FAIL'}`);
         sections.push(`- Consistency: ${report.gates.consistency.passed ? 'PASS' : 'FAIL'}`);
+        if (kit.decisions) {
+          sections.push(`- Decisions: ${report.gates.decisions.passed ? 'PASS' : 'FAIL'}`);
+        }
         sections.push(`- Overall: ${report.passed ? 'PASS' : 'FAIL'} (${report.errorCount} errors, ${report.warningCount} warnings)`);
         if (!report.passed) {
           sections.push('');
@@ -125,10 +128,74 @@ export function registerAgentPromptCommand(program: Command) {
             ...report.gates.contrast.issues.map((i) => `- Contrast: ${i.pair} — ${i.ratio}:1 (need ${i.required}:1)`),
             ...report.gates.fontCompat.issues.filter((i) => i.severity === 'error').map((i) => `- Font: ${i.pair} — ${i.message}`),
             ...report.gates.consistency.issues.filter((i) => i.severity === 'error').map((i) => `- Consistency: ${i.area} — ${i.message}`),
+            ...report.gates.decisions.issues.filter((i) => i.severity === 'error').map((i) => `- Decisions: ${i.area} — ${i.message}`),
           ];
           sections.push(...allIssues);
         }
         sections.push('');
+
+        // Creative state — the whole point of this surface. An agent that
+        // can't see the recorded rejections will relitigate them.
+        if (kit.decisions) {
+          const d = kit.decisions;
+          sections.push('### Creative State');
+          sections.push('');
+
+          const anchor = d.constitution?.conceptualAnchor;
+          sections.push(`- Conceptual anchor: ${anchor ?? '**NOT SET**'}`);
+          if (!anchor) {
+            sections.push('');
+            sections.push(
+              '> Strategy is not locked. Do not generate visual candidates yet. Find the conceptual metaphor first and record it at `decisions.constitution.conceptualAnchor` — generating against camera parts instead of an idea is the failure this field exists to prevent.',
+            );
+          }
+          sections.push('');
+
+          const decided = new Set(
+            d.ledger.filter((e) => e.decision === 'approved').map((e) => e.gate),
+          );
+          sections.push('**Gates**');
+          sections.push('');
+          for (const g of d.gates) {
+            const blockedBy = g.requires.filter((r) => !decided.has(r));
+            const state = decided.has(g.id)
+              ? 'DECIDED'
+              : blockedBy.length > 0
+                ? `BLOCKED (needs ${blockedBy.join(', ')})`
+                : 'OPEN';
+            sections.push(`- ${g.id} — ${state}`);
+          }
+          sections.push('');
+
+          if (d.rejections.length > 0) {
+            sections.push('**Recorded rejections — do not re-propose these**');
+            sections.push('');
+            for (const r of d.rejections) {
+              const tail = r.suggestion ? ` Instead: ${r.suggestion}` : '';
+              sections.push(`- \`${r.id}\` (${r.class}): ${r.reason}.${tail}`);
+            }
+            sections.push('');
+            sections.push(
+              '> `mechanical` constraints are enforced against candidate descriptors and block review. `judgment` constraints cannot be checked from text — approving in their scope requires a human to look at the artifact and record it in `decisions.ledger[].reviewed`. Do not mark that field yourself.',
+            );
+            sections.push('');
+          }
+
+          if (d.rubric.length > 0) {
+            sections.push('**Evaluation criteria**');
+            sections.push('');
+            for (const c of d.rubric) {
+              const scope = c.gates.length > 0 ? ` [${c.gates.join(', ')}]` : '';
+              sections.push(`- ${c.criterion} (weight ${c.weight})${scope}`);
+            }
+            sections.push('');
+          }
+
+          sections.push(
+            '> A gate advances only on a `decisions.ledger` entry written by the human. Do not set `status: "approved"` on a candidate; propose, and let the decision be recorded.',
+          );
+          sections.push('');
+        }
 
         // Full kit JSON if requested
         if (options.full) {
