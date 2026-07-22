@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "flickday-media",
     "created": "2025-01-15T00:00:00.000Z",
-    "updated": "2026-03-23T00:00:00.000Z",
+    "updated": "2026-07-22T13:13:13.367Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -11,8 +11,19 @@
     "name": "Flickday Media",
     "tagline": "Every Day's a Flickday",
     "mission": "Grassroots sports media — raw, fast, and player-first",
-    "audience": ["volleyball players", "tournament organizers", "sports parents", "grassroots sports community"],
-    "personality": ["authentic", "energetic", "bold", "player-focused", "grassroots"],
+    "audience": [
+      "volleyball players",
+      "tournament organizers",
+      "sports parents",
+      "grassroots sports community"
+    ],
+    "personality": [
+      "authentic",
+      "energetic",
+      "bold",
+      "player-focused",
+      "grassroots"
+    ],
     "positioning": "Chicago-based action sports media for the grassroots volleyball community",
     "domain": "sports media",
     "links": {
@@ -52,10 +63,26 @@
       "950": "#0a0a0f"
     },
     "semantic": {
-      "success": { "hex": "#22c55e", "name": "Live Green", "usage": "Now Booking indicators, live status" },
-      "warning": { "hex": "#f97316", "name": "Event Orange", "usage": "Event highlights, alerts" },
-      "error": { "hex": "#ef4444", "name": "Error Red", "usage": "Error states" },
-      "info": { "hex": "#3b82f6", "name": "Info Blue", "usage": "Informational states" }
+      "success": {
+        "hex": "#22c55e",
+        "name": "Live Green",
+        "usage": "Now Booking indicators, live status"
+      },
+      "warning": {
+        "hex": "#f97316",
+        "name": "Event Orange",
+        "usage": "Event highlights, alerts"
+      },
+      "error": {
+        "hex": "#ef4444",
+        "name": "Error Red",
+        "usage": "Error states"
+      },
+      "info": {
+        "hex": "#3b82f6",
+        "name": "Info Blue",
+        "usage": "Informational states"
+      }
     },
     "surfaces": {
       "background": "#000000",
@@ -70,9 +97,14 @@
   "typography": {
     "display": {
       "family": "Anton",
-      "fallbacks": ["Impact", "sans-serif"],
+      "fallbacks": [
+        "Impact",
+        "sans-serif"
+      ],
       "classification": "display",
-      "weights": [400],
+      "weights": [
+        400
+      ],
       "variable": false,
       "googleFonts": "Anton",
       "cssVariable": "--font-display",
@@ -81,9 +113,17 @@
     },
     "body": {
       "family": "Inter",
-      "fallbacks": ["system-ui", "sans-serif"],
+      "fallbacks": [
+        "system-ui",
+        "sans-serif"
+      ],
       "classification": "sans-serif",
-      "weights": [400, 500, 600, 700],
+      "weights": [
+        400,
+        500,
+        600,
+        700
+      ],
       "variable": true,
       "googleFonts": "Inter:wght@400;500;600;700",
       "cssVariable": "--font-body",
@@ -92,9 +132,16 @@
     },
     "mono": {
       "family": "JetBrains Mono",
-      "fallbacks": ["Menlo", "monospace"],
+      "fallbacks": [
+        "Menlo",
+        "monospace"
+      ],
       "classification": "monospace",
-      "weights": [400, 500, 700],
+      "weights": [
+        400,
+        500,
+        700
+      ],
       "variable": true,
       "googleFonts": "JetBrains+Mono:wght@400;500;700",
       "cssVariable": "--font-mono",
@@ -105,12 +152,54 @@
       "baseSizePx": 16,
       "ratio": "perfect-fourth",
       "steps": [
-        { "name": "hero", "sizeRem": 8, "sizeMobileRem": 4, "lineHeight": 0.85, "weight": 400, "font": "display" },
-        { "name": "h2", "sizeRem": 4, "sizeMobileRem": 2.5, "lineHeight": 1.1, "weight": 400, "font": "display" },
-        { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.2, "weight": 600, "font": "body" },
-        { "name": "body-lg", "sizeRem": 1.125, "sizeMobileRem": 1, "lineHeight": 1.6, "weight": 400, "font": "body" },
-        { "name": "body", "sizeRem": 1, "sizeMobileRem": 0.875, "lineHeight": 1.5, "weight": 400, "font": "body" },
-        { "name": "label", "sizeRem": 0.75, "sizeMobileRem": 0.625, "lineHeight": 1.4, "weight": 500, "font": "mono" }
+        {
+          "name": "hero",
+          "sizeRem": 8,
+          "sizeMobileRem": 4,
+          "lineHeight": 0.85,
+          "weight": 400,
+          "font": "display"
+        },
+        {
+          "name": "h2",
+          "sizeRem": 4,
+          "sizeMobileRem": 2.5,
+          "lineHeight": 1.1,
+          "weight": 400,
+          "font": "display"
+        },
+        {
+          "name": "h3",
+          "sizeRem": 1.5,
+          "sizeMobileRem": 1.25,
+          "lineHeight": 1.2,
+          "weight": 600,
+          "font": "body"
+        },
+        {
+          "name": "body-lg",
+          "sizeRem": 1.125,
+          "sizeMobileRem": 1,
+          "lineHeight": 1.6,
+          "weight": 400,
+          "font": "body"
+        },
+        {
+          "name": "body",
+          "sizeRem": 1,
+          "sizeMobileRem": 0.875,
+          "lineHeight": 1.5,
+          "weight": 400,
+          "font": "body"
+        },
+        {
+          "name": "label",
+          "sizeRem": 0.75,
+          "sizeMobileRem": 0.625,
+          "lineHeight": 1.4,
+          "weight": 500,
+          "font": "mono"
+        }
       ]
     }
   },
@@ -148,34 +237,77 @@
   },
   "voice": {
     "attributes": [
-      { "trait": "authentic", "description": "Real grassroots energy, not polished corporate", "example": "We're courtside, not in the boardroom." },
-      { "trait": "energetic", "description": "High-energy, action-forward language", "example": "Every rally, every dive, every point — we're there." },
-      { "trait": "player-focused", "description": "Always centers the athlete, not the brand", "example": "Your game. Your moment. We just capture it." },
-      { "trait": "direct", "description": "Short sentences, no filler, no jargon", "example": "Book us. Show up. Get your shots." }
+      {
+        "trait": "authentic",
+        "description": "Real grassroots energy, not polished corporate",
+        "example": "We're courtside, not in the boardroom."
+      },
+      {
+        "trait": "energetic",
+        "description": "High-energy, action-forward language",
+        "example": "Every rally, every dive, every point — we're there."
+      },
+      {
+        "trait": "player-focused",
+        "description": "Always centers the athlete, not the brand",
+        "example": "Your game. Your moment. We just capture it."
+      },
+      {
+        "trait": "direct",
+        "description": "Short sentences, no filler, no jargon",
+        "example": "Book us. Show up. Get your shots."
+      }
     ],
     "antiPatterns": [
       {
         "category": "corporate-jargon",
-        "patterns": ["leverage", "synergy", "holistic", "paradigm", "ecosystem", "circle back", "deep dive", "unpack"],
+        "patterns": [
+          "leverage",
+          "synergy",
+          "holistic",
+          "paradigm",
+          "ecosystem",
+          "circle back",
+          "deep dive",
+          "unpack"
+        ],
         "severity": "error",
         "suggestion": "Use plain language. Say what you mean."
       },
       {
         "category": "passive-voice",
-        "patterns": ["was captured", "has been provided", "will be delivered"],
+        "patterns": [
+          "was captured",
+          "has been provided",
+          "will be delivered"
+        ],
         "severity": "warning",
         "suggestion": "Use active voice. The photographer shoots. The player spikes."
       },
       {
         "category": "generic-hype",
-        "patterns": ["world-class", "best-in-class", "cutting-edge", "next-level", "game-changing"],
+        "patterns": [
+          "world-class",
+          "best-in-class",
+          "cutting-edge",
+          "next-level",
+          "game-changing"
+        ],
         "severity": "warning",
         "suggestion": "Show, don't tell. Describe the specific thing instead of using superlatives."
       }
     ],
     "structuralPatterns": [
-      { "name": "short-punchy", "description": "Keep sentences under 15 words where possible", "required": false },
-      { "name": "action-verbs", "description": "Lead with verbs: Shoot. Capture. Deliver.", "required": false }
+      {
+        "name": "short-punchy",
+        "description": "Keep sentences under 15 words where possible",
+        "required": false
+      },
+      {
+        "name": "action-verbs",
+        "description": "Lead with verbs: Shoot. Capture. Deliver.",
+        "required": false
+      }
     ],
     "examples": [
       {
@@ -193,13 +325,62 @@
   },
   "media": {
     "logos": {
-      "primary": { "id": "lockup-full", "label": "Full lockup", "path": "assets/site/og-share-card.png", "tags": ["lockup", "full"] },
-      "icon": { "id": "icon-aperture", "label": "Ball aperture icon", "path": "assets/logo-ball-aperture-motion.png", "tags": ["icon", "mark"] },
-      "wordmark": { "id": "lockup-header", "label": "Header lockup", "path": "assets/site/header-logo.png", "tags": ["wordmark", "header"] },
+      "primary": {
+        "id": "lockup-full",
+        "label": "Full lockup",
+        "path": "assets/site/og-share-card.png",
+        "tags": [
+          "lockup",
+          "full"
+        ]
+      },
+      "icon": {
+        "id": "icon-aperture",
+        "label": "Ball aperture icon",
+        "path": "assets/logo-ball-aperture-motion.png",
+        "tags": [
+          "icon",
+          "mark"
+        ]
+      },
+      "wordmark": {
+        "id": "lockup-header",
+        "label": "Header lockup",
+        "path": "assets/site/header-logo.png",
+        "tags": [
+          "wordmark",
+          "header"
+        ]
+      },
       "variations": [
-        { "id": "lockup-slogan", "label": "Slogan lockup", "path": "assets/site/slogan-card.png", "tags": ["lockup", "slogan"] },
-        { "id": "icon-favicon", "label": "Favicon", "path": "assets/site/favicon/favicon-32x32.png", "width": 32, "height": 32, "tags": ["favicon"] },
-        { "id": "icon-social", "label": "Social circle", "path": "assets/site/social-avatar.png", "tags": ["social", "circle"] }
+        {
+          "id": "lockup-slogan",
+          "label": "Slogan lockup",
+          "path": "assets/site/slogan-card.png",
+          "tags": [
+            "lockup",
+            "slogan"
+          ]
+        },
+        {
+          "id": "icon-favicon",
+          "label": "Favicon",
+          "path": "assets/site/favicon/favicon-32x32.png",
+          "width": 32,
+          "height": 32,
+          "tags": [
+            "favicon"
+          ]
+        },
+        {
+          "id": "icon-social",
+          "label": "Social circle",
+          "path": "assets/site/social-avatar.png",
+          "tags": [
+            "social",
+            "circle"
+          ]
+        }
       ],
       "clearSpace": 0.25,
       "minSizePx": 24
@@ -209,24 +390,62 @@
         "id": "social-card",
         "name": "Social Media Card",
         "description": "OG image / social share card",
-        "sizes": [{ "width": 1200, "height": 675, "dpi": 72, "label": "OG Image" }],
+        "sizes": [
+          {
+            "width": 1200,
+            "height": 675,
+            "dpi": 72,
+            "label": "OG Image"
+          }
+        ],
         "format": "png",
         "dataFields": [
-          { "name": "title", "type": "string", "required": true },
-          { "name": "subtitle", "type": "string", "required": false },
-          { "name": "backgroundImage", "type": "image-url", "required": false }
+          {
+            "name": "title",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "subtitle",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "backgroundImage",
+            "type": "image-url",
+            "required": false
+          }
         ]
       },
       {
         "id": "story",
         "name": "Instagram Story",
         "description": "Vertical story format",
-        "sizes": [{ "width": 1080, "height": 1920, "dpi": 72, "label": "IG Story" }],
+        "sizes": [
+          {
+            "width": 1080,
+            "height": 1920,
+            "dpi": 72,
+            "label": "IG Story"
+          }
+        ],
         "format": "png",
         "dataFields": [
-          { "name": "title", "type": "string", "required": true },
-          { "name": "date", "type": "string", "required": false },
-          { "name": "location", "type": "string", "required": false }
+          {
+            "name": "title",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "date",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "location",
+            "type": "string",
+            "required": false
+          }
         ]
       },
       {
@@ -234,16 +453,46 @@
         "name": "Event Flyer",
         "description": "Tournament/event flyer for print or digital",
         "sizes": [
-          { "width": 2550, "height": 3300, "dpi": 300, "label": "Letter Portrait" },
-          { "width": 1080, "height": 1080, "dpi": 72, "label": "Square Digital" }
+          {
+            "width": 2550,
+            "height": 3300,
+            "dpi": 300,
+            "label": "Letter Portrait"
+          },
+          {
+            "width": 1080,
+            "height": 1080,
+            "dpi": 72,
+            "label": "Square Digital"
+          }
         ],
         "format": "png",
         "dataFields": [
-          { "name": "eventName", "type": "string", "required": true },
-          { "name": "date", "type": "string", "required": true },
-          { "name": "location", "type": "string", "required": true },
-          { "name": "price", "type": "string", "required": false },
-          { "name": "backgroundImage", "type": "image-url", "required": false }
+          {
+            "name": "eventName",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "location",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "price",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "backgroundImage",
+            "type": "image-url",
+            "required": false
+          }
         ]
       }
     ],
@@ -268,8 +517,23 @@
         "web": "Standard web resolution. 1200x675px. Landscape format.",
         "print": "High-res output. 300dpi minimum."
       },
-      "visualKeywords": ["aperture", "volleyball", "motion", "speed", "press-credential", "film-grain", "high-contrast", "geometric"],
-      "avoid": ["text in AI-generated images", "ornamental flourishes", "gradients without purpose", "stock photo aesthetics", "corporate polish"]
+      "visualKeywords": [
+        "aperture",
+        "volleyball",
+        "motion",
+        "speed",
+        "press-credential",
+        "film-grain",
+        "high-contrast",
+        "geometric"
+      ],
+      "avoid": [
+        "text in AI-generated images",
+        "ornamental flourishes",
+        "gradients without purpose",
+        "stock photo aesthetics",
+        "corporate polish"
+      ]
     },
     "assets": []
   },
@@ -277,6 +541,7 @@
   "decisions": {
     "constitution": {
       "brief": "Resolve the Flickday Media identity: a wordmark that stands alone, a symbol that stands alone, and a lockup for the two together. The website, palette, and voice are already settled and stay. Only the marks are open.",
+      "conceptualAnchor": "The flick — the decisive instant when action becomes a moment worth replaying.",
       "nonGoals": [
         "Redesigning the website",
         "Changing the palette or type system",
@@ -287,6 +552,12 @@
         "Tagline copy: Every Day's a Flickday (live site)",
         "Anton as the site display face (live site :root)"
       ],
+      "sources": [
+        "apps/flickdaymedia/index.html — CANONICAL. Per BRAND-PRIORS.md, when a generated doc and the live site disagree, the site wins. That rule catches errors in BRAND-PRIORS itself.",
+        "apps/flickdaymedia/BRAND-PRIORS.md — owner-authored priors, 2026-07-05",
+        "Instagram @flickday.media",
+        "Prior identity sessions — see decisions.rejections for what they ruled out"
+      ],
       "openQuestions": [
         {
           "id": "logotype-typeface",
@@ -295,7 +566,11 @@
             "apps/flickdaymedia/BRAND-PRIORS.md — 'Wordmark type is OPEN and being redesigned' (2026-07-05)",
             "Rejection no-bebas-caps-wordmark records what was ruled out, not what was chosen"
           ],
-          "blocks": ["wordmark", "lockup", "production"]
+          "blocks": [
+            "wordmark",
+            "lockup",
+            "production"
+          ]
         },
         {
           "id": "play-mark-in-the-d",
@@ -304,105 +579,336 @@
             "apps/flickdaymedia/BRAND-PRIORS.md lists it under 'Signature ideas (motifs to draw from)'",
             "Rejection no-filmstrip-letter rejects exactly that construction"
           ],
-          "blocks": ["wordmark", "symbol", "lockup"]
-        },
-        {
-          "id": "conceptual-anchor",
-          "question": "What is the conceptual anchor? Prior rounds generated against camera apparatus (aperture, shutter, viewfinder), which is a parts list rather than an idea. Nothing can be generated until this is answered.",
-          "sources": [
-            "3 rounds / 15+ concepts drifted to generic camera-company marks",
-            "decisions.constitution.conceptualAnchor is unset, which blocks every gate"
-          ],
-          "blocks": ["territory"]
+          "blocks": [
+            "wordmark",
+            "symbol",
+            "lockup"
+          ]
         }
-      ],
-      "sources": [
-        "apps/flickdaymedia/index.html — CANONICAL. Per BRAND-PRIORS.md, when a generated doc and the live site disagree, the site wins. That rule catches errors in BRAND-PRIORS itself.",
-        "apps/flickdaymedia/BRAND-PRIORS.md — owner-authored priors, 2026-07-05",
-        "Instagram @flickday.media",
-        "Prior identity sessions — see decisions.rejections for what they ruled out"
       ]
     },
     "gates": [
-      { "id": "territory", "name": "Territory", "question": "Which strategic concept is this identity about?", "requires": [] },
-      { "id": "wordmark", "name": "Wordmark", "question": "Which typographic foundation carries the name?", "requires": ["territory"] },
-      { "id": "symbol", "name": "Symbol", "question": "Which mark works without the word?", "requires": ["territory"] },
-      { "id": "lockup", "name": "Lockup", "question": "How do wordmark and symbol relate?", "requires": ["wordmark", "symbol"] },
-      { "id": "stress-test", "name": "Stress test", "question": "Does it survive favicon, watermark, apparel, and 9:16 video?", "requires": ["lockup"] },
-      { "id": "production", "name": "Production", "question": "Are the masters true editable vectors in every format?", "requires": ["stress-test"] },
-      { "id": "motion", "name": "Motion", "question": "How does the approved mark behave over time?", "requires": ["production"] }
+      {
+        "id": "territory",
+        "name": "Territory",
+        "question": "Which strategic concept is this identity about?",
+        "requires": []
+      },
+      {
+        "id": "wordmark",
+        "name": "Wordmark",
+        "question": "Which typographic foundation carries the name?",
+        "requires": [
+          "territory"
+        ]
+      },
+      {
+        "id": "symbol",
+        "name": "Symbol",
+        "question": "Which mark works without the word?",
+        "requires": [
+          "territory"
+        ]
+      },
+      {
+        "id": "lockup",
+        "name": "Lockup",
+        "question": "How do wordmark and symbol relate?",
+        "requires": [
+          "wordmark",
+          "symbol"
+        ]
+      },
+      {
+        "id": "stress-test",
+        "name": "Stress test",
+        "question": "Does it survive favicon, watermark, apparel, and 9:16 video?",
+        "requires": [
+          "lockup"
+        ]
+      },
+      {
+        "id": "production",
+        "name": "Production",
+        "question": "Are the masters true editable vectors in every format?",
+        "requires": [
+          "stress-test"
+        ]
+      },
+      {
+        "id": "motion",
+        "name": "Motion",
+        "question": "How does the approved mark behave over time?",
+        "requires": [
+          "production"
+        ]
+      }
     ],
     "rubric": [
-      { "id": "distinctive", "criterion": "Distinctive and ownable", "weight": 5, "gates": ["territory", "symbol"] },
-      { "id": "personality", "criterion": "Reads as Flickday — authentic, energetic, player-first", "weight": 5, "gates": [] },
-      { "id": "type-quality", "criterion": "Typographic quality holds under scrutiny", "weight": 4, "gates": ["wordmark"] },
-      { "id": "small-size", "criterion": "Legible at favicon and watermark size", "weight": 5, "gates": ["symbol", "lockup", "stress-test"] },
-      { "id": "independence", "criterion": "Wordmark and symbol each work alone", "weight": 5, "gates": ["lockup"] },
-      { "id": "site-fit", "criterion": "Sits correctly in the existing site header", "weight": 3, "gates": ["stress-test"] },
-      { "id": "avatar", "criterion": "Survives a circular social avatar crop", "weight": 4, "gates": ["stress-test"] },
-      { "id": "watermark", "criterion": "Holds as a CapCut watermark over footage", "weight": 4, "gates": ["stress-test"] },
-      { "id": "one-color", "criterion": "Reproduces in one color on apparel", "weight": 4, "gates": ["stress-test"] },
-      { "id": "no-cliche", "criterion": "Free of film-production cliches", "weight": 4, "gates": ["territory", "symbol"] },
-      { "id": "aperture-geometry", "criterion": "Any aperture form has real blade count and rotation — check against a lens diagram, not a vibe", "description": "Lives here rather than in rejections: the brand's own icon is a ball-aperture, so a constraint matching the word would fire on every honest candidate. Mechanically wrong geometry is also not detectable from a descriptor — it needs eyes on the artifact.", "weight": 4, "gates": ["symbol"] },
-      { "id": "durable", "criterion": "Current without chasing a disposable trend", "weight": 3, "gates": [] }
+      {
+        "id": "distinctive",
+        "criterion": "Distinctive and ownable",
+        "weight": 5,
+        "gates": [
+          "territory",
+          "symbol"
+        ]
+      },
+      {
+        "id": "personality",
+        "criterion": "Reads as Flickday — authentic, energetic, player-first",
+        "weight": 5,
+        "gates": []
+      },
+      {
+        "id": "type-quality",
+        "criterion": "Typographic quality holds under scrutiny",
+        "weight": 4,
+        "gates": [
+          "wordmark"
+        ]
+      },
+      {
+        "id": "small-size",
+        "criterion": "Legible at favicon and watermark size",
+        "weight": 5,
+        "gates": [
+          "symbol",
+          "lockup",
+          "stress-test"
+        ]
+      },
+      {
+        "id": "independence",
+        "criterion": "Wordmark and symbol each work alone",
+        "weight": 5,
+        "gates": [
+          "lockup"
+        ]
+      },
+      {
+        "id": "site-fit",
+        "criterion": "Sits correctly in the existing site header",
+        "weight": 3,
+        "gates": [
+          "stress-test"
+        ]
+      },
+      {
+        "id": "avatar",
+        "criterion": "Survives a circular social avatar crop",
+        "weight": 4,
+        "gates": [
+          "stress-test"
+        ]
+      },
+      {
+        "id": "watermark",
+        "criterion": "Holds as a CapCut watermark over footage",
+        "weight": 4,
+        "gates": [
+          "stress-test"
+        ]
+      },
+      {
+        "id": "one-color",
+        "criterion": "Reproduces in one color on apparel",
+        "weight": 4,
+        "gates": [
+          "stress-test"
+        ]
+      },
+      {
+        "id": "no-cliche",
+        "criterion": "Free of film-production cliches",
+        "weight": 4,
+        "gates": [
+          "territory",
+          "symbol"
+        ]
+      },
+      {
+        "id": "aperture-geometry",
+        "criterion": "Any aperture form has real blade count and rotation — check against a lens diagram, not a vibe",
+        "description": "Lives here rather than in rejections: the brand's own icon is a ball-aperture, so a constraint matching the word would fire on every honest candidate. Mechanically wrong geometry is also not detectable from a descriptor — it needs eyes on the artifact.",
+        "weight": 4,
+        "gates": [
+          "symbol"
+        ]
+      },
+      {
+        "id": "durable",
+        "criterion": "Current without chasing a disposable trend",
+        "weight": 3,
+        "gates": []
+      }
     ],
     "rejections": [
       {
         "id": "no-bebas-caps-wordmark",
         "reason": "An all-caps Bebas-class wordmark swap was tried and rejected; the lowercase logotype reads better",
         "class": "judgment",
-        "gates": ["wordmark", "lockup"],
-        "patterns": ["all.?caps wordmark", "bebas", "uppercase logotype"],
+        "patterns": [
+          "all.?caps wordmark",
+          "bebas",
+          "uppercase logotype"
+        ],
+        "gates": [
+          "wordmark",
+          "lockup"
+        ],
         "severity": "warning",
+        "acknowledgement": "required",
         "suggestion": "Keep the logotype lowercase; the display face may still be all-caps for headlines",
         "recorded": "2026-07-05"
       },
       {
         "id": "no-meta-lookalike",
-        "class": "judgment",
-        "gates": ["symbol", "lockup"],
         "reason": "Reads as the Meta/Facebook mark",
-        "patterns": ["facebook", "\\bmeta\\b", "rounded blue f", "infinity loop"],
+        "class": "judgment",
+        "patterns": [
+          "facebook",
+          "\\bmeta\\b",
+          "rounded blue f",
+          "infinity loop"
+        ],
+        "gates": [
+          "symbol",
+          "lockup"
+        ],
         "severity": "error",
+        "acknowledgement": "required",
         "suggestion": "Break the symmetry — asymmetric counterform, non-continuous stroke"
       },
       {
         "id": "no-filmstrip-letter",
-        "class": "judgment",
-        "gates": ["wordmark", "symbol", "lockup"],
         "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
-        "patterns": ["filmstrip.*(letter|bowl|counter|\\bd\\b)", "perforation.*(letter|bowl|counter)", "sprocket.*(letter|bowl)"],
+        "class": "judgment",
+        "patterns": [
+          "filmstrip.*(letter|bowl|counter|\\bd\\b)",
+          "perforation.*(letter|bowl|counter)",
+          "sprocket.*(letter|bowl)"
+        ],
+        "gates": [
+          "wordmark",
+          "symbol",
+          "lockup"
+        ],
         "severity": "error",
+        "acknowledgement": "required",
         "suggestion": "If the film metaphor earns its place, let it be the symbol — not a substituted glyph"
       },
       {
         "id": "no-symbol-eating-word",
-        "class": "judgment",
-        "gates": ["lockup"],
         "reason": "Symbol inserted into the word reduces readability of the name",
-        "patterns": ["replaces the .? in", "symbol as the letter", "glyph substitution", "icon inside the word"],
+        "class": "judgment",
+        "patterns": [
+          "replaces the .? in",
+          "symbol as the letter",
+          "glyph substitution",
+          "icon inside the word"
+        ],
+        "gates": [
+          "lockup"
+        ],
         "severity": "error",
+        "acknowledgement": "required",
         "suggestion": "Keep the symbol adjacent, not substituted"
       },
       {
         "id": "no-variant-type-drift",
-        "class": "judgment",
-        "gates": ["lockup", "stress-test"],
         "reason": "Typography changing between lockup variants means there is no system",
-        "patterns": ["different font in", "alternate typeface for", "swapped the type"],
-        "severity": "error"
+        "class": "judgment",
+        "patterns": [
+          "different font in",
+          "alternate typeface for",
+          "swapped the type"
+        ],
+        "gates": [
+          "lockup",
+          "stress-test"
+        ],
+        "severity": "error",
+        "acknowledgement": "required"
       },
       {
         "id": "no-multi-metaphor",
-        "class": "judgment",
-        "gates": ["territory", "symbol"],
         "reason": "Multiple media metaphors stacked into one word never resolve",
-        "patterns": ["(combines|fuses|merges) .*(film|camera|lens|shutter).*(and|plus|with).*(ball|net|court)"],
+        "class": "judgment",
+        "patterns": [
+          "(film|camera|lens|shutter|flash|strobe).{0,40}(combined|combines|fused|fuses|merged|merges|and|plus|with).{0,40}(ball|net|court)",
+          "(ball|net|court).{0,40}(combined|combines|fused|fuses|merged|merges|and|plus|with).{0,40}(film|camera|lens|shutter|flash|strobe)"
+        ],
+        "gates": [
+          "territory",
+          "symbol"
+        ],
         "severity": "warning",
+        "acknowledgement": "required",
         "suggestion": "One metaphor per mark"
       }
     ],
-    "candidates": [],
-    "ledger": []
+    "candidates": [
+      {
+        "id": "T-FLICK",
+        "gate": "territory",
+        "round": 1,
+        "descriptor": "The flick: the decisive instant when action becomes a moment worth replaying. One gesture of change, not an object — carries motion, wordmark, symbol and video behavior from a single idea.",
+        "method": "other",
+        "status": "approved"
+      },
+      {
+        "id": "T-FRAME",
+        "gate": "territory",
+        "round": 1,
+        "descriptor": "The frame / the crop: what the photographer chooses to see, expressed as a bounding edge, corner marks or a viewfinder rectangle.",
+        "method": "other",
+        "status": "rejected"
+      },
+      {
+        "id": "T-BALL-FLASH",
+        "gate": "territory",
+        "round": 1,
+        "descriptor": "The ball and the flash: a volleyball combined with a burst or light source. Two literal objects, one from the sport and one from the camera, stacked into a single mark.",
+        "method": "other",
+        "status": "rejected"
+      },
+      {
+        "id": "T-F-MARK",
+        "gate": "territory",
+        "round": 1,
+        "descriptor": "The F mark: a stylized letter F with built-in motion energy — a letterform execution rather than a strategic idea.",
+        "method": "other",
+        "status": "rejected"
+      }
+    ],
+    "ledger": [
+      {
+        "gate": "territory",
+        "decision": "approved",
+        "candidates": [
+          "T-FLICK"
+        ],
+        "rationale": "The flick is native to the Flickday name. It connects sports and media without stacking volleyball and camera symbols, and it supports motion, wordmark, symbol and video behavior from one idea. Frame/crop is generic photography; ball + flash is overly literal; the F mark is an execution, not an idea.",
+        "decidedBy": "nino",
+        "reviewed": [
+          "no-multi-metaphor"
+        ],
+        "date": "2026-07-22"
+      },
+      {
+        "gate": "territory",
+        "decision": "rejected",
+        "candidates": [
+          "T-FRAME",
+          "T-BALL-FLASH",
+          "T-F-MARK"
+        ],
+        "rationale": "The flick is native to the Flickday name. It connects sports and media without stacking volleyball and camera symbols, and it supports motion, wordmark, symbol and video behavior from one idea. Frame/crop is generic photography; ball + flash is overly literal; the F mark is an execution, not an idea.",
+        "decidedBy": "nino",
+        "reviewed": [],
+        "date": "2026-07-22"
+      }
+    ]
   }
 }
