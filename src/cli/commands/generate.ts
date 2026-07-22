@@ -290,7 +290,8 @@ export function registerGenerateCommand(program: Command) {
         avoid: kit.media.creative?.avoid,
         visualKeywords: kit.media.creative?.visualKeywords,
         count: parseInt(options.count),
-        outputDir: options.output,
+        // Scoped by gate for the same reason iterate is scoped by candidate.
+        outputDir: options.gate ? path.join(options.output, options.gate) : options.output,
         model: options.model,
         anchor: readiness.anchor,
         rejected: readiness.avoid,
@@ -376,7 +377,11 @@ export function registerGenerateCommand(program: Command) {
         avoid: kit.media.creative?.avoid,
         accentHex: kit.colors.primary.hex,
         accentName: kit.colors.primary.name,
-        outputDir: options.output,
+        // Scoped to the candidate. Without this every iterate run wrote the
+        // same five paths, so the next one silently replaced the image a
+        // recorded candidate's asset.path pointed at — a ledger describing
+        // one mark while showing another, with nothing able to detect it.
+        outputDir: path.join(options.output, candidate.id),
         model: options.model,
         anchor: readiness.anchor,
         rejected: readiness.avoid,

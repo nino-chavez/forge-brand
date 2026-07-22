@@ -8,6 +8,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { nonClobberingPath, slug } from './paths.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -164,8 +165,7 @@ export async function generateLogos(
       continue;
     }
 
-    const filename = `${options.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-concept-${i + 1}.png`;
-    const filePath = path.join(outputDir, filename);
+    const filePath = nonClobberingPath(outputDir, `${slug(options.name)}-concept-${i + 1}`);
     fs.writeFileSync(filePath, imageBuffer);
 
     concepts.push({ path: filePath, prompt, model });

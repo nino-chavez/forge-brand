@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { nonClobberingPath, slug } from './paths.js';
 
 export interface LogoIterationOptions {
   /** Direction description — what to iterate on */
@@ -164,8 +165,7 @@ export async function iterateLogoConcept(
       continue;
     }
 
-    const filename = `${options.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${variant.id}.png`;
-    const filePath = path.join(outputDir, filename);
+    const filePath = nonClobberingPath(outputDir, `${slug(options.name)}-${variant.id}`);
     fs.writeFileSync(filePath, buffer);
     results.push({ path: filePath, variant: variant.id, prompt });
   }
