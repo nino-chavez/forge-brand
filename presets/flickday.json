@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "flickday-media",
     "created": "2025-01-15T00:00:00.000Z",
-    "updated": "2026-07-22T13:13:13.367Z",
+    "updated": "2026-07-22T13:31:55.011Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -550,7 +550,8 @@
       "priorApprovals": [
         "Yellow on near-black as the primary contrast pair (live site :root)",
         "Tagline copy: Every Day's a Flickday (live site)",
-        "Anton as the site display face (live site :root)"
+        "Anton as the site display face (live site :root)",
+        "Primary wordmark is clean lowercase lettering — no film reel or filmstrip substituted into the d. The play mark stays available as an independent secondary symbol or social bug, positioned adjacent to the wordmark, never nested inside it (nino, 2026-07-22)"
       ],
       "sources": [
         "apps/flickdaymedia/index.html — CANONICAL. Per BRAND-PRIORS.md, when a generated doc and the live site disagree, the site wins. That rule catches errors in BRAND-PRIORS itself.",
@@ -567,22 +568,8 @@
             "Rejection no-bebas-caps-wordmark records what was ruled out, not what was chosen"
           ],
           "blocks": [
-            "wordmark",
             "lockup",
             "production"
-          ]
-        },
-        {
-          "id": "play-mark-in-the-d",
-          "question": "Is the play button / film reel nested in the wordmark's d a signature idea or a rejected construction? Two real sources give opposite verdicts and it is not an agent's call.",
-          "sources": [
-            "apps/flickdaymedia/BRAND-PRIORS.md lists it under 'Signature ideas (motifs to draw from)'",
-            "Rejection no-filmstrip-letter rejects exactly that construction"
-          ],
-          "blocks": [
-            "wordmark",
-            "symbol",
-            "lockup"
           ]
         }
       ]
@@ -782,7 +769,7 @@
       },
       {
         "id": "no-filmstrip-letter",
-        "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
+        "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact. Settled 2026-07-22: the construction is out, the motif is not — the play mark lives adjacent as its own symbol",
         "class": "judgment",
         "patterns": [
           "filmstrip.*(letter|bowl|counter|\\bd\\b)",
@@ -791,7 +778,6 @@
         ],
         "gates": [
           "wordmark",
-          "symbol",
           "lockup"
         ],
         "severity": "error",
@@ -880,6 +866,146 @@
         "descriptor": "The F mark: a stylized letter F with built-in motion energy — a letterform execution rather than a strategic idea.",
         "method": "other",
         "status": "rejected"
+      },
+      {
+        "id": "W-S01",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-01 — Plus Jakarta Sans 800 lowercase logotype. Geometric sans, wide fit, tall x-height, neutral f and k.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S01",
+          "label": "W-S01",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S02",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-02 — Baloo 2 800 lowercase logotype. Rounded terminals, chunky, friendly; softer than the incumbent.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S02",
+          "label": "W-S02",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S03",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-03 — Manrope 800 lowercase logotype. Open counters, lighter apparent weight; thins at small size.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S03",
+          "label": "W-S03",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S04",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-04 — Poppins 800 lowercase logotype. Geometric sans with near-circular bowls, wide, very heavy.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S04",
+          "label": "W-S04",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S05",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-05 — Nunito 900 lowercase logotype. Rounded terminals, medium apparent weight, soft.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S05",
+          "label": "W-S05",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S06",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-06 — Sora 800 lowercase logotype. Geometric sans, tight fit, round bowls, straight-tail y.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S06",
+          "label": "W-S06",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S07",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-07 — Montserrat 800 lowercase logotype. Geometric sans, clean, slightly wide.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S07",
+          "label": "W-S07",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S08",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-08 — Figtree 900 lowercase logotype. Geometric sans, dense, softly cut corners, tight fit.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S08",
+          "label": "W-S08",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S09",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-09 — Fredoka 600 lowercase logotype. Rounded display face, least geometric of the set, lightest at small size.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-S09",
+          "label": "W-S09",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        },
+        "status": "candidate"
+      },
+      {
+        "id": "W-S10",
+        "gate": "wordmark",
+        "round": 1,
+        "descriptor": "S-10 — Rubik 800 lowercase logotype. Heavy geometric sans, wide, flat terminals, strongest at 11px.",
+        "method": "type-setting",
+        "status": "candidate",
+        "asset": {
+          "id": "W-S10",
+          "label": "W-S10",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
+          "tags": []
+        }
       }
     ],
     "ledger": [

@@ -59,13 +59,39 @@ describe('open questions survive a write cycle', () => {
     }
   });
 
-  it('does not record an approval for something the sources call open', () => {
-    // "Lowercase over Bebas caps" is a rejection of one option, not an
-    // approved wordmark; BRAND-PRIORS says wordmark type is OPEN.
+  it('records no typeface as approved while the typeface question is open', () => {
+    // The fabrication this catches was "wordmark set in Bebas Neue-class
+    // condensed display type" — nobody approved that, and BRAND-PRIORS says
+    // wordmark type is OPEN.
+    //
+    // It used to assert that the word "wordmark" never appeared here, which
+    // is a keyword standing in for the real property. That misfired the
+    // moment a genuine ruling about the wordmark's *construction* was
+    // recorded. Approving how the mark is built is not approving what it is
+    // set in; test the second thing, since that is the one in dispute.
     const c = baseKit().decisions?.constitution;
+    const open = (c?.openQuestions ?? []).some((q) => q.id === 'logotype-typeface');
+    expect(open, 'this test is scoped to the window where the typeface is undecided').toBe(true);
+
     const approvals = (c?.priorApprovals ?? []).join(' ').toLowerCase();
-    expect(approvals).not.toContain('logotype');
-    expect(approvals).not.toContain('wordmark');
+    const faces = [
+      'bebas',
+      'poppins',
+      'montserrat',
+      'baloo',
+      'fredoka',
+      'nunito',
+      'rubik',
+      'plus jakarta',
+      'sora',
+      'figtree',
+      'manrope',
+    ];
+    for (const face of faces) {
+      expect(approvals, `"${face}" is recorded as approved while the typeface is open`).not.toContain(
+        face,
+      );
+    }
   });
 });
 
