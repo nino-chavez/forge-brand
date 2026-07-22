@@ -330,7 +330,7 @@
       {
         "id": "no-filmstrip-letter",
         "class": "judgment",
-        "gates": ["wordmark", "symbol"],
+        "gates": ["wordmark", "symbol", "lockup"],
         "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
         "patterns": ["filmstrip.*(letter|bowl|counter|\\bd\\b)", "perforation.*(letter|bowl|counter)", "sprocket.*(letter|bowl)"],
         "severity": "error",

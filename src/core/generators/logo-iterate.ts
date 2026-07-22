@@ -21,6 +21,14 @@ export interface LogoIterationOptions {
   basePrompt?: string;
   /** Things to avoid */
   avoid?: string[];
+  /**
+   * The brand's own accent color, `#rrggbb`. Required for the on-black and
+   * on-white variants — those constrain the palette, and hardcoding one
+   * brand's accent here injected it into every other brand's iterations.
+   */
+  accentHex: string;
+  /** Human-readable accent name for the prompt, e.g. "Flickday Yellow" */
+  accentName?: string;
   /** Output directory */
   outputDir?: string;
   /** Model */
@@ -33,7 +41,16 @@ export interface LogoVariation {
   prompt: string;
 }
 
-const VARIANTS = [
+function accentLabel(options: LogoIterationOptions): string {
+  return options.accentName
+    ? `${options.accentName} (${options.accentHex})`
+    : options.accentHex;
+}
+
+const VARIANTS: Array<{
+  id: string;
+  instruction: string | ((o: LogoIterationOptions) => string);
+}> = [
   {
     id: 'simplified',
     instruction: 'EXTREME SIMPLIFICATION for favicon/app icon use. Must be recognizable at 32x32 pixels. Maximum 2-3 shapes. No fine detail. Bold, clean, iconic. Single color on transparent background.',
@@ -48,11 +65,13 @@ const VARIANTS = [
   },
   {
     id: 'on-black',
-    instruction: 'Optimized for dark backgrounds. Use Flickday Yellow (#facc15) and white (#ffffff) only. Bold contrast. No background fill — mark floats on transparency for compositing onto dark surfaces.',
+    instruction: (o) =>
+      `Optimized for dark backgrounds. Use ${accentLabel(o)} and white (#ffffff) only. Bold contrast. No background fill — mark floats on transparency for compositing onto dark surfaces.`,
   },
   {
     id: 'on-white',
-    instruction: 'Optimized for light backgrounds. Use black (#000000) and Flickday Yellow (#facc15) only. Clean contrast. No background fill — mark floats on transparency for compositing onto light surfaces.',
+    instruction: (o) =>
+      `Optimized for light backgrounds. Use black (#000000) and ${accentLabel(o)} only. Clean contrast. No background fill — mark floats on transparency for compositing onto light surfaces.`,
   },
 ];
 
@@ -69,12 +88,17 @@ export async function iterateLogoConcept(
   const results: LogoVariation[] = [];
 
   for (const variant of VARIANTS) {
+    const instruction =
+      typeof variant.instruction === 'function'
+        ? variant.instruction(options)
+        : variant.instruction;
+
     const prompt = `${options.basePrompt || ''}
 
 LOGO DIRECTION TO ITERATE ON:
 ${options.direction}
 
-VARIANT: ${variant.instruction}
+VARIANT: ${instruction}
 
 BRAND: ${options.name}
 

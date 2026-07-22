@@ -26,6 +26,21 @@
 import { z } from 'zod';
 import { AssetRef } from './media.js';
 
+/**
+ * `YYYY-MM-DD`, optionally with a time part.
+ *
+ * Validated at the boundary because these fields are hand-authored and load
+ * bearing: rule 7 compares them to decide whether a constraint predates a
+ * decision, and a format like `07/20/2026` would compare lexicographically
+ * as later than any ISO date, silently dropping the constraint.
+ */
+const IsoDate = z
+  .string()
+  .regex(
+    /^\d{4}-\d{2}-\d{2}(T[\d:.]+(Z|[+-]\d{2}:?\d{2})?)?$/,
+    'Must be YYYY-MM-DD, optionally with a time part',
+  );
+
 // ---------------------------------------------------------------------------
 // Constitution — the reconciled brief
 // ---------------------------------------------------------------------------
@@ -135,12 +150,26 @@ export const RejectionConstraint = z.object({
   patterns: z.array(z.string()).min(1),
   /** Applies only when approving at these gates. Empty means all gates. */
   gates: z.array(z.string()).default([]),
-  /** Severity of a descriptor hit. Forced to `warning` for judgment class. */
+  /**
+   * Severity of a DESCRIPTOR HIT only — how much a text match matters.
+   * Judgment-class hits are reported as warnings regardless, because a text
+   * match is weak evidence for a visual claim.
+   *
+   * This does NOT govern whether the mandatory look is required; that is
+   * `acknowledgement`. Two meanings on one field meant an author lowering
+   * this for evidentiary reasons silently disabled the real enforcement.
+   */
   severity: z.enum(['error', 'warning']).default('error'),
+  /**
+   * Whether approving in this constraint's scope requires the human to name
+   * it in the ledger entry's `reviewed`. Judgment-class only. `required`
+   * blocks; `optional` warns.
+   */
+  acknowledgement: z.enum(['required', 'optional']).default('required'),
   /** What to do instead */
   suggestion: z.string().optional(),
-  /** ISO 8601 date the rejection was recorded */
-  recorded: z.string().optional(),
+  /** Date the rejection was recorded */
+  recorded: IsoDate.optional(),
 });
 export type RejectionConstraint = z.infer<typeof RejectionConstraint>;
 
@@ -212,8 +241,8 @@ export const DecisionEntry = z.object({
    * that mandatory look is the only real enforcement a judgment call has.
    */
   reviewed: z.array(z.string()).default([]),
-  /** ISO 8601 date */
-  date: z.string().optional(),
+  /** Date the decision was made */
+  date: IsoDate.optional(),
 });
 export type DecisionEntry = z.infer<typeof DecisionEntry>;
 

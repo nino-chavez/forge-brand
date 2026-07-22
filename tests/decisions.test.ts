@@ -577,6 +577,44 @@ describe('rule 7 — judgment constraints require a recorded look', () => {
     expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
   });
 
+  it('does not treat a same-day timestamp as postdating a date-only approval', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        // Lexically "2026-07-20T09:00:00Z" > "2026-07-20", which would have
+        // silently skipped the constraint. The day is the same, so nothing
+        // is proven and the look is still owed.
+        rejections: [{ ...judgmentRejection, gates: ['territory'], recorded: '2026-07-20T09:00:00Z' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino', date: '2026-07-20' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
+  });
+
+  it('rejects a non-ISO date at parse time', () => {
+    expect(() =>
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino', date: '07/20/2026' },
+        ],
+      }),
+    ).toThrow();
+  });
+
   it('warns on an undated approval when dated constraints exist', () => {
     const report = reviewDecisions(
       withDecisions({
@@ -596,13 +634,33 @@ describe('rule 7 — judgment constraints require a recorded look', () => {
     expect(report.issues.some((i) => i.area === 'decisions.ledger[0].date')).toBe(true);
   });
 
-  it('honors a constraint declared as a warning instead of forcing an error', () => {
+  it('a lowered descriptor-hit severity does not disable the mandatory look', () => {
     const report = reviewDecisions(
       withDecisions({
         constitution: CONSTITUTION,
         gates: GATES,
         rubric: RUBRIC,
+        // severity governs descriptor hits only; acknowledgement stays required
         rejections: [{ ...judgmentRejection, gates: ['territory'], severity: 'warning' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
+  });
+
+  it('downgrades to a warning when acknowledgement is optional', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], acknowledgement: 'optional' }],
         candidates: [
           { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
         ],
@@ -744,7 +802,7 @@ describe('pattern matching', () => {
 
   it('reports which patterns hit', () => {
     const hits = violatedPatterns(
-      { id: 'x', reason: 'y', class: 'mechanical', gates: [], patterns: ['aperture', 'blade'], severity: 'error' },
+      { id: 'x', reason: 'y', class: 'mechanical', gates: [], patterns: ['aperture', 'blade'], severity: 'error', acknowledgement: 'required' },
       'aperture blades around a ball',
     );
     expect(hits).toEqual(['aperture', 'blade']);

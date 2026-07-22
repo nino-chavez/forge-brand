@@ -301,13 +301,15 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
       (r) => appliesToGate(r.gates, entry.gate) && !postdates(r, entry),
     );
 
-    // A constraint's declared severity governs here. Rule 5 downgrades a
-    // judgment text-match to a warning because a match is weak evidence;
-    // that is about proof. This is about the required act, so an author who
-    // marked a constraint `warning` gets a warning. Default is `error`.
-    for (const sev of ['error', 'warning'] as const) {
+    // Graded by `acknowledgement`, NOT `severity`. `severity` describes how
+    // much a descriptor hit matters — an author lowering it for evidentiary
+    // reasons must not silently disable the mandatory look.
+    for (const [level, sev] of [
+      ['required', 'error'],
+      ['optional', 'warning'],
+    ] as const) {
       const missed = inScope.filter(
-        (r) => r.severity === sev && !entry.reviewed.includes(r.id),
+        (r) => r.acknowledgement === level && !entry.reviewed.includes(r.id),
       );
       if (missed.length === 0) continue;
       issues.push({
@@ -434,13 +436,33 @@ function appliesToGate(scope: string[], gate: string): boolean {
  * yet. That makes falsifying the record the sanctioned repair, which
  * destroys the one property the ledger has.
  *
- * Only skips when it can be proven. Undated either side means the
- * constraint still applies, and rule 7 warns about the undated entry.
+ * Only skips when it can be proven, and "proven" is strict:
+ *
+ * - Compared at day granularity. A date-only approval says nothing about
+ *   the hour, so a constraint stamped 09:00 the same day is not proven to
+ *   come after it. String comparison got this wrong in the other direction
+ *   — `"2026-07-20T09:00:00Z" > "2026-07-20"` is true by prefix length —
+ *   which silently dropped the constraint and disabled the only enforcement
+ *   a judgment call has.
+ * - Anything unparseable is not proven, so the constraint still applies.
+ *
+ * Failing toward "still applies" is the right direction: the cost is an
+ * acknowledgement you did not strictly owe, versus a skipped check you did.
  */
 function postdates(
   r: { recorded?: string },
   entry: { date?: string },
 ): boolean {
-  if (!r.recorded || !entry.date) return false;
-  return r.recorded > entry.date;
+  const recorded = utcDay(r.recorded);
+  const decided = utcDay(entry.date);
+  if (!recorded || !decided) return false;
+  return recorded > decided;
+}
+
+/** `YYYY-MM-DD` in UTC, or null if absent/unparseable. */
+function utcDay(value: string | undefined): string | null {
+  if (!value) return null;
+  const ms = Date.parse(value);
+  if (Number.isNaN(ms)) return null;
+  return new Date(ms).toISOString().slice(0, 10);
 }

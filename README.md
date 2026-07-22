@@ -115,7 +115,8 @@ An identity that is still being developed carries a `decisions` block. It record
 
 - A candidate marked `approved` with no matching ledger entry is an **error**. Approval has to be an explained, attributed entry rather than a silently flipped flag.
 - A live candidate matching a **mechanical** rejection constraint is an **error** — those are decidable from text (a banned slogan, a forbidden font).
-- A **judgment** constraint ("reads as the Facebook mark") can't be decided from text, so a descriptor match only warns. Its real enforcement is that approving inside its gate scope requires the human to list it in the ledger entry's `reviewed`. That mandatory look is the honest version of enforcing a visual call.
+- A **judgment** constraint ("reads as the Facebook mark") can't be decided from text, so a descriptor match only warns. Its real enforcement is that approving inside its gate scope requires the human to list it in the ledger entry's `reviewed`. That mandatory look is the honest version of enforcing a visual call, and it's governed by `acknowledgement`, not `severity` — lowering how much a text match matters must not switch off the look.
+- Adding a constraint does **not** retroactively invalidate earlier approvals, as long as both carry dates. Otherwise the only way to clear the error would be backdating a claim that someone checked a rule that didn't exist yet.
 - A ledger entry rejecting a candidate that is still marked live is an **error**. Otherwise a recorded rejection is inert and the candidate keeps competing.
 - Approving any gate with no `conceptualAnchor` recorded is an **error**. Generating before the metaphor exists is how a project ends up describing camera parts instead of an idea.
 - An approved candidate with `method: "trace"` is an **error**. A traced raster is not a master. Rebuild it as `hand-vector` with `parent` pointing at the trace.
