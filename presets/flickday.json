@@ -321,6 +321,7 @@
       {
         "id": "no-meta-lookalike",
         "class": "judgment",
+        "gates": ["symbol", "lockup"],
         "reason": "Reads as the Meta/Facebook mark",
         "patterns": ["facebook", "\\bmeta\\b", "rounded blue f", "infinity loop"],
         "severity": "error",
@@ -329,6 +330,7 @@
       {
         "id": "no-filmstrip-letter",
         "class": "judgment",
+        "gates": ["wordmark", "symbol"],
         "reason": "Filmstrip forced into a letterform collapses at small sizes and reads as a rescue of an earlier artifact",
         "patterns": ["filmstrip.*(letter|bowl|counter|\\bd\\b)", "perforation.*(letter|bowl|counter)", "sprocket.*(letter|bowl)"],
         "severity": "error",
@@ -337,6 +339,7 @@
       {
         "id": "no-symbol-eating-word",
         "class": "judgment",
+        "gates": ["lockup"],
         "reason": "Symbol inserted into the word reduces readability of the name",
         "patterns": ["replaces the .? in", "symbol as the letter", "glyph substitution", "icon inside the word"],
         "severity": "error",
@@ -345,6 +348,7 @@
       {
         "id": "no-variant-type-drift",
         "class": "judgment",
+        "gates": ["lockup", "stress-test"],
         "reason": "Typography changing between lockup variants means there is no system",
         "patterns": ["different font in", "alternate typeface for", "swapped the type"],
         "severity": "error"
@@ -352,6 +356,7 @@
       {
         "id": "no-multi-metaphor",
         "class": "judgment",
+        "gates": ["territory", "symbol"],
         "reason": "Multiple media metaphors stacked into one word never resolve",
         "patterns": ["(combines|fuses|merges) .*(film|camera|lens|shutter).*(and|plus|with).*(ball|net|court)"],
         "severity": "warning",

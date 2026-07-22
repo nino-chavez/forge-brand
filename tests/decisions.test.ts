@@ -58,6 +58,28 @@ describe('reviewDecisions — no decisions block', () => {
     expect(report.issues).toHaveLength(0);
   });
 
+  /**
+   * An unscoped judgment constraint applies to every gate, so rule 7 demands
+   * it be acknowledged at every approval — including gates where it is
+   * nonsense ("typography drift across lockup variants" at the territory
+   * gate, before any artwork exists). That trains rubber-stamping, which is
+   * the behavior the mandatory look exists to prevent.
+   */
+  it('every shipped judgment constraint is gate-scoped', () => {
+    const presets = fs.readdirSync(PRESETS_DIR).filter((f) => f.endsWith('.json'));
+    for (const file of presets) {
+      const raw = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, file), 'utf-8'));
+      const kit = parseBrandKit(raw);
+      for (const r of kit.decisions?.rejections ?? []) {
+        if (r.class !== 'judgment') continue;
+        expect(
+          r.gates.length,
+          `${file}: judgment constraint "${r.id}" is unscoped, so it applies to every gate`,
+        ).toBeGreaterThan(0);
+      }
+    }
+  });
+
   it('every shipped preset still parses and reviews clean', () => {
     const presets = fs.readdirSync(PRESETS_DIR).filter((f) => f.endsWith('.json'));
     expect(presets.length).toBeGreaterThan(0);
@@ -496,6 +518,102 @@ describe('rule 7 — judgment constraints require a recorded look', () => {
     expect(report.passed).toBe(false);
     const msg = report.issues.map((i) => i.message).join(' ');
     expect(msg).toContain('no-such-rule');
+  });
+
+  it('errors on a scope naming a gate that does not exist', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        // "symbols" — a typo. Without the check this silently applies
+        // nowhere while still being counted as enforced.
+        rejections: [{ ...judgmentRejection, gates: ['symbols'] }],
+        candidates: [
+          { id: 'C-060', gate: 'symbol', descriptor: 'Asymmetric contact burst', method: 'hand-vector', status: 'candidate' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.rejections[no-meta-lookalike].gates');
+  });
+
+  it('does not retroactively invalidate an approval that predates the constraint', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], recorded: '2026-07-20' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino', date: '2026-07-01' },
+        ],
+      }),
+    );
+    // Clearing this any other way would mean backdating an attestation that
+    // a human checked a constraint which did not exist yet.
+    expect(report.passed).toBe(true);
+  });
+
+  it('still demands acknowledgement for a constraint that predates the approval', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], recorded: '2026-07-01' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns the instant of contact.', decidedBy: 'nino', date: '2026-07-20' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.ledger[0].reviewed');
+  });
+
+  it('warns on an undated approval when dated constraints exist', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], recorded: '2026-07-01' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino', reviewed: ['no-meta-lookalike'] },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+    expect(report.issues.some((i) => i.area === 'decisions.ledger[0].date')).toBe(true);
+  });
+
+  it('honors a constraint declared as a warning instead of forcing an error', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        rejections: [{ ...judgmentRejection, gates: ['territory'], severity: 'warning' }],
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'ai-image', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+    const issue = report.issues.find((i) => i.area === 'decisions.ledger[0].reviewed');
+    expect(issue?.severity).toBe('warning');
   });
 
   it('does not demand acknowledgement at gates outside the constraint scope', () => {

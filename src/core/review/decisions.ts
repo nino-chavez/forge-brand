@@ -1,7 +1,8 @@
 /**
  * Decisions Review Gate
  *
- * Enforces the two rules that keep a creative process from drifting:
+ * Eight rules, serving two principles that keep a creative process from
+ * drifting:
  *
  * 1. A gate advances only on a ledger entry carrying a rationale and an
  *    author. This is a soft control by construction — the gate cannot prove
@@ -16,9 +17,10 @@
  *    record that they looked. Automating a judgment call produces a gate
  *    that misses the real cases and cries wolf on the honest ones.
  *
- * Plus the ordering and generate-before-criteria checks that catch the
- * classic failure: producing artifacts before the evaluation bar exists,
- * then arguing about the artifacts instead of the bar.
+ * Rules 1-2 and 6 serve the first; 4-5 and 7 serve the second. Rules 3 and 8
+ * catch the classic failure underneath both: producing artifacts before the
+ * anchor and the evaluation bar exist, then arguing about the artifacts
+ * instead of the bar.
  *
  * Pure deterministic check on a parsed kit. No AI, no network.
  * Kits without a `decisions` block pass trivially.
@@ -120,6 +122,22 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
         message: `References parent candidate "${c.parent}" which does not exist`,
         severity: 'error',
       });
+    }
+  }
+
+  for (const r of d.rejections) {
+    for (const g of r.gates) {
+      if (!gateIds.has(g)) {
+        // Error, not warning: a mistyped scope makes appliesToGate false
+        // everywhere, so the constraint silently stops enforcing while
+        // still being counted. A disabled rejection that looks active is
+        // worse than no rejection at all.
+        issues.push({
+          area: `decisions.rejections[${r.id}].gates`,
+          message: `References gate "${g}" which is not defined, so this constraint silently applies nowhere. Declared gates: ${[...gateIds].join(', ') || '(none)'}`,
+          severity: 'error',
+        });
+      }
     }
   }
 
@@ -278,13 +296,36 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
   const judgment = d.rejections.filter((r) => r.class === 'judgment');
   for (const [i, entry] of d.ledger.entries()) {
     if (entry.decision !== 'approved') continue;
-    const inScope = judgment.filter((r) => appliesToGate(r.gates, entry.gate));
-    const missed = inScope.filter((r) => !entry.reviewed.includes(r.id));
-    if (missed.length > 0) {
+
+    const inScope = judgment.filter(
+      (r) => appliesToGate(r.gates, entry.gate) && !postdates(r, entry),
+    );
+
+    // A constraint's declared severity governs here. Rule 5 downgrades a
+    // judgment text-match to a warning because a match is weak evidence;
+    // that is about proof. This is about the required act, so an author who
+    // marked a constraint `warning` gets a warning. Default is `error`.
+    for (const sev of ['error', 'warning'] as const) {
+      const missed = inScope.filter(
+        (r) => r.severity === sev && !entry.reviewed.includes(r.id),
+      );
+      if (missed.length === 0) continue;
       issues.push({
         area: `decisions.ledger[${i}].reviewed`,
         message: `Approves gate "${entry.gate}" without confirming these judgment constraints were looked at: ${missed.map((r) => r.id).join(', ')}. Add their ids to "reviewed" once you have actually checked the artifact against each.`,
-        severity: 'error',
+        severity: sev,
+      });
+    }
+
+    // Undated approvals can't be protected from constraints recorded later,
+    // and the repair for that is backdating an attestation — exactly the
+    // dishonesty the ledger exists to prevent. Say so once, here.
+    if (!entry.date && d.rejections.some((r) => r.recorded)) {
+      issues.push({
+        area: `decisions.ledger[${i}].date`,
+        message:
+          'Undated approval. Rejection constraints recorded after this decision cannot be told apart from ones that preceded it, so a later constraint will demand acknowledgement retroactively. Date the entry.',
+        severity: 'warning',
       });
     }
     for (const id of entry.reviewed) {
@@ -382,4 +423,24 @@ function normalize(s: string): string {
 /** Empty scope means every gate. */
 function appliesToGate(scope: string[], gate: string): boolean {
   return scope.length === 0 || scope.includes(gate);
+}
+
+/**
+ * Was this constraint recorded after the decision was made?
+ *
+ * Without this, adding a rejection retroactively invalidates every prior
+ * approval, and the only way to clear the error is to edit a historical
+ * ledger entry claiming a human checked a constraint that did not exist
+ * yet. That makes falsifying the record the sanctioned repair, which
+ * destroys the one property the ledger has.
+ *
+ * Only skips when it can be proven. Undated either side means the
+ * constraint still applies, and rule 7 warns about the undated entry.
+ */
+function postdates(
+  r: { recorded?: string },
+  entry: { date?: string },
+): boolean {
+  if (!r.recorded || !entry.date) return false;
+  return r.recorded > entry.date;
 }
