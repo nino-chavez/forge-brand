@@ -150,10 +150,24 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
       });
     }
     for (const cid of entry.candidates) {
-      if (!candidateIds.has(cid)) {
+      const c = d.candidates.find((x) => x.id === cid);
+      if (!c) {
         issues.push({
           area: `decisions.ledger[${i}].candidates`,
           message: `References candidate "${cid}" which does not exist`,
+          severity: 'error',
+        });
+        continue;
+      }
+      // Both ids existing is not enough. A typo'd id that happens to name a
+      // candidate from another gate records that gate as decided by
+      // something that never competed there — and every gate downstream
+      // unblocks with no real winner. Nothing else catches this: rule 2
+      // keys on the candidate's gate, rule 3 keys on the entry's.
+      if (c.gate !== entry.gate) {
+        issues.push({
+          area: `decisions.ledger[${i}].candidates`,
+          message: `Decides gate "${entry.gate}" using candidate "${cid}", which competes at "${c.gate}"`,
           severity: 'error',
         });
       }
@@ -173,16 +187,22 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
     }
   }
 
-  // A ledger approval that contradicts the candidate's own status
+  // A ledger approval that contradicts the candidate's own status.
+  //
+  // `superseded` is allowed when a LATER approval at the same gate replaced
+  // it. That is how a gate reopens without deleting history: the old entry
+  // stays, the status tells you it is no longer the winner. Requiring
+  // `approved` unconditionally left "supersede it first" as advice whose
+  // only execution was erasing the ledger.
   for (const cid of ledgerApproved) {
     const c = d.candidates.find((x) => x.id === cid);
-    if (c && c.status !== 'approved') {
-      issues.push({
-        area: `decisions.candidates[${cid}].status`,
-        message: `Ledger records this candidate as approved but its status is "${c.status}"`,
-        severity: 'error',
-      });
-    }
+    if (!c || c.status === 'approved') continue;
+    if (c.status === 'superseded' && wasSuperseded(d, cid, c.gate)) continue;
+    issues.push({
+      area: `decisions.candidates[${cid}].status`,
+      message: `Ledger records this candidate as approved but its status is "${c.status}"`,
+      severity: 'error',
+    });
   }
 
   // --- Rule 2: one winner per gate -------------------------------------------
@@ -449,6 +469,7 @@ export interface GenerationReadiness {
 export function checkGenerationReadiness(
   kit: BrandKit,
   gate: string,
+  options: { reopen?: boolean } = {},
 ): GenerationReadiness {
   const d = kit.decisions;
   if (!d) return { ready: true, blockers: [], avoid: [], criteria: [] };
@@ -477,9 +498,9 @@ export function checkGenerationReadiness(
         `Gate "${gate}" is blocked until ${open.join(', ')} ${open.length === 1 ? 'is' : 'are'} decided.`,
       );
     }
-    if (approved.has(gate)) {
+    if (approved.has(gate) && !options.reopen) {
       blockers.push(
-        `Gate "${gate}" is already decided. Supersede the approved candidate before opening a new round.`,
+        `Gate "${gate}" is already decided. Pass --reopen to run another round — approving a new candidate there supersedes the current winner and keeps both ledger entries.`,
       );
     }
   }
@@ -501,6 +522,30 @@ export function checkGenerationReadiness(
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Did a later approval at the same gate replace this candidate?
+ *
+ * "Later" is ledger order, which is append order. Dates are optional and a
+ * same-day reopen is normal, so position is the only ordering that always
+ * exists.
+ */
+function wasSuperseded(
+  d: DecisionSystem,
+  candidateId: string,
+  gate: string,
+): boolean {
+  const approvals = d.ledger
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => e.decision === 'approved' && e.gate === gate);
+
+  const mine = approvals.find(({ e }) => e.candidates.includes(candidateId));
+  if (!mine) return false;
+
+  return approvals.some(
+    ({ e, i }) => i > mine.i && !e.candidates.includes(candidateId),
+  );
 }
 
 /** Empty scope means every gate. */

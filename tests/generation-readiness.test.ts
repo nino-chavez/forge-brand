@@ -87,22 +87,43 @@ describe('checkGenerationReadiness', () => {
     expect(r.blockers.join(' ')).toContain('not defined');
   });
 
-  it('refuses to reopen a decided gate', () => {
-    const r = checkGenerationReadiness(
-      withDecisions({
-        constitution: ANCHORED,
-        gates: GATES,
-        candidates: [
-          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'other', status: 'approved' },
-        ],
-        ledger: [
-          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino' },
-        ],
-      }),
-      'territory',
-    );
+  const decided = () =>
+    withDecisions({
+      constitution: ANCHORED,
+      gates: GATES,
+      candidates: [
+        { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'other', status: 'approved' },
+      ],
+      ledger: [
+        { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino' },
+      ],
+    });
+
+  it('refuses at a decided gate by default', () => {
+    const r = checkGenerationReadiness(decided(), 'territory');
     expect(r.ready).toBe(false);
     expect(r.blockers.join(' ')).toContain('already decided');
+  });
+
+  it('allows another round when reopening is explicit', () => {
+    const r = checkGenerationReadiness(decided(), 'territory', { reopen: true });
+    expect(r.ready).toBe(true);
+  });
+
+  it('reopening does not waive the anchor or the prerequisites', () => {
+    const noAnchor = checkGenerationReadiness(
+      withDecisions({ constitution: { brief: 'Resolve it.' }, gates: GATES }),
+      'territory',
+      { reopen: true },
+    );
+    expect(noAnchor.ready).toBe(false);
+
+    const blocked = checkGenerationReadiness(
+      withDecisions({ constitution: ANCHORED, gates: GATES }),
+      'symbol',
+      { reopen: true },
+    );
+    expect(blocked.ready).toBe(false);
   });
 
   it('returns only the rejections and criteria in scope for the gate', () => {

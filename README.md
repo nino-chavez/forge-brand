@@ -158,7 +158,19 @@ brand-forge decide -k kit.json -g territory --approve C-001 \
 brand-forge generate logo -k kit.json -g symbol
 ```
 
-`candidate add` and `decide` validate the whole kit before writing and refuse to persist anything the review gate would reject, so the file on disk is always in a state you can trust.
+`candidate add` and `decide` validate against both the schema and the review gate before writing, and refuse to persist anything either would reject — so the file on disk always parses and always passes.
+
+Reopening a decided gate is explicit and keeps the record:
+
+```bash
+brand-forge generate logo -k kit.json -g territory --reopen
+brand-forge decide -k kit.json -g territory --approve C-002 \
+  --rationale "Crowd reaction travels further on social than the play does." \
+  --by nino --reviewed no-multi-metaphor
+# → Gate "territory": approved C-002; superseded C-001
+```
+
+Both ledger entries survive. The old candidate becomes `superseded`, so the gate still resolves to exactly one live winner and nothing has to be deleted to change your mind.
 
 The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
 

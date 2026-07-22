@@ -247,7 +247,8 @@ export function registerGenerateCommand(program: Command) {
     .option('-o, --output <dir>', 'Output directory', './output/logos')
     .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
     .option('-g, --gate <id>', 'Gate to generate at (required for kits with a decisions block)')
-    .action(async (options: { kit: string; count: string; output: string; model: string; gate?: string }) => {
+    .option('--reopen', 'Run another round at a gate that is already decided')
+    .action(async (options: { kit: string; count: string; output: string; model: string; gate?: string; reopen?: boolean }) => {
       const kitPath = path.resolve(options.kit);
       const kit = parseBrandKit(JSON.parse(fs.readFileSync(kitPath, 'utf-8')));
 
@@ -265,7 +266,7 @@ export function registerGenerateCommand(program: Command) {
           );
           process.exit(1);
         }
-        readiness = checkGenerationReadiness(kit, options.gate);
+        readiness = checkGenerationReadiness(kit, options.gate, { reopen: options.reopen });
         if (!readiness.ready) {
           console.error(chalk.red('\nNot ready to generate:\n'));
           for (const b of readiness.blockers) console.error(chalk.red(`  - ${b}`));

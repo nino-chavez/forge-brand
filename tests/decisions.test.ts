@@ -437,6 +437,77 @@ describe('rule 5 — recorded rejections stay rejected', () => {
   });
 });
 
+describe('a decision must use a candidate from its own gate', () => {
+  it('errors when the ledger decides a gate with another gate\'s candidate', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'other', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'Owns it.', decidedBy: 'nino' },
+          // Typo: meant a wordmark candidate. Both ids exist, so the plain
+          // existence checks pass, and every gate downstream of wordmark
+          // would unblock with no real winner.
+          { gate: 'wordmark', decision: 'approved', candidates: ['C-001'], rationale: 'Typo.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(report.issues.some((i) => i.message.includes('competes at'))).toBe(true);
+  });
+});
+
+describe('superseding reopens a gate without erasing history', () => {
+  function reopened(secondStatus: 'approved' | 'superseded') {
+    return withDecisions({
+      constitution: CONSTITUTION,
+      gates: GATES,
+      rubric: RUBRIC,
+      candidates: [
+        { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'other', status: 'superseded' },
+        { id: 'C-002', gate: 'territory', descriptor: 'Crowd reaction', method: 'other', status: secondStatus },
+      ],
+      ledger: [
+        { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'First call.', decidedBy: 'nino' },
+        { gate: 'territory', decision: 'approved', candidates: ['C-002'], rationale: 'Travels further on social.', decidedBy: 'nino' },
+      ],
+    });
+  }
+
+  it('accepts a superseded winner when a later approval replaced it', () => {
+    const report = reviewDecisions(reopened('approved'));
+    expect(report.passed).toBe(true);
+  });
+
+  it('still resolves the gate to exactly one live winner', () => {
+    const kit = reopened('approved');
+    const approved = kit.decisions!.candidates.filter((c) => c.status === 'approved');
+    expect(approved.map((c) => c.id)).toEqual(['C-002']);
+  });
+
+  it('does not let a candidate escape by being marked superseded with nothing replacing it', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'Contact instant', method: 'other', status: 'superseded' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'First call.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.candidates[C-001].status');
+  });
+});
+
 describe('rule 6 — a ledger rejection actually rejects', () => {
   it('errors when the ledger rejects a candidate still marked live', () => {
     const report = reviewDecisions(

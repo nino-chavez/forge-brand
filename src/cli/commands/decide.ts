@@ -11,7 +11,7 @@
  * has to untangle later.
  */
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import chalk from 'chalk';
@@ -45,6 +45,23 @@ function loadKit(kitPath: string): { kit: BrandKit; resolved: string } {
  * decision, it is a mess someone inherits.
  */
 function commit(kit: BrandKit, resolved: string, summary: string): void {
+  // Schema first. None of the review gates run Zod — `reviewBrandKit` never
+  // calls `parseBrandKit` — so validating only against the gates let a bad
+  // `--method` or a NaN round reach disk, after which every later command
+  // died on an uncaught ZodError until someone hand-edited the JSON. That is
+  // the exact friction these commands exist to remove.
+  const serialized = JSON.stringify(kit, null, 2);
+  try {
+    parseBrandKit(JSON.parse(serialized));
+  } catch (e: any) {
+    console.error(chalk.red('Refusing to write — the result would not parse:\n'));
+    for (const issue of e.issues ?? []) {
+      console.error(chalk.red(`  - ${issue.path.join('.')}: ${issue.message}`));
+    }
+    if (!e.issues) console.error(chalk.red(`  ${e.message}`));
+    process.exit(1);
+  }
+
   const report = reviewBrandKit(kit);
   const errors = report.gates.decisions.issues.filter((i) => i.severity === 'error');
 
@@ -97,7 +114,11 @@ export function registerCandidateCommand(program: Command) {
       '-d, --descriptor <text>',
       'What the candidate IS, in mechanical terms — this is what rejection constraints match against, so describe the construction, not the vibe',
     )
-    .requiredOption('-m, --method <method>', 'ai-image | ai-vector | type-setting | hand-vector | trace | other')
+    .addOption(
+      new Option('-m, --method <method>', 'How the candidate was produced')
+        .makeOptionMandatory()
+        .choices(['ai-image', 'ai-vector', 'type-setting', 'hand-vector', 'trace', 'other']),
+    )
     .option('-k, --kit <path>', 'Path to brand-kit.json', 'brand-kit.json')
     .option('-a, --asset <path>', 'Path to the rendered artifact')
     .option('-p, --parent <id>', 'Candidate this was derived from')
@@ -215,6 +236,19 @@ export function registerDecideCommand(program: Command) {
 
       const date = options.date || today();
 
+      // Approving at a gate that already has a winner replaces it. The old
+      // ledger entry stays — history is the point — and the old candidate's
+      // status drops to `superseded` so the gate still resolves to one.
+      const superseded: string[] = [];
+      if (approve.length > 0) {
+        for (const c of d.candidates) {
+          if (c.gate === options.gate && c.status === 'approved' && !approve.includes(c.id)) {
+            c.status = 'superseded';
+            superseded.push(c.id);
+          }
+        }
+      }
+
       for (const [ids, decision, status] of [
         [approve, 'approved', 'approved'],
         [reject, 'rejected', 'rejected'],
@@ -237,6 +271,14 @@ export function registerDecideCommand(program: Command) {
             console.error(chalk.red(`Candidate "${id}" does not exist.`));
             process.exit(1);
           }
+          if (c.gate !== options.gate) {
+            console.error(
+              chalk.red(
+                `Candidate "${id}" competes at gate "${c.gate}", not "${options.gate}". Deciding a gate with a candidate from another one records a winner that never competed there.`,
+              ),
+            );
+            process.exit(1);
+          }
           c.status = status;
         }
       }
@@ -244,6 +286,7 @@ export function registerDecideCommand(program: Command) {
       const parts = [
         approve.length > 0 ? `approved ${approve.join(', ')}` : '',
         reject.length > 0 ? `rejected ${reject.join(', ')}` : '',
+        superseded.length > 0 ? `superseded ${superseded.join(', ')}` : '',
       ].filter(Boolean);
 
       commit(kit, resolved, `Gate "${options.gate}": ${parts.join('; ')} (${date})`);
