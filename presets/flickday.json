@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "flickday-media",
     "created": "2025-01-15T00:00:00.000Z",
-    "updated": "2026-07-22T13:31:55.011Z",
+    "updated": "2026-07-22T13:43:57.555Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -545,13 +545,15 @@
       "nonGoals": [
         "Redesigning the website",
         "Changing the palette or type system",
-        "Animating anything before the static mark works"
+        "Animating anything before the static mark works",
+        "Matching any legacy wordmark outline — systems A-D are forensic evidence of type drift, not geometry to preserve"
       ],
       "priorApprovals": [
         "Yellow on near-black as the primary contrast pair (live site :root)",
         "Tagline copy: Every Day's a Flickday (live site)",
         "Anton as the site display face (live site :root)",
-        "Primary wordmark is clean lowercase lettering — no film reel or filmstrip substituted into the d. The play mark stays available as an independent secondary symbol or social bug, positioned adjacent to the wordmark, never nested inside it (nino, 2026-07-22)"
+        "Primary wordmark is clean lowercase lettering — no film reel or filmstrip substituted into the d. The play mark stays available as an independent secondary symbol or social bug, positioned adjacent to the wordmark, never nested inside it (nino, 2026-07-22)",
+        "No shipped Flickday wordmark outline is canonical. Continuity comes from the lowercase name, yellow-on-black, the voice, and the flick concept — not from legacy letterforms. Select the new typeface on brand fit, distinctiveness, production performance, and its ability to become one reproducible master (nino, 2026-07-22)"
       ],
       "sources": [
         "apps/flickdaymedia/index.html — CANONICAL. Per BRAND-PRIORS.md, when a generated doc and the live site disagree, the site wins. That rule catches errors in BRAND-PRIORS itself.",
@@ -638,7 +640,8 @@
         "weight": 5,
         "gates": [
           "territory",
-          "symbol"
+          "symbol",
+          "wordmark"
         ]
       },
       {
@@ -662,7 +665,8 @@
         "gates": [
           "symbol",
           "lockup",
-          "stress-test"
+          "stress-test",
+          "wordmark"
         ]
       },
       {
@@ -728,6 +732,15 @@
         "criterion": "Current without chasing a disposable trend",
         "weight": 3,
         "gates": []
+      },
+      {
+        "id": "one-master",
+        "criterion": "Becomes one reproducible master — a real typeface or true vector geometry that every variant is set from, not an outline nobody can regenerate",
+        "weight": 5,
+        "gates": [
+          "wordmark",
+          "production"
+        ]
       }
     ],
     "rejections": [
@@ -879,7 +892,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S02",
@@ -893,7 +906,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S03",
@@ -907,7 +920,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S04",
@@ -921,7 +934,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S05",
@@ -935,7 +948,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S06",
@@ -963,7 +976,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S08",
@@ -991,7 +1004,7 @@
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
         },
-        "status": "candidate"
+        "status": "rejected"
       },
       {
         "id": "W-S10",
@@ -999,13 +1012,13 @@
         "round": 1,
         "descriptor": "S-10 — Rubik 800 lowercase logotype. Heavy geometric sans, wide, flat terminals, strongest at 11px.",
         "method": "type-setting",
-        "status": "candidate",
         "asset": {
           "id": "W-S10",
           "label": "W-S10",
           "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/specimens-screen.png",
           "tags": []
-        }
+        },
+        "status": "candidate"
       }
     ],
     "ledger": [
@@ -1031,6 +1044,23 @@
           "T-F-MARK"
         ],
         "rationale": "The flick is native to the Flickday name. It connects sports and media without stacking volleyball and camera symbols, and it supports motion, wordmark, symbol and video behavior from one idea. Frame/crop is generic photography; ball + flash is overly literal; the F mark is an execution, not an idea.",
+        "decidedBy": "nino",
+        "reviewed": [],
+        "date": "2026-07-22"
+      },
+      {
+        "gate": "wordmark",
+        "decision": "rejected",
+        "candidates": [
+          "W-S01",
+          "W-S02",
+          "W-S03",
+          "W-S04",
+          "W-S05",
+          "W-S07",
+          "W-S09"
+        ],
+        "rationale": "Cut to three finalists, judged independently of any incumbent. Sora 800 leads: compact, decisive, contemporary, and able to carry sharper custom detail — it expresses the snap of the flick. Rubik 800 is the strongest challenger but its roundness reads friendlier and less sharp. Figtree 900 has the best utility and legibility and is the least distinctive. The seven cut here lose on brand fit, distinctiveness, or weight retention at small size.",
         "decidedBy": "nino",
         "reviewed": [],
         "date": "2026-07-22"
