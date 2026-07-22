@@ -489,6 +489,84 @@ describe('superseding reopens a gate without erasing history', () => {
     expect(approved.map((c) => c.id)).toEqual(['C-002']);
   });
 
+  /**
+   * A → B → A. Anchoring the exemption on a candidate's FIRST approval let
+   * both sides claim "someone else was approved after me", so the gate
+   * counted as decided with nobody holding it — and everything downstream
+   * unblocked against no winner at all.
+   */
+  it('catches a re-approval cycle that leaves the gate with no live winner', () => {
+    const entry = (c: string) => ({
+      gate: 'territory',
+      decision: 'approved' as const,
+      candidates: [c],
+      rationale: 'x',
+      decidedBy: 'nino',
+    });
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'A', method: 'other', status: 'superseded' },
+          { id: 'C-002', gate: 'territory', descriptor: 'B', method: 'other', status: 'superseded' },
+        ],
+        ledger: [entry('C-001'), entry('C-002'), entry('C-001')],
+      }),
+    );
+    expect(report.passed).toBe(false);
+    expect(errorAreas(report.issues)).toContain('decisions.gates[territory]');
+  });
+
+  it('exempts only the candidate that is no longer last-approved', () => {
+    const entry = (c: string) => ({
+      gate: 'territory',
+      decision: 'approved' as const,
+      candidates: [c],
+      rationale: 'x',
+      decidedBy: 'nino',
+    });
+    // Same A → B → A ledger, but C-001 correctly marked approved again.
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'A', method: 'other', status: 'approved' },
+          { id: 'C-002', gate: 'territory', descriptor: 'B', method: 'other', status: 'superseded' },
+        ],
+        ledger: [entry('C-001'), entry('C-002'), entry('C-001')],
+      }),
+    );
+    expect(report.passed).toBe(true);
+  });
+
+  it('warns when a downstream gate was decided against a winner since replaced', () => {
+    const report = reviewDecisions(
+      withDecisions({
+        constitution: CONSTITUTION,
+        gates: GATES,
+        rubric: RUBRIC,
+        candidates: [
+          { id: 'C-001', gate: 'territory', descriptor: 'A', method: 'other', status: 'superseded' },
+          { id: 'C-010', gate: 'wordmark', descriptor: 'Condensed grotesk', method: 'type-setting', status: 'approved' },
+          { id: 'C-002', gate: 'territory', descriptor: 'B', method: 'other', status: 'approved' },
+        ],
+        ledger: [
+          { gate: 'territory', decision: 'approved', candidates: ['C-001'], rationale: 'First.', decidedBy: 'nino' },
+          { gate: 'wordmark', decision: 'approved', candidates: ['C-010'], rationale: 'Reads small.', decidedBy: 'nino' },
+          { gate: 'territory', decision: 'approved', candidates: ['C-002'], rationale: 'Better.', decidedBy: 'nino' },
+        ],
+      }),
+    );
+    expect(report.passed).toBe(true);
+    const warn = report.issues.find((i) => i.area === 'decisions.gates[wordmark]');
+    expect(warn?.severity).toBe('warning');
+    expect(warn?.message).toContain('since been replaced');
+  });
+
   it('does not let a candidate escape by being marked superseded with nothing replacing it', () => {
     const report = reviewDecisions(
       withDecisions({

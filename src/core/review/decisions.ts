@@ -222,6 +222,19 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
     }
   }
 
+  // The other half of "resolves to one". Checking only for >1 missed zero,
+  // and a gate that counts as decided while nothing holds the position
+  // unblocks every gate downstream of it with no real winner.
+  for (const gate of approvedGates) {
+    if ((approvedByGate.get(gate) ?? []).length === 0) {
+      issues.push({
+        area: `decisions.gates[${gate}]`,
+        message: `Recorded as decided but no candidate holds the position — every candidate approved here has since been rejected or superseded. Approve one, or remove the gate's approvals from the ledger.`,
+        severity: 'error',
+      });
+    }
+  }
+
   // --- Rule 3: gates advance in order ----------------------------------------
 
   for (const gate of d.gates) {
@@ -361,7 +374,30 @@ export function reviewDecisions(kit: BrandKit): DecisionsReport {
     }
   }
 
-  // --- Rule 8: no generation before a conceptual anchor ------------------------
+  // --- Rule 8: downstream decisions made against a replaced winner -------------
+  //
+  // Rule 3 checks that prerequisites were decided, never WHICH candidate they
+  // landed on. Reopen territory, pick a different direction, and the wordmark
+  // approved under the old one silently stands — chosen to express an idea
+  // that is no longer the brand's. A warning, not an error: the old choice may
+  // still be right, but someone has to look and say so.
+
+  for (const gate of d.gates) {
+    const decidedAt = lastApprovalIndex(d, gate.id);
+    if (decidedAt === null) continue;
+    for (const req of gate.requires) {
+      const reqDecidedAt = lastApprovalIndex(d, req);
+      if (reqDecidedAt !== null && reqDecidedAt > decidedAt) {
+        issues.push({
+          area: `decisions.gates[${gate.id}]`,
+          message: `Decided before "${req}" was re-decided, so it was chosen against a winner that has since been replaced. Re-confirm it or reopen this gate.`,
+          severity: 'warning',
+        });
+      }
+    }
+  }
+
+  // --- Rule 9: no generation before a conceptual anchor ------------------------
 
   if (d.constitution && !d.constitution.conceptualAnchor) {
     if (approvedGates.size > 0) {
@@ -540,12 +576,31 @@ function wasSuperseded(
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => e.decision === 'approved' && e.gate === gate);
 
-  const mine = approvals.find(({ e }) => e.candidates.includes(candidateId));
+  // The candidate's LATEST approval, not its first. Using the first only
+  // asked "was anyone else ever approved after this?", so an A → B → A
+  // ledger exempted both A and B and the gate ended with no live winner at
+  // all — while still counting as decided, unblocking everything downstream.
+  //
+  // Anchoring on the latest makes the invariant structural: whoever was
+  // approved last can never be exempt, so a decided gate always keeps one.
+  let mine: { i: number } | undefined;
+  for (const a of approvals) {
+    if (a.e.candidates.includes(candidateId)) mine = a;
+  }
   if (!mine) return false;
 
   return approvals.some(
-    ({ e, i }) => i > mine.i && !e.candidates.includes(candidateId),
+    ({ e, i }) => i > mine!.i && !e.candidates.includes(candidateId),
   );
+}
+
+/** Ledger position of the most recent approval at a gate, or null. */
+function lastApprovalIndex(d: DecisionSystem, gate: string): number | null {
+  let found: number | null = null;
+  d.ledger.forEach((e, i) => {
+    if (e.decision === 'approved' && e.gate === gate) found = i;
+  });
+  return found;
 }
 
 /** Empty scope means every gate. */
