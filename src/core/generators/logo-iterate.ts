@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { nonClobberingPath, slug } from './paths.js';
 
 export interface LogoIterationOptions {
   /** Direction description — what to iterate on */
@@ -21,10 +22,38 @@ export interface LogoIterationOptions {
   basePrompt?: string;
   /** Things to avoid */
   avoid?: string[];
+  /**
+   * The brand's own accent color, `#rrggbb`. Required for the on-black and
+   * on-white variants — those constrain the palette, and hardcoding one
+   * brand's accent here injected it into every other brand's iterations.
+   */
+  accentHex: string;
+  /** Human-readable accent name for the prompt, e.g. "Flickday Yellow" */
+  accentName?: string;
   /** Output directory */
   outputDir?: string;
   /** Model */
   model?: string;
+  /** The idea being expressed, from the kit's conceptual anchor */
+  anchor?: string;
+  /**
+   * Recorded rejections in scope for this gate.
+   *
+   * Iteration is where they matter most: this is the path that takes an
+   * existing artifact and refines it, so without them a variant round will
+   * happily polish a direction that was already killed.
+   */
+  rejected?: string[];
+  /**
+   * Path to the candidate's rendered artifact. Sent to the model alongside
+   * the prompt.
+   *
+   * Without it this command was regeneration from a text description
+   * wearing the word "iteration" — the model never saw the mark, so
+   * geometry, proportion and weight drifted on every variant while the
+   * output claimed to be variants OF something.
+   */
+  sourceImagePath?: string;
 }
 
 export interface LogoVariation {
@@ -33,7 +62,16 @@ export interface LogoVariation {
   prompt: string;
 }
 
-const VARIANTS = [
+function accentLabel(options: LogoIterationOptions): string {
+  return options.accentName
+    ? `${options.accentName} (${options.accentHex})`
+    : options.accentHex;
+}
+
+const VARIANTS: Array<{
+  id: string;
+  instruction: string | ((o: LogoIterationOptions) => string);
+}> = [
   {
     id: 'simplified',
     instruction: 'EXTREME SIMPLIFICATION for favicon/app icon use. Must be recognizable at 32x32 pixels. Maximum 2-3 shapes. No fine detail. Bold, clean, iconic. Single color on transparent background.',
@@ -48,13 +86,54 @@ const VARIANTS = [
   },
   {
     id: 'on-black',
-    instruction: 'Optimized for dark backgrounds. Use Flickday Yellow (#facc15) and white (#ffffff) only. Bold contrast. No background fill — mark floats on transparency for compositing onto dark surfaces.',
+    instruction: (o) =>
+      `Optimized for dark backgrounds. Use ${accentLabel(o)} and white (#ffffff) only. Bold contrast. No background fill — mark floats on transparency for compositing onto dark surfaces.`,
   },
   {
     id: 'on-white',
-    instruction: 'Optimized for light backgrounds. Use black (#000000) and Flickday Yellow (#facc15) only. Clean contrast. No background fill — mark floats on transparency for compositing onto light surfaces.',
+    instruction: (o) =>
+      `Optimized for light backgrounds. Use black (#000000) and ${accentLabel(o)} only. Clean contrast. No background fill — mark floats on transparency for compositing onto light surfaces.`,
   },
 ];
+
+/** Exposed so the recorded state reaching the prompt can be asserted directly. */
+export function buildIterationPrompt(
+  options: LogoIterationOptions,
+  variantId: string,
+): string {
+  const variant = VARIANTS.find((v) => v.id === variantId);
+  if (!variant) throw new Error(`Unknown variant: ${variantId}`);
+  const instruction =
+    typeof variant.instruction === 'function'
+      ? variant.instruction(options)
+      : variant.instruction;
+
+  return `${options.basePrompt || ''}
+${options.anchor ? `\nCONCEPTUAL ANCHOR — the idea this expresses:\n${options.anchor}\n` : ''}${
+    options.sourceImagePath
+      ? '\nThe attached image IS the mark. Preserve its geometry, proportion and stroke weight — you are producing a variant of it, not a new interpretation of the description below.\n'
+      : ''
+  }
+LOGO DIRECTION TO ITERATE ON:
+${options.direction}
+
+VARIANT: ${instruction}
+
+BRAND: ${options.name}
+
+CRITICAL:
+- NO text, words, letters, or typography
+- Generate ONLY the graphic mark / symbol
+- Clean vector-quality edges
+${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('\n')}` : ''}
+${
+  options.rejected?.length
+    ? `\nALREADY REJECTED — refining toward any of these is wasted work:\n${options.rejected.map((r) => `- ${r}`).join('\n')}`
+    : ''
+}`;
+}
+
+export const VARIANT_IDS = VARIANTS.map((v) => v.id);
 
 export async function iterateLogoConcept(
   options: LogoIterationOptions,
@@ -68,21 +147,19 @@ export async function iterateLogoConcept(
 
   const results: LogoVariation[] = [];
 
+  // Read once, not per variant.
+  const sourceImage = options.sourceImagePath
+    ? encodeImage(options.sourceImagePath)
+    : null;
+
   for (const variant of VARIANTS) {
-    const prompt = `${options.basePrompt || ''}
-
-LOGO DIRECTION TO ITERATE ON:
-${options.direction}
-
-VARIANT: ${variant.instruction}
-
-BRAND: ${options.name}
-
-CRITICAL:
-- NO text, words, letters, or typography
-- Generate ONLY the graphic mark / symbol
-- Clean vector-quality edges
-${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('\n')}` : ''}`;
+    const prompt = buildIterationPrompt(options, variant.id);
+    const content = sourceImage
+      ? [
+          { type: 'text', text: prompt },
+          { type: 'image_url', image_url: { url: sourceImage } },
+        ]
+      : prompt;
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -95,7 +172,7 @@ ${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('
       body: JSON.stringify({
         model,
         modalities: ['text', 'image'],
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'user', content }],
       }),
     });
 
@@ -113,8 +190,7 @@ ${options.avoid?.length ? `\nAVOID:\n${options.avoid.map((a) => `- ${a}`).join('
       continue;
     }
 
-    const filename = `${options.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${variant.id}.png`;
-    const filePath = path.join(outputDir, filename);
+    const filePath = nonClobberingPath(outputDir, `${slug(options.name)}-${variant.id}`);
     fs.writeFileSync(filePath, buffer);
     results.push({ path: filePath, variant: variant.id, prompt });
   }
@@ -142,4 +218,24 @@ function extractImage(message: any): Buffer | null {
 
 function decode(url: string): Buffer {
   return Buffer.from(url.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+}
+
+const MIME: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+};
+
+/** Read a local artifact as a data URL for the model to condition on. */
+export function encodeImage(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase();
+  const mime = MIME[ext];
+  if (!mime) {
+    throw new Error(
+      `Cannot send ${ext || 'a file with no extension'} to the model. Supported: ${Object.keys(MIME).join(', ')}`,
+    );
+  }
+  return `data:${mime};base64,${fs.readFileSync(filePath).toString('base64')}`;
 }

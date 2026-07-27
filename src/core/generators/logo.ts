@@ -8,6 +8,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { nonClobberingPath, slug } from './paths.js';
+import { GATE_PROFILES, type GateProfile } from './gate-profiles.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,6 +32,22 @@ export interface LogoGeneratorOptions {
   outputDir?: string;
   /** Image model to use (OpenRouter model ID) */
   model?: string;
+  /**
+   * Recorded creative state for the gate being generated at, from
+   * `checkGenerationReadiness`. Without it a generator has no idea which
+   * directions were already rejected and will happily re-propose them.
+   */
+  anchor?: string;
+  /** Recorded rejections in scope for this gate */
+  rejected?: string[];
+  /** Evaluation criteria in scope for this gate */
+  criteria?: string[];
+  /**
+   * Gate-specific directions and hard rules. Without one the prompt used a
+   * fixed hint list that asked for wordmarks and lockups while forbidding
+   * all text — a contradiction the model resolved arbitrarily.
+   */
+  profile?: GateProfile;
 }
 
 export interface LogoConcept {
@@ -45,18 +63,13 @@ export interface LogoConcept {
 // Prompt
 // ---------------------------------------------------------------------------
 
-function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): string {
+export function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): string {
   const { name, personality, basePrompt, avoid, visualKeywords } = options;
 
-  const variationHints = [
-    'minimal geometric mark — simple shapes, one or two colors, works at any size',
-    'wordmark with custom letterforms — the brand name styled as the logo itself',
-    'icon + wordmark lockup — a distinct symbol paired with the brand name',
-    'abstract mark — non-literal, captures the brand feeling through shape and movement',
-    'monogram — first letter or initials of the brand, stylized as a mark',
-  ];
-
-  const hint = variationHints[variation % variationHints.length];
+  // Defaults to the symbol profile rather than the old self-contradicting
+  // list, so an ungated call still gets internally consistent instructions.
+  const profile = options.profile ?? GATE_PROFILES.symbol;
+  const hint = profile.hints[variation % profile.hints.length];
 
   let prompt = '';
 
@@ -65,24 +78,30 @@ function buildLogoPrompt(options: LogoGeneratorOptions, variation: number): stri
   }
 
   prompt += `Generate a logo concept for "${name}".
-
+${options.anchor ? `\nCONCEPTUAL ANCHOR — everything must express this idea, not a set of props:\n${options.anchor}\n` : ''}
 DIRECTION: ${hint}
 
 BRAND PERSONALITY: ${personality.join(', ')}
 ${visualKeywords?.length ? `VISUAL KEYWORDS: ${visualKeywords.join(', ')}` : ''}
+${
+  options.criteria?.length
+    ? `\nJUDGED AGAINST:\n${options.criteria.map((c) => `- ${c}`).join('\n')}`
+    : ''
+}
+${
+  options.rejected?.length
+    ? `\nALREADY REJECTED — do not re-propose any of these:\n${options.rejected.map((r) => `- ${r}`).join('\n')}`
+    : ''
+}
 
 REQUIREMENTS:
-- Clean, professional logo design
+- Clean, professional design
 - Must work on both light and dark backgrounds
-- Must be recognizable at small sizes (32px favicon)
-- Vector-quality: clean edges, solid shapes, no gradients unless intentional
-- NO photographic elements — this is a logo, not an illustration
+- No photographic elements
+- Output on a transparent or solid neutral background
 
 CRITICAL:
-- NO text, words, letters, or typography in the image
-- Generate ONLY the graphic mark / symbol / icon
-- Typography will be composited separately
-- Output on a transparent or solid neutral background
+${profile.rules.map((r) => `- ${r}`).join('\n')}
 ${avoid?.length ? `\nAVOID:\n${avoid.map((a) => `- ${a}`).join('\n')}` : ''}`;
 
   return prompt;
@@ -144,8 +163,7 @@ export async function generateLogos(
       continue;
     }
 
-    const filename = `${options.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-concept-${i + 1}.png`;
-    const filePath = path.join(outputDir, filename);
+    const filePath = nonClobberingPath(outputDir, `${slug(options.name)}-concept-${i + 1}`);
     fs.writeFileSync(filePath, imageBuffer);
 
     concepts.push({ path: filePath, prompt, model });

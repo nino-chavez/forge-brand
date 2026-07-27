@@ -13,6 +13,7 @@ import { Command } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseBrandKit, safeParseBrandKit } from '../../core/schema/brand-kit.js';
+import { resolveDecisionState } from '../../core/review/decisions.js';
 import { reviewBrandKit } from '../../core/review/index.js';
 import { listTemplateIds } from '../../media/templates/index.js';
 
@@ -117,6 +118,9 @@ export function registerAgentPromptCommand(program: Command) {
         sections.push(`- Contrast: ${report.gates.contrast.passed ? 'PASS' : 'FAIL'}`);
         sections.push(`- Font Compatibility: ${report.gates.fontCompat.passed ? 'PASS' : 'FAIL'}`);
         sections.push(`- Consistency: ${report.gates.consistency.passed ? 'PASS' : 'FAIL'}`);
+        if (kit.decisions) {
+          sections.push(`- Decisions: ${report.gates.decisions.passed ? 'PASS' : 'FAIL'}`);
+        }
         sections.push(`- Overall: ${report.passed ? 'PASS' : 'FAIL'} (${report.errorCount} errors, ${report.warningCount} warnings)`);
         if (!report.passed) {
           sections.push('');
@@ -125,10 +129,98 @@ export function registerAgentPromptCommand(program: Command) {
             ...report.gates.contrast.issues.map((i) => `- Contrast: ${i.pair} — ${i.ratio}:1 (need ${i.required}:1)`),
             ...report.gates.fontCompat.issues.filter((i) => i.severity === 'error').map((i) => `- Font: ${i.pair} — ${i.message}`),
             ...report.gates.consistency.issues.filter((i) => i.severity === 'error').map((i) => `- Consistency: ${i.area} — ${i.message}`),
+            ...report.gates.decisions.issues.filter((i) => i.severity === 'error').map((i) => `- Decisions: ${i.area} — ${i.message}`),
           ];
           sections.push(...allIssues);
         }
         sections.push('');
+
+        // Creative state — the whole point of this surface. An agent that
+        // can't see the recorded rejections will relitigate them.
+        if (kit.decisions) {
+          const d = kit.decisions;
+          sections.push('### Creative State');
+          sections.push('');
+
+          const anchor = d.constitution?.conceptualAnchor;
+          sections.push(`- Conceptual anchor: ${anchor ?? '**NOT SET**'}`);
+          if (!anchor) {
+            sections.push('');
+            sections.push(
+              '> Strategy is not locked. Do not generate visual candidates yet. Find the conceptual metaphor first and record it at `decisions.constitution.conceptualAnchor` — generating against camera parts instead of an idea is the failure this field exists to prevent.',
+            );
+          }
+          sections.push('');
+
+          const open = d.constitution?.openQuestions ?? [];
+          if (open.length > 0) {
+            sections.push('**Open questions — do not resolve these yourself**');
+            sections.push('');
+            for (const q of open) {
+              const scope = q.blocks.length > 0 ? ` _(blocks: ${q.blocks.join(', ')})_` : '';
+              sections.push(`- \`${q.id}\`${scope} — ${q.question}`);
+              for (const s of q.sources) sections.push(`  - source: ${s}`);
+            }
+            sections.push('');
+            sections.push(
+              '> These are recorded because two real sources disagree or nobody has decided yet. Surface them; do not pick an answer and proceed as though it were settled.',
+            );
+            sections.push('');
+          }
+
+          // Shared resolver, `decided` semantics: a gate whose winner has
+          // since been rejected is not decided, however many approvals its
+          // history holds. This used to be computed here independently and
+          // said DECIDED for a gate holding nothing.
+          const state = resolveDecisionState(d);
+          sections.push('**Gates**');
+          sections.push('');
+          for (const g of d.gates) {
+            const blockedBy = g.requires.filter((r) => !state.decided(r));
+            const winner = state.winner(g.id);
+            let label: string;
+            if (state.decided(g.id)) {
+              label = `DECIDED (${winner})`;
+            } else if (state.everApproved(g.id)) {
+              label = 'UNRESOLVED — approved once, but no candidate holds it now';
+            } else if (blockedBy.length > 0) {
+              label = `BLOCKED (needs ${blockedBy.join(', ')})`;
+            } else {
+              label = 'OPEN';
+            }
+            sections.push(`- ${g.id} — ${label}`);
+          }
+          sections.push('');
+
+          if (d.rejections.length > 0) {
+            sections.push('**Recorded rejections — do not re-propose these**');
+            sections.push('');
+            for (const r of d.rejections) {
+              const tail = r.suggestion ? ` Instead: ${r.suggestion}` : '';
+              sections.push(`- \`${r.id}\` (${r.class}): ${r.reason}.${tail}`);
+            }
+            sections.push('');
+            sections.push(
+              '> `mechanical` constraints are enforced against candidate descriptors and block review. `judgment` constraints cannot be checked from text — approving in their scope requires a human to look at the artifact and record it in `decisions.ledger[].reviewed`. Do not mark that field yourself.',
+            );
+            sections.push('');
+          }
+
+          if (d.rubric.length > 0) {
+            sections.push('**Evaluation criteria**');
+            sections.push('');
+            for (const c of d.rubric) {
+              const scope = c.gates.length > 0 ? ` [${c.gates.join(', ')}]` : '';
+              sections.push(`- ${c.criterion} (weight ${c.weight})${scope}`);
+            }
+            sections.push('');
+          }
+
+          sections.push(
+            '> A gate advances only on a `decisions.ledger` entry written by the human. Do not set `status: "approved"` on a candidate; propose, and let the decision be recorded.',
+          );
+          sections.push('');
+        }
 
         // Full kit JSON if requested
         if (options.full) {

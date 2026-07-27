@@ -79,6 +79,11 @@ export function registerExportCommand(program: Command) {
               console.error(chalk.red(`  - ${issue.area}: ${issue.message}`));
             }
           }
+          for (const issue of report.gates.decisions.issues) {
+            if (issue.severity === 'error') {
+              console.error(chalk.red(`  - ${issue.area}: ${issue.message}`));
+            }
+          }
           console.error(chalk.yellow('Fix errors or use --skip-review to bypass (not recommended)'));
           process.exit(1);
         }

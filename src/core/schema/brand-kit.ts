@@ -18,6 +18,7 @@ import { TypographySystem } from './typography.js';
 import { VoiceSystem } from './voice.js';
 import { MediaSystem } from './media.js';
 import { SpacingScale, RadiusScale, LayoutConstraints } from './spacing.js';
+import { DecisionSystem } from './decisions.js';
 
 // ---------------------------------------------------------------------------
 // Brand Identity (non-visual)
@@ -86,6 +87,13 @@ export const BrandKit = z.object({
   media: MediaSystem,
   /** Default theme mode for this brand */
   defaultMode: ThemeMode.default('dark'),
+  /**
+   * How the brand got here — constitution, gates, rubric, rejections, ledger.
+   * Optional: kits authored before this section existed still parse. Present
+   * on any kit whose identity is being actively developed rather than
+   * imported wholesale.
+   */
+  decisions: DecisionSystem.optional(),
 });
 export type BrandKit = z.infer<typeof BrandKit>;
 

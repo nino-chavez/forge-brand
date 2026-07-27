@@ -73,6 +73,30 @@ function buildFrontmatter(kit: BrandKit): string[] {
   for (const [name, hex] of Object.entries(kit.colors.surfaces)) {
     lines.push(`${indent(2)}${name}: ${yamlScalar(hex)}`);
   }
+
+  // Flat aliases for every nested color, emitted alongside the grouped blocks.
+  //
+  // Why: conformance readers that check a rendered page against this file walk
+  // only the top level of `colors:` for string values — impeccable's
+  // cli/engine/design-system.mjs addColorObject() is non-recursive. Without
+  // these aliases such a reader sees primary/secondary/accent and treats every
+  // neutral, semantic, and surface color as undeclared drift, which on a real
+  // page is almost entirely false positives (verified 2026-07-26: 8 findings
+  // against a flickday page, 6 of them declared colors; adding the aliases took
+  // it to 2, both genuine).
+  //
+  // The design.md spec permits additional top-level keys, so the grouped blocks
+  // above stay canonical and these are purely additive. Keys are prefixed to
+  // avoid colliding with primary/secondary/accent.
+  for (const [step, hex] of Object.entries(kit.colors.neutral)) {
+    lines.push(`${indent(1)}neutral-${step}: ${yamlScalar(hex)}`);
+  }
+  for (const [role, token] of Object.entries(kit.colors.semantic)) {
+    lines.push(`${indent(1)}semantic-${role}: ${yamlScalar(token.hex)}`);
+  }
+  for (const [name, hex] of Object.entries(kit.colors.surfaces)) {
+    lines.push(`${indent(1)}surface-${name}: ${yamlScalar(hex)}`);
+  }
   lines.push('');
 
   // --- typography ---
@@ -106,6 +130,36 @@ function buildFrontmatter(kit: BrandKit): string[] {
     lines.push(`${indent(3)}lineHeight: ${step.lineHeight}`);
     lines.push(`${indent(3)}weight: ${step.weight}`);
     lines.push(`${indent(3)}font: ${step.font}`);
+  }
+
+  // Role and step aliases, for the same reason as the flat colors above and
+  // against the same reader.
+  //
+  // impeccable's addTypographyFonts (cli/engine/design-system.mjs) walks the top
+  // level of `typography:` for a role object carrying a string `fontFamily`;
+  // addTypographySizes wants either a flat name -> size string under `scale:` or
+  // a role object carrying `fontSize`. This exporter emits `fonts.<role>.family`
+  // and `scale.<name>.size` — wrong nesting and wrong key on both paths — so
+  // both walks find nothing. Measured 2026-07-26: a generated DESIGN.md parsed
+  // to 19 colors, ZERO fonts and zero type steps.
+  //
+  // That failure is worse than it sounds. Declaring no fonts does not relax the
+  // font check; it makes every font on the rendered page undeclared, so the
+  // check either floods or is switched off — and a switched-off check reads as
+  // a passing one.
+  //
+  // Additive, like the colors: the grouped blocks above stay canonical. Step
+  // aliases are prefixed because a scale step may legitimately be named
+  // `display`, which would collide with the display font role.
+  for (const [role, font] of fonts) {
+    lines.push(`${indent(1)}${role}:`);
+    lines.push(
+      `${indent(2)}fontFamily: ${yamlScalar([font.family, ...font.fallbacks].join(', '))}`,
+    );
+  }
+  for (const step of kit.typography.scale.steps) {
+    lines.push(`${indent(1)}${yamlKey(`step-${step.name}`)}:`);
+    lines.push(`${indent(2)}fontSize: ${yamlScalar(`${step.sizeRem}rem`)}`);
   }
   lines.push('');
 

@@ -16,6 +16,12 @@ import { generateVoice } from '../../core/generators/voice.js';
 import { generateFontPairings } from '../../core/generators/fonts.js';
 import { generateIdentity } from '../../core/generators/identity.js';
 import { generateLogos } from '../../core/generators/logo.js';
+import { iterateLogoConcept } from '../../core/generators/logo-iterate.js';
+import { profileFor, refusalFor } from '../../core/generators/gate-profiles.js';
+import {
+  checkGenerationReadiness,
+  type GenerationReadiness,
+} from '../../core/review/decisions.js';
 
 export function registerGenerateCommand(program: Command) {
   const gen = program
@@ -242,10 +248,50 @@ export function registerGenerateCommand(program: Command) {
     .option('-n, --count <n>', 'Number of concepts', '3')
     .option('-o, --output <dir>', 'Output directory', './output/logos')
     .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
-    .action(async (options: { kit: string; count: string; output: string; model: string }) => {
-      const kit = parseBrandKit(JSON.parse(fs.readFileSync(path.resolve(options.kit), 'utf-8')));
+    .option('-g, --gate <id>', 'Gate to generate at (required for kits with a decisions block)')
+    .option('--reopen', 'Run another round at a gate that is already decided')
+    .action(async (options: { kit: string; count: string; output: string; model: string; gate?: string; reopen?: boolean }) => {
+      const kitPath = path.resolve(options.kit);
+      const kit = parseBrandKit(JSON.parse(fs.readFileSync(kitPath, 'utf-8')));
+
+      // A managed kit does not generate freehand. Refusing here is cheap;
+      // discovering afterward that a round was generated with no anchor, or
+      // at a gate whose prerequisites are open, costs the round.
+      let readiness: GenerationReadiness = { ready: true, blockers: [], avoid: [], criteria: [] };
+      if (kit.decisions) {
+        if (!options.gate) {
+          console.error(
+            chalk.red('This kit records decisions. Pass --gate so generation is scoped to an open decision point.'),
+          );
+          console.error(
+            chalk.dim(`Gates: ${kit.decisions.gates.map((g) => g.id).join(', ') || '(none defined)'}`),
+          );
+          process.exit(1);
+        }
+        readiness = checkGenerationReadiness(kit, options.gate, { reopen: options.reopen });
+        if (!readiness.ready) {
+          console.error(chalk.red('\nNot ready to generate:\n'));
+          for (const b of readiness.blockers) console.error(chalk.red(`  - ${b}`));
+          console.error('');
+          process.exit(1);
+        }
+
+        // Being ready is not the same as this being the right instrument.
+        const refusal = refusalFor(options.gate);
+        if (refusal) {
+          console.error(chalk.red(`\nAn image model is the wrong tool at "${options.gate}".\n`));
+          console.error(chalk.red(`  ${refusal.reason}\n`));
+          console.error(chalk.yellow(`  Instead: ${refusal.instead}\n`));
+          process.exit(1);
+        }
+      }
 
       console.log(chalk.bold(`\nGenerating ${options.count} logo concepts for ${kit.identity.name}...\n`));
+      if (readiness.anchor) {
+        console.log(chalk.dim(`  anchor:   ${readiness.anchor}`));
+        console.log(chalk.dim(`  avoiding: ${readiness.avoid.length} recorded rejections`));
+        console.log('');
+      }
 
       const concepts = await generateLogos({
         name: kit.identity.name,
@@ -254,8 +300,13 @@ export function registerGenerateCommand(program: Command) {
         avoid: kit.media.creative?.avoid,
         visualKeywords: kit.media.creative?.visualKeywords,
         count: parseInt(options.count),
-        outputDir: options.output,
+        // Scoped by gate for the same reason iterate is scoped by candidate.
+        outputDir: options.gate ? path.join(options.output, options.gate) : options.output,
         model: options.model,
+        anchor: readiness.anchor,
+        rejected: readiness.avoid,
+        criteria: readiness.criteria,
+        profile: options.gate ? profileFor(options.gate) ?? undefined : undefined,
       });
 
       for (let i = 0; i < concepts.length; i++) {
@@ -268,6 +319,132 @@ export function registerGenerateCommand(program: Command) {
       }
 
       console.log(chalk.dim(`\nReview the concepts in ${options.output}/`));
-      console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
+
+      if (kit.decisions && options.gate) {
+        console.log(chalk.dim('\nRecord the ones worth keeping, describing the construction rather than the vibe:'));
+        for (const c of concepts) {
+          console.log(
+            chalk.dim(
+              `  brand-forge candidate add -k ${options.kit} -g ${options.gate} -m ai-image -a ${c.path} -d "<what it IS>"`,
+            ),
+          );
+        }
+      } else {
+        console.log(chalk.dim('To add to the brand kit, update media.logos in the preset JSON.'));
+      }
+    });
+
+  // --- Iterate ---
+  //
+  // Iteration is the path that produced the drift this whole system exists
+  // to prevent: an early artifact appears, and every round after it is spent
+  // repairing that artifact instead of solving the brief. So it takes a
+  // recorded candidate rather than a free-floating direction string, and it
+  // refuses to refine one that has already been killed.
+  gen
+    .command('iterate')
+    .description('Generate size and background variants of a recorded candidate')
+    .requiredOption('-c, --candidate <id>', 'Candidate to iterate on')
+    .option('-k, --kit <path>', 'Path to brand-kit.json', 'brand-kit.json')
+    .option('-o, --output <dir>', 'Output directory', './output/logo-iterations')
+    .option('-m, --model <model>', 'OpenRouter image model', 'google/gemini-2.5-flash-image')
+    .action(async (options: { kit: string; candidate: string; output: string; model: string }) => {
+      const kit = parseBrandKit(JSON.parse(fs.readFileSync(path.resolve(options.kit), 'utf-8')));
+      if (!kit.decisions) {
+        console.error(chalk.red('This kit has no `decisions` block, so there are no candidates to iterate on.'));
+        process.exit(1);
+      }
+
+      const candidate = kit.decisions.candidates.find((c) => c.id === options.candidate);
+      if (!candidate) {
+        console.error(chalk.red(`Candidate "${options.candidate}" does not exist.`));
+        process.exit(1);
+      }
+
+      if (candidate.status === 'rejected' || candidate.status === 'superseded') {
+        console.error(
+          chalk.red(
+            `\nCandidate ${candidate.id} is ${candidate.status}. Refining a direction that was already killed is how a project ends up rescuing an artifact instead of solving the brief.\n`,
+          ),
+        );
+        process.exit(1);
+      }
+
+      // Iteration drives the same image model, so it needs the same refusal.
+      // Gating only `generate logo` covered half the path that produces the
+      // drift: a wordmark specimen recorded as a PNG — which is exactly what
+      // the wordmark refusal tells you to produce — could still be fed here,
+      // and a diffusion model would "preserve the geometry" of letterforms it
+      // is incapable of setting.
+      const refusal = refusalFor(candidate.gate);
+      if (refusal) {
+        console.error(chalk.red(`\nAn image model is the wrong tool at "${candidate.gate}".\n`));
+        console.error(chalk.red(`  ${refusal.reason}\n`));
+        console.error(chalk.yellow(`  Instead: ${refusal.instead}\n`));
+        process.exit(1);
+      }
+
+      // Iteration means producing variants OF a mark. With no image the model
+      // only ever saw the descriptor, so it re-invented the mark each time
+      // while the command called the result a variant.
+      const assetPath = candidate.asset?.path
+        ? path.resolve(path.dirname(path.resolve(options.kit)), candidate.asset.path)
+        : null;
+
+      if (!assetPath) {
+        console.error(
+          chalk.red(
+            `\nCandidate ${candidate.id} has no recorded asset, so there is no mark to iterate on. Record one with \`candidate add -a <path>\`, or use \`generate logo\` to explore fresh.\n`,
+          ),
+        );
+        process.exit(1);
+      }
+      if (!fs.existsSync(assetPath)) {
+        console.error(chalk.red(`\nRecorded asset is missing on disk: ${assetPath}\n`));
+        process.exit(1);
+      }
+
+      const readiness = checkGenerationReadiness(kit, candidate.gate, { reopen: true });
+      if (!readiness.ready) {
+        console.error(chalk.red('\nNot ready to iterate:\n'));
+        for (const b of readiness.blockers) console.error(chalk.red(`  - ${b}`));
+        console.error('');
+        process.exit(1);
+      }
+
+      console.log(chalk.bold(`\nIterating ${candidate.id} at gate "${candidate.gate}"\n`));
+      console.log(chalk.dim(`  ${candidate.descriptor}`));
+      console.log(chalk.dim(`  conditioned on ${path.relative(process.cwd(), assetPath)}\n`));
+
+      const variants = await iterateLogoConcept({
+        direction: candidate.descriptor,
+        name: kit.identity.name,
+        basePrompt: kit.media.creative?.basePrompt,
+        avoid: kit.media.creative?.avoid,
+        accentHex: kit.colors.primary.hex,
+        accentName: kit.colors.primary.name,
+        // Scoped to the candidate. Without this every iterate run wrote the
+        // same five paths, so the next one silently replaced the image a
+        // recorded candidate's asset.path pointed at — a ledger describing
+        // one mark while showing another, with nothing able to detect it.
+        outputDir: path.join(options.output, candidate.id),
+        model: options.model,
+        anchor: readiness.anchor,
+        rejected: readiness.avoid,
+        sourceImagePath: assetPath,
+      });
+
+      for (const v of variants) {
+        console.log(chalk.green(`  ${v.variant.padEnd(12)} → ${v.path}`));
+      }
+
+      if (variants.length > 0) {
+        console.log(chalk.dim('\nRecord any that change the mark rather than just its size:'));
+        console.log(
+          chalk.dim(
+            `  brand-forge candidate add -k ${options.kit} -g ${candidate.gate} -m ai-image -p ${candidate.id} -a <path> -d "<what it IS>"`,
+          ),
+        );
+      }
     });
 }

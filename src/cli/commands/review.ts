@@ -85,6 +85,25 @@ export function registerReviewCommand(program: Command) {
       }
       console.log('');
 
+      // Decisions gate — skipped entirely for kits with no decisions block
+      if (kit.decisions) {
+        const gate = report.gates.decisions;
+        console.log(chalk.bold('Decisions'));
+        console.log(
+          `  ${gate.candidatesChecked} live candidates against ${gate.constraintsEnforced} rejection constraints`,
+        );
+        if (gate.passed) {
+          console.log(chalk.green('  PASSED'));
+        } else {
+          console.log(chalk.red('  FAILED'));
+        }
+        for (const issue of gate.issues) {
+          const color = issue.severity === 'error' ? chalk.red : chalk.yellow;
+          console.log(color(`  - [${issue.severity}] ${issue.area}: ${issue.message}`));
+        }
+        console.log('');
+      }
+
       // Summary
       console.log(chalk.bold('Summary'));
       const statusColor = report.passed ? chalk.green : chalk.red;

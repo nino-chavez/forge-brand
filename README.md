@@ -102,11 +102,97 @@ npx tsx src/cli/index.ts batch --kit presets/volley-rx.json
 ### Quality review
 
 ```bash
-# Run QA gates (contrast, font compat, consistency)
+# Run QA gates (contrast, font compat, consistency, decisions)
 npx tsx src/cli/index.ts review --kit brand-kit.json
 
 # Diff two kit versions
 npx tsx src/cli/index.ts diff old-kit.json new-kit.json
+```
+
+### Decisions — durable creative state
+
+An identity that is still being developed carries a `decisions` block. It records the brief, the ordered gates, the evaluation rubric, every candidate, the decision ledger, and the rejections. The `review` command enforces it and exits non-zero on failure:
+
+- A candidate marked `approved` with no matching ledger entry is an **error**. Approval has to be an explained, attributed entry rather than a silently flipped flag.
+- A live candidate matching a **mechanical** rejection constraint is an **error** — those are decidable from text (a banned slogan, a forbidden font).
+- A **judgment** constraint ("reads as the Facebook mark") can't be decided from text, so a descriptor match only warns. Its real enforcement is that approving inside its gate scope requires the human to list it in the ledger entry's `reviewed`. That mandatory look is the honest version of enforcing a visual call, and it's governed by `acknowledgement`, not `severity` — lowering how much a text match matters must not switch off the look.
+- Adding a constraint does **not** retroactively invalidate earlier approvals, as long as both carry dates. Otherwise the only way to clear the error would be backdating a claim that someone checked a rule that didn't exist yet.
+- A ledger entry rejecting a candidate that is still marked live is an **error**. Otherwise a recorded rejection is inert and the candidate keeps competing.
+- Approving any gate with no `conceptualAnchor` recorded is an **error**. Generating before the metaphor exists is how a project ends up describing camera parts instead of an idea.
+- An approved candidate with `method: "trace"` is an **error**. A traced raster is not a master. Rebuild it as `hand-vector` with `parent` pointing at the trace.
+- A gate approved before its prerequisite is an **error**. Generating at the symbol gate before territory is settled is how a project ends up defending an early artifact instead of solving the brief.
+- Candidates with an empty rubric is a **warning**. Agree the bar before generating, or the first artifact becomes the bar.
+
+Two limits worth knowing. This is a **soft control on authorship**: the gate checks that a ledger entry exists with a rationale and an author, not that a human wrote it — a forged entry passes, and git review is where that gets caught. And descriptor matching is a **self-report channel**: it catches an honest describer, not a motivated one. Describe candidates mechanically ("filmstrip perforations forming the d bowl"), not by vibe. Where a structured field already carries the fact — generation method, gate, parentage — the gate reads that field instead of the prose.
+
+`agent-prompt` emits the whole creative state: anchor, gate status, recorded rejections, criteria, and the instruction not to self-approve. Point a fresh session or a different harness at it and it inherits every past rejection instead of relitigating them.
+
+```bash
+npx tsx src/cli/index.ts agent-prompt --kit presets/flickday.json
+```
+
+### The loop
+
+Generation is scoped to a gate, and a managed kit refuses to generate at the wrong moment — before the anchor exists, at a gate whose prerequisites are open, or at one already decided. When it does generate, the anchor, the in-scope rejections, and the criteria go into the prompt, so a generator can't re-propose a direction you already killed.
+
+```bash
+# refuses: no anchor yet, so there is nothing to generate toward
+brand-forge generate logo -k kit.json -g territory
+
+# record a candidate — describe the construction, not the vibe;
+# the descriptor is what rejection constraints match against
+brand-forge candidate add -k kit.json -g territory -m other \
+  -d "The instant of contact — the mark is the moment the ball is struck"
+
+brand-forge candidate list -k kit.json
+
+# refuses, and prints the exact flag to re-run with once you have looked
+brand-forge decide -k kit.json -g territory --approve C-001 \
+  --rationale "Reads across stills and video without a camera cliche." --by nino
+
+brand-forge decide -k kit.json -g territory --approve C-001 \
+  --rationale "Reads across stills and video without a camera cliche." --by nino \
+  --reviewed no-multi-metaphor
+
+# now the downstream gates open
+brand-forge generate logo -k kit.json -g symbol
+```
+
+`candidate add` and `decide` validate against both the schema and the review gate before writing, and refuse to persist anything either would reject — so the file on disk always parses and always passes.
+
+Reopening a decided gate is explicit and keeps the record:
+
+```bash
+brand-forge generate logo -k kit.json -g territory --reopen
+brand-forge decide -k kit.json -g territory --approve C-002 \
+  --rationale "Crowd reaction travels further on social than the play does." \
+  --by nino --reviewed no-multi-metaphor
+# → Gate "territory": approved C-002; superseded C-001
+```
+
+Both ledger entries survive. The old candidate becomes `superseded`, so the gate still resolves to exactly one live winner and nothing has to be deleted to change your mind.
+
+Iteration takes a recorded candidate rather than a free-typed direction, and refuses to refine one that's already dead:
+
+```bash
+brand-forge generate iterate -k kit.json -c C-002
+# → simplified / standard / detailed / on-black / on-white
+
+brand-forge generate iterate -k kit.json -c C-001
+# → Candidate C-001 is superseded. Refining a direction that was already
+#   killed is how a project ends up rescuing an artifact instead of
+#   solving the brief.
+```
+
+That refusal is the point of the whole feature. Iteration is where a project quietly stops solving the brief and starts repairing whatever appeared first.
+
+The block is optional — kits imported wholesale have no decision history and pass trivially. `presets/flickday.json` is the worked example.
+
+```bash
+npx tsx src/cli/index.ts review --kit presets/flickday.json
+# Decisions
+#   0 live candidates against 7 rejection constraints
+#   PASSED
 ```
 
 ## Presets
