@@ -73,6 +73,30 @@ function buildFrontmatter(kit: BrandKit): string[] {
   for (const [name, hex] of Object.entries(kit.colors.surfaces)) {
     lines.push(`${indent(2)}${name}: ${yamlScalar(hex)}`);
   }
+
+  // Flat aliases for every nested color, emitted alongside the grouped blocks.
+  //
+  // Why: conformance readers that check a rendered page against this file walk
+  // only the top level of `colors:` for string values — impeccable's
+  // cli/engine/design-system.mjs addColorObject() is non-recursive. Without
+  // these aliases such a reader sees primary/secondary/accent and treats every
+  // neutral, semantic, and surface color as undeclared drift, which on a real
+  // page is almost entirely false positives (verified 2026-07-26: 8 findings
+  // against a flickday page, 6 of them declared colors; adding the aliases took
+  // it to 2, both genuine).
+  //
+  // The design.md spec permits additional top-level keys, so the grouped blocks
+  // above stay canonical and these are purely additive. Keys are prefixed to
+  // avoid colliding with primary/secondary/accent.
+  for (const [step, hex] of Object.entries(kit.colors.neutral)) {
+    lines.push(`${indent(1)}neutral-${step}: ${yamlScalar(hex)}`);
+  }
+  for (const [role, token] of Object.entries(kit.colors.semantic)) {
+    lines.push(`${indent(1)}semantic-${role}: ${yamlScalar(token.hex)}`);
+  }
+  for (const [name, hex] of Object.entries(kit.colors.surfaces)) {
+    lines.push(`${indent(1)}surface-${name}: ${yamlScalar(hex)}`);
+  }
   lines.push('');
 
   // --- typography ---

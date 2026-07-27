@@ -121,6 +121,33 @@ describe('exportDesignMd', () => {
     expect(md).toContain('primary: "#facc15"');
   });
 
+  it('mirrors every nested color as a flat top-level key', () => {
+    // Conformance readers that check a rendered page against DESIGN.md walk only
+    // the top level of `colors:` for string values (impeccable's
+    // design-system.mjs addColorObject() is non-recursive). Without these flat
+    // aliases every neutral/semantic/surface color reads as undeclared drift.
+    const md = exportDesignMd(flickdayKit);
+    const frontmatter = md.slice(0, md.indexOf('\n---\n', 4));
+
+    const flatValue = (key: string) =>
+      frontmatter.match(new RegExp(`^ {2}${key}: "(#[0-9a-fA-F]+)"$`, 'm'))?.[1];
+
+    for (const [step, hex] of Object.entries(flickdayKit.colors.neutral)) {
+      expect(flatValue(`neutral-${step}`)).toBe(hex);
+    }
+    for (const [role, token] of Object.entries(flickdayKit.colors.semantic)) {
+      expect(flatValue(`semantic-${role}`)).toBe(token.hex);
+    }
+    for (const [name, hex] of Object.entries(flickdayKit.colors.surfaces)) {
+      expect(flatValue(`surface-${name}`)).toBe(hex);
+    }
+
+    // The grouped blocks stay canonical — flat keys are additive, not a swap.
+    expect(md).toContain('  neutral:');
+    expect(md).toContain('  semantic:');
+    expect(md).toContain('  surfaces:');
+  });
+
   it('emits canonical body sections in order', () => {
     const md = exportDesignMd(flickdayKit);
     const idx = (s: string) => md.indexOf(s);
