@@ -148,6 +148,39 @@ describe('exportDesignMd', () => {
     expect(md).toContain('  surfaces:');
   });
 
+  it('mirrors fonts and type steps in the shape a conformance reader walks', () => {
+    // Same failure as the flat colors, on two more paths. impeccable's
+    // addTypographyFonts wants a top-level role object with a string
+    // `fontFamily`; addTypographySizes wants a role object with `fontSize`.
+    // This exporter's canonical shape is `fonts.<role>.family` and
+    // `scale.<name>.size`, so before these aliases a generated DESIGN.md parsed
+    // to zero fonts and zero type steps — which does not relax the font check,
+    // it makes every font on the page read as undeclared.
+    const md = exportDesignMd(flickdayKit);
+    const frontmatter = md.slice(0, md.indexOf('\n---\n', 4));
+
+    const roleFamily = (role: string) =>
+      frontmatter.match(new RegExp(`^ {2}${role}:\\n {4}fontFamily: "([^"]+)"$`, 'm'))?.[1];
+
+    for (const role of ['display', 'body', 'mono'] as const) {
+      const font = flickdayKit.typography[role];
+      // The whole stack, not just the primary: a rendered page computes to the
+      // fallback when the primary is missing, and an undeclared fallback is a
+      // finding.
+      expect(roleFamily(role)).toBe([font.family, ...font.fallbacks].join(', '));
+    }
+
+    for (const step of flickdayKit.typography.scale.steps) {
+      expect(frontmatter).toMatch(
+        new RegExp(`^ {2}"?step-${step.name}"?:\\n {4}fontSize: ${step.sizeRem}rem$`, 'm'),
+      );
+    }
+
+    // Additive, not a swap — the grouped blocks stay canonical.
+    expect(md).toContain('  fonts:');
+    expect(md).toContain('  scale:');
+  });
+
   it('emits canonical body sections in order', () => {
     const md = exportDesignMd(flickdayKit);
     const idx = (s: string) => md.indexOf(s);

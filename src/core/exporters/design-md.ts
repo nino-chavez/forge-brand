@@ -131,6 +131,36 @@ function buildFrontmatter(kit: BrandKit): string[] {
     lines.push(`${indent(3)}weight: ${step.weight}`);
     lines.push(`${indent(3)}font: ${step.font}`);
   }
+
+  // Role and step aliases, for the same reason as the flat colors above and
+  // against the same reader.
+  //
+  // impeccable's addTypographyFonts (cli/engine/design-system.mjs) walks the top
+  // level of `typography:` for a role object carrying a string `fontFamily`;
+  // addTypographySizes wants either a flat name -> size string under `scale:` or
+  // a role object carrying `fontSize`. This exporter emits `fonts.<role>.family`
+  // and `scale.<name>.size` — wrong nesting and wrong key on both paths — so
+  // both walks find nothing. Measured 2026-07-26: a generated DESIGN.md parsed
+  // to 19 colors, ZERO fonts and zero type steps.
+  //
+  // That failure is worse than it sounds. Declaring no fonts does not relax the
+  // font check; it makes every font on the rendered page undeclared, so the
+  // check either floods or is switched off — and a switched-off check reads as
+  // a passing one.
+  //
+  // Additive, like the colors: the grouped blocks above stay canonical. Step
+  // aliases are prefixed because a scale step may legitimately be named
+  // `display`, which would collide with the display font role.
+  for (const [role, font] of fonts) {
+    lines.push(`${indent(1)}${role}:`);
+    lines.push(
+      `${indent(2)}fontFamily: ${yamlScalar([font.family, ...font.fallbacks].join(', '))}`,
+    );
+  }
+  for (const step of kit.typography.scale.steps) {
+    lines.push(`${indent(1)}${yamlKey(`step-${step.name}`)}:`);
+    lines.push(`${indent(2)}fontSize: ${yamlScalar(`${step.sizeRem}rem`)}`);
+  }
   lines.push('');
 
   // --- spacing ---
