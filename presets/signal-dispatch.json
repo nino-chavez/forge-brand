@@ -79,8 +79,8 @@
       "letterSpacing": -0.02
     },
     "body": {
-      "family": "Inter",
-      "fallbacks": ["system-ui", "sans-serif"],
+      "family": "Inter Variable",
+      "fallbacks": ["Inter", "system-ui", "sans-serif"],
       "classification": "sans-serif",
       "weights": [400, 500, 600, 700],
       "variable": true,
