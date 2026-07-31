@@ -1,4 +1,8 @@
-# brand-forge
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="Forge Brand carries one approved brand kit into tokens, media, components, and documentation.">
+</p>
+
+# Forge Brand
 
 CLI-first design agency toolkit. One brand kit JSON drives every output — tokens, media, components, docs.
 
