@@ -6,7 +6,7 @@
  *
  * signal-forge VoiceRules shape:
  * {
- *   openingPatterns: { questionFirst, uncomfortableTruth, avoidAcademic[], avoidCasual[] },
+ *   openingPatterns: { defectFirst, questionFirst, uncomfortableTruth, avoidAcademic[], avoidCasual[] },
  *   structuralPatterns: { evolution, compareContrast, provisional, boldHeaders },
  *   tonalElements: { selfInterrogation, culturalTouchstones, technicalDepth, conversational },
  *   avoid: { corporateJargon[], academicDistance[], humbleBragging[], prescriptiveAuthority[] }
@@ -49,6 +49,7 @@ export function exportSignalForgeVoice(kit: BrandKit): string {
 
   const voiceRules = {
     openingPatterns: {
+      defectFirst: structNames.some((n) => n.includes('defect')),
       questionFirst: structNames.some((n) => n.includes('question')),
       uncomfortableTruth: hasAttribute('provocative') || hasAttribute('direct'),
       avoidAcademic: avoidMap.academicDistance.slice(0, 5),
