@@ -565,17 +565,13 @@
       ],
       "openQuestions": [
         {
-          "id": "logotype-typeface",
-          "question": "Which typeface is the production logotype? The traced marks (systems B/C/D) have no recoverable type identity. System A is documented as Avenir Next Heavy converted to paths, chosen because earlier sessions favoured Avenir — but that README calls the production typeface an open design decision, so it is a control to test, not an answer.",
-          "sources": [
-            "apps/flickdaymedia/BRAND-PRIORS.md — 'Wordmark type is OPEN and being redesigned' (2026-07-05)",
-            "concepts/2026-07-modular-wordmark/round-1/README.md — base is Avenir Next Heavy converted to paths; 'The exact production typeface is still a design decision'",
-            "Rejection no-bebas-caps-wordmark records what was ruled out, not what was chosen"
-          ],
+          "id": "play-reel-in-d-peridot",
+          "question": "Reopened 2026-07-27 by nino. Can a play and/or reel icon be embedded in the d of the flickday wordmark now that the typeface is settled? The original embed was rejected (no-filmstrip-letter, error) because a filmstrip forced into a traced letterform collapsed at small sizes and read as a rescue of an earlier artifact. The reopen is justified because the d is now a real, settled Peridot glyph rather than a trace — so the construction gets a fresh test against the ACTUAL counter and the same small-size criterion (must hold at the 15px watermark). If Peridot d cannot carry a legible mark at watermark size, the original rejection stands.",
           "blocks": [
-            "lockup",
-            "production"
-          ]
+            "symbol",
+            "lockup"
+          ],
+          "reopened": true
         }
       ]
     },
@@ -848,6 +844,26 @@
         "severity": "warning",
         "acknowledgement": "required",
         "suggestion": "One metaphor per mark"
+      },
+      {
+        "id": "no-curled-l-foot",
+        "reason": "A lowercase l whose foot curls/hooks toward the following i makes the 'fli' of flickday read as a fragmented 'u'. Verified 2026-07-27 against an isolated large 'li' render of all eight variable candidates (scripts/wordmark-glyph.mjs li).",
+        "class": "judgment",
+        "patterns": [
+          "curl(ed|ing)? l",
+          "looping? l",
+          "tailed l",
+          "l ?foot",
+          "fragmented u"
+        ],
+        "gates": [
+          "wordmark",
+          "lockup"
+        ],
+        "severity": "error",
+        "acknowledgement": "required",
+        "suggestion": "Require a straight, flat-cut l terminal. Pass: Peridot PE, Roc Grotesk, Latino Gothic, Bananas. Fail: Config, Schibsted Grotesk, Next Exit, IvyEpic. Operator-judged against the isolated li render; grotesk vs display is not the tell.",
+        "recorded": "2026-07-27"
       }
     ],
     "candidates": [
@@ -1022,6 +1038,22 @@
           "tags": []
         },
         "status": "candidate"
+      },
+      {
+        "id": "W-PERIDOT",
+        "gate": "wordmark",
+        "round": 4,
+        "descriptor": "Peridot PE 950 lowercase logotype. Heavy geometric display sans, straight flat-cut l-foot (passes no-curled-l-foot), tight even rhythm. Hand kd/ck correction + watermark tracking.",
+        "method": "type-setting",
+        "asset": {
+          "id": "W-PERIDOT",
+          "label": "W-PERIDOT",
+          "path": "/Users/nino/Workspace/dev/apps/flickdaymedia/flickday-assets/wordmarks/mocks-peridot-assets.png",
+          "tags": [
+            "locked"
+          ]
+        },
+        "status": "approved"
       }
     ],
     "ledger": [
@@ -1067,6 +1099,47 @@
         "decidedBy": "nino",
         "reviewed": [],
         "date": "2026-07-22"
+      },
+      {
+        "gate": "wordmark",
+        "decision": "approved",
+        "candidates": [
+          "W-PERIDOT"
+        ],
+        "rationale": "Peridot PE 950 chosen as the production logotype. Survived the l-foot legibility filter (straight flat-cut l — no fragmented-u in \"fli\"), which cut Config and Schibsted; also passed over Roc, Latino, Bananas. Lowercase heavy geometric — courtside, not corporate. Validated against real application: the live index.html header swap plus the full asset system (photo watermark, DTF apparel dark+light, social handle bug/avatar, OG 1200x675, reel 1080x1920).",
+        "decidedBy": "nino",
+        "reviewed": [
+          "no-bebas-caps-wordmark",
+          "no-curled-l-foot"
+        ],
+        "date": "2026-07-27"
+      },
+      {
+        "gate": "lockup",
+        "decision": "approved",
+        "candidates": [
+          "W-PERIDOT"
+        ],
+        "rationale": "Two lockups locked: primary \"flickday\" (wordmark alone) and full \"flickday media\" (wordmark + \"media\" in JetBrains Mono 600, uppercase, ~0.47em tracked, ~0.34x scale, left-aligned beneath). Spec: flickday-assets/wordmarks/WORDMARK.md.",
+        "decidedBy": "nino",
+        "reviewed": [
+          "no-curled-l-foot"
+        ],
+        "date": "2026-07-27"
+      },
+      {
+        "gate": "production",
+        "decision": "approved",
+        "candidates": [
+          "W-PERIDOT"
+        ],
+        "rationale": "Production master locked. Peridot PE 950, two optical cuts (standard kd -0.03/ck +0.01 no track for >=24px; micro kd -0.02/ck +0.008 +0.045em track for <24px), four flat-solid colorways, clearspace 0.62x cap, min 88px/18mm. Single source of truth scripts/wordmark-lib.mjs PERIDOT_CUTS; documented in WORDMARK.md; wired live into index.html header as live Peridot text (kit fju5pyz). Validated against real application (site + asset mocks) and font-pairing audit (no clashes).",
+        "decidedBy": "nino",
+        "reviewed": [
+          "no-bebas-caps-wordmark",
+          "no-curled-l-foot"
+        ],
+        "date": "2026-07-27"
       }
     ]
   }
