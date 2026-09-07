@@ -4,3 +4,5 @@ output/
 *.env
 *.env.local
 .DS_Store
+.playwright-mcp/console-*.log
+.playwright-mcp/page-*.yml
