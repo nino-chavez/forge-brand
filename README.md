@@ -62,6 +62,7 @@ npx tsx src/cli/index.ts export figma --kit brand-kit.json
 npx tsx src/cli/index.ts export signal-forge --kit brand-kit.json
 npx tsx src/cli/index.ts export signal-forge-voice --kit brand-kit.json
 npx tsx src/cli/index.ts export image-gen --kit brand-kit.json
+npx tsx src/cli/index.ts export design-md --kit brand-kit.json   # <id>.DESIGN.md — the brand feed HyperFrames reads (frame.md → design.md → DESIGN.md); rename to DESIGN.md in the project
 
 # All formats at once
 npx tsx src/cli/index.ts export all --kit brand-kit.json
