@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "volley-rx",
     "created": "2024-09-01T00:00:00.000Z",
-    "updated": "2026-03-23T00:00:00.000Z",
+    "updated": "2026-10-12T00:00:00.000Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -21,47 +21,47 @@
   },
   "colors": {
     "primary": {
-      "hex": "#c4923a",
-      "name": "Aged Gold",
-      "usage": "Primary accent, metallic accents, premium elements"
+      "hex": "#9E0FD8",
+      "name": "Purple",
+      "usage": "Primary CTA"
     },
     "secondary": {
-      "hex": "#2dd4bf",
-      "name": "Pharmacy Teal",
-      "usage": "Secondary accent, depth, contrast on dark backgrounds"
+      "hex": "#2648FD",
+      "name": "Electric Blue",
+      "usage": "Secondary accent, format badges"
     },
     "accent": {
-      "hex": "#c4453a",
-      "name": "Rx Red",
-      "usage": "Warnings, alerts, hot-level indicators"
+      "hex": "#FF0082",
+      "name": "Pink",
+      "usage": "Live and urgency badge fill"
     },
     "neutral": {
-      "50": "#fdf8f0",
-      "100": "#f5e6d3",
-      "200": "#e8d5b8",
-      "300": "#d4b896",
-      "400": "#b8956e",
-      "500": "#9a7a55",
-      "600": "#7d6040",
-      "700": "#5a4530",
-      "800": "#3a2d1f",
-      "900": "#1a1a2e",
-      "950": "#0a0a0a"
+      "50": "#F7F8FA",
+      "100": "#EDEEF3",
+      "200": "#DFE0E7",
+      "300": "#C3C5D0",
+      "400": "#9A9CAA",
+      "500": "#696B7A",
+      "600": "#56565F",
+      "700": "#3A3A44",
+      "800": "#22222A",
+      "900": "#111118",
+      "950": "#000000"
     },
     "semantic": {
       "success": { "hex": "#4a7c59", "name": "Pharmacy Green", "usage": "Available, in stock, success" },
       "warning": { "hex": "#c4923a", "name": "Aged Gold", "usage": "Caution, limited availability" },
-      "error": { "hex": "#c4453a", "name": "Rx Red", "usage": "Sold out, critical" },
-      "info": { "hex": "#2dd4bf", "name": "Teal Light", "usage": "Informational, dosage info" }
+      "error": { "hex": "#C4006A", "name": "Rx Red", "usage": "Sold out, critical (--color-rx-red)" },
+      "info": { "hex": "#2648FD", "name": "Electric Blue", "usage": "Informational, dosage info" }
     },
     "surfaces": {
-      "background": "#0a0a0a",
-      "foreground": "#fdf8f0",
-      "card": "#1a1a2e",
-      "cardForeground": "#fdf8f0",
-      "muted": "#1a1a2e",
-      "mutedForeground": "#b8956e",
-      "border": "#3a2d1f"
+      "background": "#F1F2F6",
+      "foreground": "#3A3A44",
+      "card": "#FFFFFF",
+      "cardForeground": "#3A3A44",
+      "muted": "#DFE0E7",
+      "mutedForeground": "#56565F",
+      "border": "#DFE0E7"
     }
   },
   "typography": {
@@ -202,7 +202,7 @@
       }
     ],
     "creative": {
-      "basePrompt": "BRAND: Volley Rx — competitive adult volleyball tournament series, Chicago IL.\nAESTHETIC: 1950s pharmaceutical advertising meets atomic age retro-futurism.\nThink vintage apothecary labels, propaganda posters, Bioshock/Fallout art deco.\n\nKEY VISUAL LANGUAGE:\n- Aged paper textures, halftone dot patterns, sepia warmth\n- Art deco borders, ornamental dividers, starburst rays\n- Brass/gold metallic accents on dark or cream backgrounds\n- Volleyball as the central subject/icon\n- Rx symbol as the brand mark",
+      "basePrompt": "BRAND: Volley Rx — competitive adult volleyball tournament series, Chicago IL.\nAESTHETIC: 1950s pharmaceutical advertising meets atomic age retro-futurism.\nThink vintage apothecary labels, propaganda posters, Bioshock/Fallout art deco.\n\nKEY VISUAL LANGUAGE:\n- Cool gray page #F1F2F6, halftone dot patterns\n- Art deco borders, ornamental dividers, starburst rays\n- Purple #9E0FD8, pink #FF0082, and electric blue #2648FD accents on cool gray #F1F2F6 and white #FFFFFF\n- Volleyball as the central subject/icon\n- Rx symbol as the brand mark",
       "conceptMap": {
         "rx": "pharmacy prescription Rx symbol, vintage apothecary style",
         "prescription": "vintage prescription pad or pharmacy label aesthetic",
@@ -211,7 +211,7 @@
         "atomic": "atomic age starburst, atom symbol, 1950s futurism",
         "propaganda": "bold flat shapes, limited palette, WPA/Soviet poster composition",
         "halftone": "Ben-Day dots pattern, vintage comic/print texture",
-        "gold": "metallic gold/brass texture with realistic reflection and depth",
+        "purple": "purple #9E0FD8 primary CTA",
         "crest": "symmetrical emblem/seal design, heraldic but modern"
       },
       "formatModifiers": {
@@ -221,10 +221,10 @@
         "web": "Standard web resolution. 1200x675px. Landscape format.",
         "print": "High-res CMYK-safe. 300dpi minimum."
       },
-      "visualKeywords": ["retro", "pharmaceutical", "art-deco", "gold", "vintage", "halftone", "propaganda", "atomic"],
-      "avoid": ["text in AI-generated images", "modern minimalism", "flat/corporate design", "bright neon colors", "stock photography"]
+      "visualKeywords": ["retro", "pharmaceutical", "art-deco", "purple", "vintage", "halftone", "propaganda", "atomic"],
+      "avoid": ["text in AI-generated images", "modern minimalism", "flat/corporate design", "stock photography"]
     },
     "assets": []
   },
-  "defaultMode": "dark"
+  "defaultMode": "light"
 }

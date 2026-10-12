@@ -208,8 +208,8 @@ Pre-built brand kits in `presets/`:
 |--------|-------|-------|
 | `flickday.json` | Flickday Media | Dark, yellow accent, Bebas Neue |
 | `630volleyball.json` | 630 Volleyball | Light, red accent, Space Grotesk |
-| `signal-dispatch.json` | Signal Dispatch | Dark, coral accent, Rival Sans |
-| `volley-rx.json` | Volley Rx | Dark, gold accent, Playfair Display |
+| `signal-dispatch.json` | Signal Dispatch | Light, #0d5a93 accent, Inter Variable |
+| `volley-rx.json` | Volley Rx | Light, #9E0FD8 accent, Playfair Display |
 | `letspepper.json` | Let's Pepper | Dark, yellow/green, Bebas Neue |
 
 ## Creating a new preset

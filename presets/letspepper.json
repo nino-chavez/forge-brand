@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "lets-pepper",
     "created": "2024-03-01T00:00:00.000Z",
-    "updated": "2026-03-23T00:00:00.000Z",
+    "updated": "2026-10-12T00:00:00.000Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -91,7 +91,7 @@
     },
     "mono": {
       "family": "Space Mono",
-      "fallbacks": ["Menlo", "monospace"],
+      "fallbacks": ["JetBrains Mono", "monospace"],
       "classification": "monospace",
       "weights": [400, 700],
       "variable": false,
@@ -104,7 +104,7 @@
       "baseSizePx": 16,
       "ratio": "perfect-fourth",
       "steps": [
-        { "name": "hero", "sizeRem": 6, "sizeMobileRem": 3.5, "lineHeight": 0.9, "weight": 400, "font": "display" },
+        { "name": "hero", "sizeRem": 7, "sizeMobileRem": 2.5, "lineHeight": 0.9, "weight": 400, "font": "display" },
         { "name": "h2", "sizeRem": 3.5, "sizeMobileRem": 2.25, "lineHeight": 1.0, "weight": 400, "font": "display" },
         { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.2, "weight": 600, "font": "body" },
         { "name": "body-lg", "sizeRem": 1.125, "sizeMobileRem": 1, "lineHeight": 1.6, "weight": 400, "font": "body" },
