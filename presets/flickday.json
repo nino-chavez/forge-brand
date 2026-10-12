@@ -566,8 +566,9 @@
       "openQuestions": [
         {
           "id": "logotype-typeface",
-          "question": "Which typeface is the production logotype? flickdaymedia locked Peridot PE 950 lowercase on 2026-07-27 and switched the site header to live Peridot text the same day. The 2026-10-09 home rebuild put the traced play-d wordmark back in the header, and that mark's letterforms are not Peridot. BRAND-PRIORS still calls Peridot locked, and it also says the live site is canonical, so the two disagree. This kit records no ledger approval for either. W-PERIDOT is a live wordmark candidate; approving it is nino's call, made with `decide` after looking at every judgment constraint in scope for the wordmark gate.",
+          "question": "Which typeface is the production logotype? nino locked Peridot PE 950 lowercase on 2026-07-27, after checking it against mocks of real assets and a font-pairing audit, and the site header switched to live Peridot text the same day. The 2026-10-09 home rebuild put the traced play-d wordmark back in the header, and that mark's letterforms are not Peridot. BRAND-PRIORS still calls Peridot locked, and it also says the live site is canonical, so the two disagree. This kit records no ledger approval for either. W-PERIDOT is a live wordmark candidate; recording it is nino's call, made with `decide` after looking at every judgment constraint in scope for the wordmark gate.",
           "sources": [
+            "Claude session 43649f57 (cwd ~/Workspace/dev/wip), nino, 2026-07-27 — 'lets lock in peridot. apply this to mocks of our existing assets and website so i can finalize my decision against real application' (23:03 UTC); 'lock it all in. proceed.' (23:18 UTC)",
             "sites/ventures/flickdaymedia/BRAND-PRIORS.md — 'Wordmark type is LOCKED: Peridot PE 950, lowercase (2026-07-27)'; also 'Live site is canonical'",
             "flickdaymedia ed6d37f (2026-07-27) — lock Peridot PE as production wordmark; 'Peridot survived the l-foot legibility rule'",
             "flickdaymedia ee85386 (2026-07-27) — site header switched to live Peridot text",
@@ -582,10 +583,11 @@
         },
         {
           "id": "play-mark-in-d",
-          "question": "Does the primary wordmark carry a play mark inside the d? The 2026-07-22 prior approval says no: the play mark stays an independent secondary symbol, never nested in the wordmark, and the no-filmstrip-letter rejection holds that line at the wordmark and lockup gates. Since then, the 2026-08-24 modular wordmark set names play-d its primary video mark, and the live header has shown a play triangle in the d since 2026-10-09.",
+          "question": "Does the primary wordmark carry a play mark inside the d? The 2026-07-22 prior approval says no: the play mark stays an independent secondary symbol, never nested in the wordmark, and the no-filmstrip-letter rejection holds that line at the wordmark and lockup gates. nino reopened the question on 2026-07-27 to settle the font for the play and reel icons in the d, then set it aside the same evening without deciding it. Since then, the 2026-08-24 modular wordmark set names play-d its primary video mark, and the live header has shown a play triangle in the d since 2026-10-09.",
           "sources": [
             "decisions.constitution.priorApprovals — 'no film reel or filmstrip substituted into the d … never nested inside it (nino, 2026-07-22)'",
             "Rejection no-filmstrip-letter, scoped to the wordmark and lockup gates",
+            "Claude session 43649f57 (cwd ~/Workspace/dev/wip), nino — 'we started this whole thing to settle the font to use for any and all wordmarks across various surfaces. including the play and reel icons embeded in the 'd' of flickday' (2026-07-27 23:28 UTC); 'forget the icon wordmark. lets just get back to other assets using peridot now' (2026-07-28 03:39 UTC, the same Chicago evening)",
             "flickdaymedia 17acce2 (2026-08-24) — flickday-assets/brand/modular-wordmarks/README.md: 'play-d / color — primary video-production and reel mark'; the commit calls itself not reviewed",
             "flickdaymedia 6ff33a2 (2026-10-09) — the live header, wordmark-play-yellow.png, has a play triangle in the bowl of the d"
           ],
