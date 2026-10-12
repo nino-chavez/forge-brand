@@ -999,6 +999,48 @@ describe('pattern matching', () => {
   });
 });
 
+/**
+ * nino ruled on 2026-10-12: no play mark in the d. The constraint sits on the
+ * lockup gate too, which is where the approved arrangement, a play mark
+ * beside the word, gets described, so a pattern that is too loose flags the
+ * ruling's own answer. Two review rounds found both kinds of miss by reading
+ * the regexes; these lists are the cases they named, kept so the next edit
+ * cannot reopen them.
+ */
+describe('flickday no-play-in-d patterns', () => {
+  const rule = baseKit().decisions!.rejections.find((r) => r.id === 'no-play-in-d')!;
+
+  it.each([
+    'flickday wordmark with a play triangle nested inside the bowl of the d',
+    'traced lowercase flickday, play-d variant',
+    'play icon inside the d counter',
+    'reel d variant',
+    'play triangles inside the d',
+    'play icons nested in the d',
+    "play triangle inside the wordmark's d",
+    'play button nested in the lowercase d',
+  ])('flags "%s"', (descriptor) => {
+    expect(violatedPatterns(rule, descriptor).length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    'play mark set beside the wordmark, aligned in the baseline',
+    'play icon in its own tile',
+    'play mark in a tile to the right of the wordmark',
+    'Rounded display face, d terminal',
+    'replay d',
+    'Peridot PE 950 lowercase logotype with a separate play symbol to the right',
+  ])('leaves "%s" alone', (descriptor) => {
+    expect(violatedPatterns(rule, descriptor)).toEqual([]);
+  });
+
+  it("flags none of the kit's own candidates", () => {
+    for (const c of baseKit().decisions!.candidates) {
+      expect(violatedPatterns(rule, c.descriptor), c.id).toEqual([]);
+    }
+  });
+});
+
 describe('reviewBrandKit integration', () => {
   it('a decisions error blocks the whole review', () => {
     const kit = withDecisions({
