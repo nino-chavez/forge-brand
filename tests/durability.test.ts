@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseBrandKit, type BrandKit } from '../src/core/schema/brand-kit.js';
+import { Constitution, OpenQuestion } from '../src/core/schema/decisions.js';
 
 const PRESETS_DIR = path.resolve(__dirname, '../presets');
 
@@ -52,10 +53,24 @@ describe('open questions survive a write cycle', () => {
   });
 
   it('the shipped flickday kit records its open questions in the real field', () => {
-    const c = baseKit().decisions?.constitution;
-    expect(c?.openQuestions.length).toBeGreaterThan(0);
-    for (const q of c!.openQuestions) {
-      expect(q.sources.length, `${q.id} cites no source`).toBeGreaterThan(0);
+    // Reads the raw file, not the parsed kit: parsing strips an unknown key,
+    // so a check after parse cannot see one. A `reopened` key written on
+    // 2026-08-26 sat in the file, meaning nothing, until this was raw.
+    //
+    // It used to require at least one open question. That held only while
+    // something was unsettled; nino answered the last one on 2026-10-12.
+    const raw = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'flickday.json'), 'utf-8'));
+    const c = raw.decisions?.constitution ?? {};
+    const constitutionKeys = Object.keys(Constitution.shape);
+    expect(Object.keys(c).filter((k) => !constitutionKeys.includes(k))).toEqual([]);
+
+    const questionKeys = Object.keys(OpenQuestion.shape);
+    for (const q of c.openQuestions ?? []) {
+      expect(
+        Object.keys(q).filter((k) => !questionKeys.includes(k)),
+        `${q.id} carries a key the schema drops`,
+      ).toEqual([]);
+      expect(q.sources?.length ?? 0, `${q.id} cites no source`).toBeGreaterThan(0);
     }
   });
 
