@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "signal-dispatch",
     "created": "2024-01-01T00:00:00.000Z",
-    "updated": "2026-03-23T00:00:00.000Z",
+    "updated": "2026-10-12T00:00:00.000Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -22,19 +22,19 @@
   },
   "colors": {
     "primary": {
-      "hex": "#e86c5d",
-      "name": "Signal Coral",
-      "usage": "Primary accent, links, emphasis"
+      "hex": "#0d5a93",
+      "name": "Action",
+      "usage": "Links, focus, and article category on publication pages"
     },
     "secondary": {
-      "hex": "#00ced1",
-      "name": "Signal Cyan",
-      "usage": "Secondary accent, highlights, data viz"
+      "hex": "#0d5a93",
+      "name": "Action",
+      "usage": "Same as primary — publication pages use one action color"
     },
     "accent": {
-      "hex": "#e86c5d",
-      "name": "Signal Coral",
-      "usage": "Same as primary — single-accent brand"
+      "hex": "#0d5a93",
+      "name": "Action",
+      "usage": "Same as primary — publication pages use one action color"
     },
     "neutral": {
       "50": "#f9fafb",
@@ -53,30 +53,28 @@
       "success": { "hex": "#22c55e", "name": "Green", "usage": "Positive signals" },
       "warning": { "hex": "#f59e0b", "name": "Amber", "usage": "Caution signals" },
       "error": { "hex": "#ef4444", "name": "Red", "usage": "Critical signals" },
-      "info": { "hex": "#00ced1", "name": "Cyan", "usage": "Informational — matches secondary" }
+      "info": { "hex": "#00ced1", "name": "Cyan", "usage": "Data viz and the presentations surface" }
     },
     "surfaces": {
-      "background": "#0a0a0b",
-      "foreground": "#ffffff",
-      "card": "#1a1a1d",
-      "cardForeground": "#ffffff",
-      "muted": "#121214",
-      "mutedForeground": "#9ca3af",
+      "background": "#f4f0e8",
+      "foreground": "#122a3c",
+      "card": "#fbf8f1",
+      "cardForeground": "#122a3c",
+      "muted": "#e4edf2",
+      "mutedForeground": "#536373",
       "border": "#374151"
     }
   },
   "typography": {
     "display": {
-      "family": "Rival Sans",
-      "fallbacks": ["system-ui", "sans-serif"],
+      "family": "Inter Variable",
+      "fallbacks": ["Inter", "system-ui", "sans-serif"],
       "classification": "sans-serif",
-      "weights": [400, 500, 700],
-      "variable": false,
-      "typekitId": "tjp7ihm",
-      "localPath": "fonts/RivalSans-Regular.ttf",
+      "weights": [400, 500, 700, 760, 800],
+      "variable": true,
       "cssVariable": "--font-display",
       "textTransform": "none",
-      "letterSpacing": -0.02
+      "letterSpacing": -0.03
     },
     "body": {
       "family": "Inter Variable",
@@ -104,8 +102,8 @@
       "baseSizePx": 16,
       "ratio": "major-third",
       "steps": [
-        { "name": "hero", "sizeRem": 3.5, "sizeMobileRem": 2.5, "lineHeight": 1.1, "weight": 700, "font": "display" },
-        { "name": "h2", "sizeRem": 2.25, "sizeMobileRem": 1.75, "lineHeight": 1.2, "weight": 700, "font": "display" },
+        { "name": "hero", "sizeRem": 4.25, "sizeMobileRem": 2.35, "lineHeight": 1, "weight": 800, "font": "display" },
+        { "name": "h2", "sizeRem": 2.25, "sizeMobileRem": 1.75, "lineHeight": 1.2, "weight": 760, "font": "display" },
         { "name": "h3", "sizeRem": 1.5, "sizeMobileRem": 1.25, "lineHeight": 1.3, "weight": 500, "font": "display" },
         { "name": "body-lg", "sizeRem": 1.125, "lineHeight": 1.7, "weight": 400, "font": "body" },
         { "name": "body", "sizeRem": 1, "lineHeight": 1.6, "weight": 400, "font": "body" },
@@ -222,7 +220,7 @@
       }
     ],
     "creative": {
-      "basePrompt": "BRAND: Signal Dispatch — a strategic technology newsletter by Nino Chavez.\nAESTHETIC: Dark, professional, tech-focused. Minimalist with purpose.\n\nVISUAL LANGUAGE:\n- Signal waveforms, circuit-like patterns, geometric nodes\n- Abstract data visualization, flowing lines\n- Network topology patterns, subtle grid systems\n- Near-black backgrounds with coral/cyan accent highlights\n- Clean lines, no ornamental flourishes",
+      "basePrompt": "BRAND: Signal Dispatch — a strategic technology newsletter by Nino Chavez.\nAESTHETIC: Light publication, professional, tech-focused. Minimalist with purpose.\n\nVISUAL LANGUAGE:\n- Signal waveforms, circuit-like patterns, geometric nodes\n- Abstract data visualization, flowing lines\n- Network topology patterns, subtle grid systems\n- Warm paper background #f4f0e8 with action #0d5a93 highlights\n- Clean lines, no ornamental flourishes",
       "conceptMap": {
         "signal": "abstract signal waveform, frequency pattern, data stream",
         "network": "network topology nodes and edges, connected systems",
@@ -234,10 +232,10 @@
         "web": "Standard web resolution. 1200x675px. Landscape format.",
         "banner": "Newsletter banner. 1200x200px. Horizontal strip."
       },
-      "visualKeywords": ["dark", "minimal", "technical", "geometric", "signal", "network"],
+      "visualKeywords": ["light", "minimal", "technical", "geometric", "signal", "network"],
       "avoid": ["text in AI-generated images", "stock photo aesthetics", "bright/cheerful colors", "corporate clip art", "gratuitous gradients"]
     },
     "assets": []
   },
-  "defaultMode": "dark"
+  "defaultMode": "light"
 }
