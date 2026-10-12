@@ -563,23 +563,7 @@
         "Instagram @flickday.media",
         "Prior identity sessions — see decisions.rejections for what they ruled out"
       ],
-      "openQuestions": [
-        {
-          "id": "play-mark-in-d",
-          "question": "Does the primary wordmark carry a play mark inside the d? The 2026-07-22 prior approval says no: the play mark stays an independent secondary symbol, never nested in the wordmark, and the no-filmstrip-letter rejection holds that line at the wordmark and lockup gates. nino reopened the question on 2026-07-27 to settle the font for the play and reel icons in the d, then set it aside the same evening without deciding it. Since then, the 2026-08-24 modular wordmark set names play-d its primary video mark, and the live header has shown a play triangle in the d since 2026-10-09.",
-          "sources": [
-            "decisions.constitution.priorApprovals — 'no film reel or filmstrip substituted into the d … never nested inside it (nino, 2026-07-22)'",
-            "Rejection no-filmstrip-letter, scoped to the wordmark and lockup gates",
-            "Claude session 43649f57 (cwd ~/Workspace/dev/wip), nino — 'we started this whole thing to settle the font to use for any and all wordmarks across various surfaces. including the play and reel icons embeded in the 'd' of flickday' (2026-07-27 23:28 UTC); 'forget the icon wordmark. lets just get back to other assets using peridot now' (2026-07-28 03:39 UTC, the same Chicago evening)",
-            "flickdaymedia 17acce2 (2026-08-24) — flickday-assets/brand/modular-wordmarks/README.md: 'play-d / color — primary video-production and reel mark'; the commit calls itself not reviewed",
-            "flickdaymedia 6ff33a2 (2026-10-09) — the live header, wordmark-play-yellow.png, has a play triangle in the bowl of the d"
-          ],
-          "blocks": [
-            "symbol",
-            "lockup"
-          ]
-        }
-      ]
+      "openQuestions": []
     },
     "gates": [
       {
@@ -870,6 +854,24 @@
         "acknowledgement": "required",
         "suggestion": "Require a straight, flat-cut l terminal. Pass: Peridot PE, Roc Grotesk, Latino Gothic, Bananas. Fail: Config, Schibsted Grotesk, Next Exit, IvyEpic. Operator-judged against the isolated li render; grotesk vs display is not the tell.",
         "recorded": "2026-07-27"
+      },
+      {
+        "id": "no-play-in-d",
+        "reason": "No play mark inside the d of the wordmark. nino ruled on 2026-10-12, answering the play-mark-in-d question and reaffirming the 2026-07-22 prior approval: the play mark is an independent symbol, never nested in the word. The live header had shipped a play triangle in the d from 2026-10-09.",
+        "class": "judgment",
+        "patterns": [
+          "\\bplay (mark|icon|triangle|button|glyph)s?\\b.{0,30}\\b(in|inside|within|nested)\\b.{0,20}(\\bd\\b|bowl|counter)",
+          "\\b(play|reel)s?\\b.{0,12}\\bd\\b",
+          "triangle.{0,30}(bowl|counter)"
+        ],
+        "gates": [
+          "wordmark",
+          "lockup"
+        ],
+        "severity": "error",
+        "acknowledgement": "required",
+        "suggestion": "Set the wordmark plain. Place the play mark beside it as its own symbol.",
+        "recorded": "2026-10-12"
       }
     ],
     "candidates": [
