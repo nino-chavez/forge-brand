@@ -860,8 +860,8 @@
         "reason": "No play mark inside the d of the wordmark. nino ruled on 2026-10-12, answering the play-mark-in-d question and reaffirming the 2026-07-22 prior approval: the play mark is an independent symbol, never nested in the word. The live header had shipped a play triangle in the d from 2026-10-09.",
         "class": "judgment",
         "patterns": [
-          "play (mark|icon|triangle|button|glyph).{0,30}(in|inside|within|nested)",
-          "(play|reel).{0,12}\\bd\\b",
+          "\\bplay (mark|icon|triangle|button|glyph)\\b.{0,30}\\b(in|inside|within|nested)\\b.{0,15}(\\bd\\b|bowl|counter)",
+          "\\b(play|reel)\\b.{0,12}\\bd\\b",
           "triangle.{0,30}(bowl|counter)"
         ],
         "gates": [
