@@ -59,22 +59,34 @@ describe('open questions survive a write cycle', () => {
     }
   });
 
-  it('records no typeface as approved while the typeface question is open', () => {
+  it('records the logotype typeface only through the ledger', () => {
     // The fabrication this catches was "wordmark set in Bebas Neue-class
-    // condensed display type" — nobody approved that, and BRAND-PRIORS says
-    // wordmark type is OPEN.
+    // condensed display type" — nobody approved that, and BRAND-PRIORS said
+    // wordmark type was OPEN.
     //
     // It used to assert that the word "wordmark" never appeared here, which
     // is a keyword standing in for the real property. That misfired the
     // moment a genuine ruling about the wordmark's *construction* was
     // recorded. Approving how the mark is built is not approving what it is
     // set in; test the second thing, since that is the one in dispute.
-    const c = baseKit().decisions?.constitution;
+    //
+    // It was then scoped to the window where the typeface was undecided, and
+    // failed on purpose when nino approved Peridot at the wordmark gate. The
+    // property outlives the window: a typeface is open or decided in the
+    // ledger, and never carried in as prose in priorApprovals.
+    const d = baseKit().decisions;
+    const c = d?.constitution;
     const open = (c?.openQuestions ?? []).some((q) => q.id === 'logotype-typeface');
-    expect(open, 'this test is scoped to the window where the typeface is undecided').toBe(true);
+    const decided = (d?.ledger ?? []).some(
+      (e) => e.gate === 'wordmark' && e.decision === 'approved',
+    );
+    expect(open || decided, 'the typeface is neither an open question nor a ledger decision').toBe(
+      true,
+    );
 
     const approvals = (c?.priorApprovals ?? []).join(' ').toLowerCase();
     const faces = [
+      'peridot',
       'bebas',
       'poppins',
       'montserrat',
@@ -88,7 +100,7 @@ describe('open questions survive a write cycle', () => {
       'manrope',
     ];
     for (const face of faces) {
-      expect(approvals, `"${face}" is recorded as approved while the typeface is open`).not.toContain(
+      expect(approvals, `"${face}" is recorded as a prior approval instead of a ledger decision`).not.toContain(
         face,
       );
     }

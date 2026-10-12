@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "flickday-media",
     "created": "2025-01-15T00:00:00.000Z",
-    "updated": "2026-10-12T15:13:55.375Z",
+    "updated": "2026-10-12T15:42:10.827Z",
     "author": "Nino Chavez",
     "version": "1.0.0"
   },
@@ -565,23 +565,6 @@
       ],
       "openQuestions": [
         {
-          "id": "logotype-typeface",
-          "question": "Which typeface is the production logotype? nino locked Peridot PE 950 lowercase on 2026-07-27, after checking it against mocks of real assets and a font-pairing audit, and the site header switched to live Peridot text the same day. The 2026-10-09 home rebuild put the traced play-d wordmark back in the header, and that mark's letterforms are not Peridot. BRAND-PRIORS still calls Peridot locked, and it also says the live site is canonical, so the two disagree. This kit records no ledger approval for either. W-PERIDOT is a live wordmark candidate; recording it is nino's call, made with `decide` after looking at every judgment constraint in scope for the wordmark gate.",
-          "sources": [
-            "Claude session 43649f57 (cwd ~/Workspace/dev/wip), nino, 2026-07-27 — 'lets lock in peridot. apply this to mocks of our existing assets and website so i can finalize my decision against real application' (23:03 UTC); 'lock it all in. proceed.' (23:18 UTC)",
-            "sites/ventures/flickdaymedia/BRAND-PRIORS.md — 'Wordmark type is LOCKED: Peridot PE 950, lowercase (2026-07-27)'; also 'Live site is canonical'",
-            "flickdaymedia ed6d37f (2026-07-27) — lock Peridot PE as production wordmark; 'Peridot survived the l-foot legibility rule'",
-            "flickdaymedia ee85386 (2026-07-27) — site header switched to live Peridot text",
-            "flickdaymedia 6ff33a2 (2026-10-09) — home rebuild; the site/index.html header is flickday-assets/site/wordmark-play-yellow.png",
-            "flickdaymedia b25701d (2026-07-27) — the wordmark-play marks are potrace traces of image-generated proofs; 'Their letterforms are NOT Peridot'",
-            "forge-brand e91a325 (2026-08-26) — approved W-PERIDOT at wordmark, lockup and production by hand-editing this file; the decisions review rejected all three, so they were removed"
-          ],
-          "blocks": [
-            "lockup",
-            "production"
-          ]
-        },
-        {
           "id": "play-mark-in-d",
           "question": "Does the primary wordmark carry a play mark inside the d? The 2026-07-22 prior approval says no: the play mark stays an independent secondary symbol, never nested in the wordmark, and the no-filmstrip-letter rejection holds that line at the wordmark and lockup gates. nino reopened the question on 2026-07-27 to settle the font for the play and reel icons in the d, then set it aside the same evening without deciding it. Since then, the 2026-08-24 modular wordmark set names play-d its primary video mark, and the live header has shown a play triangle in the d since 2026-10-09.",
           "sources": [
@@ -1068,7 +1051,7 @@
         "round": 4,
         "descriptor": "Peridot PE 950 lowercase logotype. Heavy geometric display sans, straight flat-cut l-foot, tight even rhythm. Hand kd/ck correction + watermark tracking.",
         "method": "type-setting",
-        "status": "candidate"
+        "status": "approved"
       }
     ],
     "ledger": [
@@ -1114,6 +1097,21 @@
         "decidedBy": "nino",
         "reviewed": [],
         "date": "2026-07-22"
+      },
+      {
+        "gate": "wordmark",
+        "decision": "approved",
+        "candidates": [
+          "W-PERIDOT"
+        ],
+        "rationale": "Peridot PE 950, lowercase, is the production logotype. nino locked it on 2026-07-27 after seeing it on mocks of the existing assets and site and auditing it against every other font in use ('lock it all in. proceed.'). It passed the l-foot legibility rule, which removes any l whose foot curls into the i. Reaffirmed on 2026-10-12 ('peridot stands'), after the 2026-10-09 home rebuild had put a traced, non-Peridot play-d mark in the live header.",
+        "decidedBy": "nino",
+        "reviewed": [
+          "no-bebas-caps-wordmark",
+          "no-filmstrip-letter",
+          "no-curled-l-foot"
+        ],
+        "date": "2026-07-27"
       }
     ]
   }
