@@ -51,7 +51,7 @@
     "semantic": {
       "success": { "hex": "#4a7c59", "name": "Pharmacy Green", "usage": "Available, in stock, success" },
       "warning": { "hex": "#c4923a", "name": "Aged Gold", "usage": "Caution, limited availability" },
-      "error": { "hex": "#C4006A", "name": "Rx Red", "usage": "Pink text on light surfaces" },
+      "error": { "hex": "#C4006A", "name": "Rx Red", "usage": "Sold out, critical (--color-rx-red)" },
       "info": { "hex": "#2648FD", "name": "Electric Blue", "usage": "Informational, dosage info" }
     },
     "surfaces": {

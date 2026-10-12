@@ -73,7 +73,7 @@
       "classification": "display",
       "weights": [400],
       "variable": false,
-      "localPath": "src/app/fonts/bebas-neue-latin-400-normal.woff2",
+      "googleFonts": "Bebas+Neue",
       "cssVariable": "--font-display",
       "textTransform": "uppercase",
       "letterSpacing": 0.02
@@ -84,7 +84,7 @@
       "classification": "sans-serif",
       "weights": [400, 500, 600, 700],
       "variable": true,
-      "localPath": "src/app/fonts/inter-latin-wght-normal.woff2",
+      "googleFonts": "Inter:wght@400;500;600;700",
       "cssVariable": "--font-body",
       "textTransform": "none",
       "letterSpacing": 0
@@ -95,7 +95,7 @@
       "classification": "monospace",
       "weights": [400, 700],
       "variable": false,
-      "localPath": "src/app/fonts/space-mono-latin-400-normal.woff2",
+      "googleFonts": "Space+Mono:wght@400;700",
       "cssVariable": "--font-mono",
       "textTransform": "uppercase",
       "letterSpacing": 0.05
