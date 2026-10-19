@@ -1,6 +1,6 @@
 # brand-forge — Domain Glossary
 
-This is the canonical vocabulary for brand-forge. Use these terms exactly. Operational rules and dev commands live in [`CLAUDE.md`](./CLAUDE.md); this file is *just* the language.
+This is the canonical vocabulary for brand-forge. Use these terms exactly. Operational rules and dev commands live in [`AGENTS.md`](./AGENTS.md); this file is *just* the language.
 
 For per-brand glossaries (terms specific to a *particular* brand kit), generate one with:
 ```
