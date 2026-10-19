@@ -104,7 +104,7 @@ graph TB
 - **Context:** AI-generated outputs are non-deterministic and can produce invalid or low-quality results. Production outputs consumed by downstream tools must be deterministic and reliable.
 - **Decision:** Generators (AI-assisted) and exporters (pure functions) are separated into distinct module groups with different rules. Generators propose; review gates validate; exporters transform. Exporters are explicitly forbidden from using AI, network calls, or randomness.
 - **Alternatives Considered:** Single module that generates and exports in one step, generator output used directly without review.
-- **Evidence:** `CLAUDE.md` rule 1: "Exporters are pure functions. No AI, no network, no randomness." Rule 2: "Generators propose. Review gates validate. Humans approve. Then it locks into the schema."
+- **Evidence:** `AGENTS.md` rule 1: "Exporters are pure functions. No AI, no network, no randomness." Rule 2: "Generators propose. Review gates validate. Humans approve. Then it locks into the schema."
 - **Consequences:** The human-in-the-loop approval step (via `@inquirer/prompts` in CLI commands) means generators cannot run unattended. The batch command only runs exporters and media — it does not invoke generators.
 
 ### Decision 3: OpenRouter as Primary AI Provider
